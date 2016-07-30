@@ -113,5 +113,26 @@
       "weight" : "Elves are slender, medium sized creatures"
     }
 
+  },
+  {
+    "name" : "Human"
+  },
+  {
+    "name" : "Gnome"
+  },
+  {
+    "name" : "Halfling"
+  },
+  {
+    "name" : "Half-Orc"
+  },
+  {
+    "name" : "Half-Elf"
+  },
+  {
+    "name" : "Teifling"
+  },
+  {
+    "name" : "Dragonborn"
   }
 ]

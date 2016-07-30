@@ -1,9 +1,10 @@
 import React from 'react';
 import raceData from '../../json/races.json';
 import { DropDown } from '../form-fields/drop-down.js';
+import * as utilities from "../utilities.js";
 
 
-export class DwarfForm extends React.Component {
+export class RaceDetailsForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -34,6 +35,8 @@ export class DwarfForm extends React.Component {
     }
   }
 
+
+
   onChange(e) {
     this.setState({
       selection : e.target.value
@@ -42,8 +45,9 @@ export class DwarfForm extends React.Component {
   }
 
   render() {
-    return  <div>This is the {this.props.race} form
-      <DropDown name="select_subrace" label="Select Subrace" choices={this.getChoices()} onUpdate={this.onChange}/>
+
+
+    return  <div>
 
     </div>
   }

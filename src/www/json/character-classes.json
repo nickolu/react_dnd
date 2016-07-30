@@ -1,27 +1,5 @@
 [
   {
-    "name" : "Template",
-    "id" : "this_template",
-    "hit_dice" : "",
-    "base_stats" : {
-      "hp" : "",
-      "ac" : "",
-      "ac_mods" : []
-    },
-    "proficiencies" : {
-      "armor" : [],
-      "weapons" : [],
-      "saving_throws" : [],
-      "skills" : [],
-      "skill_choices" : []
-    },
-    "starting_equipment" : {
-      "choices" : [[],[]],
-      "given" : []
-    },
-    "feats" : []
-  },
-  {
     "name" : "Barbarian",
     "id" : "barbarian",
     "hit_dice" : "1d12",
@@ -75,5 +53,36 @@
       }
     },
     "feats" : ["bardic_inspiration"]
+  },
+  {"name" : "Cleric"},
+  {"name" : "Druid"},
+  {"name" : "Fighter"},
+  {"name" : "Monk"},
+  {"name" : "Paladin"},
+  {"name" : "Ranger"},
+  {"name" : "Sorcerer"},
+  {"name" : "Warlock"},
+  {"name" : "Wizard"},
+  {
+    "name" : "Template",
+    "id" : "this_template",
+    "hit_dice" : "",
+    "base_stats" : {
+      "hp" : "",
+      "ac" : "",
+      "ac_mods" : []
+    },
+    "proficiencies" : {
+      "armor" : [],
+      "weapons" : [],
+      "saving_throws" : [],
+      "skills" : [],
+      "skill_choices" : []
+    },
+    "starting_equipment" : {
+      "choices" : [[],[]],
+      "given" : []
+    },
+    "feats" : []
   }
 ]

@@ -66,15 +66,15 @@
 
 	var _raceForm = __webpack_require__(166);
 
-	var _classForm = __webpack_require__(169);
+	var _classForm = __webpack_require__(167);
 
-	var _characterBiographyForm = __webpack_require__(170);
+	var _characterBiographyForm = __webpack_require__(168);
 
-	var _backgroundForm = __webpack_require__(172);
+	var _backgroundForm = __webpack_require__(170);
 
-	var _abilityScoresForm = __webpack_require__(173);
+	var _abilityScoresForm = __webpack_require__(171);
 
-	var _characterDetailsForm = __webpack_require__(174);
+	var _characterDetailsForm = __webpack_require__(172);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20397,6 +20397,27 @@
 				"alignment": "",
 				"weight": "Elves are slender, medium sized creatures"
 			}
+		},
+		{
+			"name": "Human"
+		},
+		{
+			"name": "Gnome"
+		},
+		{
+			"name": "Halfling"
+		},
+		{
+			"name": "Half-Orc"
+		},
+		{
+			"name": "Half-Elf"
+		},
+		{
+			"name": "Teifling"
+		},
+		{
+			"name": "Dragonborn"
 		}
 	];
 
@@ -20405,31 +20426,6 @@
 /***/ function(module, exports) {
 
 	module.exports = [
-		{
-			"name": "Template",
-			"id": "this_template",
-			"hit_dice": "",
-			"base_stats": {
-				"hp": "",
-				"ac": "",
-				"ac_mods": []
-			},
-			"proficiencies": {
-				"armor": [],
-				"weapons": [],
-				"saving_throws": [],
-				"skills": [],
-				"skill_choices": []
-			},
-			"starting_equipment": {
-				"choices": [
-					[],
-					[]
-				],
-				"given": []
-			},
-			"feats": []
-		},
 		{
 			"name": "Barbarian",
 			"id": "barbarian",
@@ -20575,6 +20571,58 @@
 			"feats": [
 				"bardic_inspiration"
 			]
+		},
+		{
+			"name": "Cleric"
+		},
+		{
+			"name": "Druid"
+		},
+		{
+			"name": "Fighter"
+		},
+		{
+			"name": "Monk"
+		},
+		{
+			"name": "Paladin"
+		},
+		{
+			"name": "Ranger"
+		},
+		{
+			"name": "Sorcerer"
+		},
+		{
+			"name": "Warlock"
+		},
+		{
+			"name": "Wizard"
+		},
+		{
+			"name": "Template",
+			"id": "this_template",
+			"hit_dice": "",
+			"base_stats": {
+				"hp": "",
+				"ac": "",
+				"ac_mods": []
+			},
+			"proficiencies": {
+				"armor": [],
+				"weapons": [],
+				"saving_throws": [],
+				"skills": [],
+				"skill_choices": []
+			},
+			"starting_equipment": {
+				"choices": [
+					[],
+					[]
+				],
+				"given": []
+			},
+			"feats": []
 		}
 	];
 
@@ -20869,10 +20917,6 @@
 
 	var _dropDown = __webpack_require__(163);
 
-	var _dwarfForm = __webpack_require__(167);
-
-	var _subraceForm = __webpack_require__(168);
-
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -20919,38 +20963,21 @@
 	      return choices;
 	    }
 	  }, {
-	    key: 'getQuestions',
-	    value: function getQuestions() {
-	      var component_name = this.state.race + "Form";
-
-	      switch (this.state.race) {
-	        case "Dwarf":
-	          return;
-	          break;
-	        case "Elf":
-	          return _react2.default.createElement(
-	            'div',
-	            null,
-	            'This is the elf form'
-	          );
-	          break;
-	        default:
-	          return '';
-	      }
-	    }
-	  }, {
 	    key: 'getSubraceForm',
-	    value: function getSubraceForm(race) {
-	      var thisRaceData = utilities.getObjectByName(_races2.default, this.state.race);
+	    value: function getSubraceForm() {
+	      var dropdown;
+	      var thisRaceData = utilities.getObjectByName(_races2.default, this.props.charData.select_race);
+	      var subraces = thisRaceData.subraces;
+	      console.log(thisRaceData);
 
-	      if (thisRaceData.subraces && thisRaceData.subraces.length) {
-	        return _react2.default.createElement(_subraceForm.SubraceForm, { race: this.state.race, onUpdate: this.onChange });
+	      if (thisRaceData && thisRaceData.subraces && thisRaceData.subraces.length) {
+	        return _react2.default.createElement(_dropDown.DropDown, { name: 'select_subrace', label: 'Select Subrace', choices: subraces, onUpdate: this.onChange });
 	      }
-	      return "";
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var thisRaceData = utilities.getObjectByName(_races2.default, this.props.race);
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'form-field race-form' },
@@ -20960,7 +20987,7 @@
 	          'Race'
 	        ),
 	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_race', label: 'Select Race', choices: this.getChoices(), onUpdate: this.onChange }),
-	        this.getSubraceForm(this.state.race)
+	        this.getSubraceForm()
 	      );
 	    }
 	  }]);
@@ -20970,185 +20997,6 @@
 
 /***/ },
 /* 167 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.DwarfForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _dropDown = __webpack_require__(163);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var DwarfForm = exports.DwarfForm = function (_React$Component) {
-	  _inherits(DwarfForm, _React$Component);
-
-	  function DwarfForm(props) {
-	    _classCallCheck(this, DwarfForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DwarfForm).call(this, props));
-
-	    _this.state = {
-	      selection: ''
-	    };
-
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(DwarfForm, [{
-	    key: 'getChoices',
-	    value: function getChoices() {
-	      var thisRaceData = _races2.default.filter(this.filterByName)[0];
-	      var choices = [];
-	      var item = "";
-
-	      for (item in thisRaceData.subraces) {
-	        console.log(thisRaceData.subraces[item]);
-	        choices.push(thisRaceData.subraces[item]);
-	      }
-
-	      return choices;
-	    }
-	  }, {
-	    key: 'filterByName',
-	    value: function filterByName(obj) {
-	      if ('name' in obj) {
-	        if (obj.name === this.props.race) {
-	          return true;
-	        }
-	      }
-	    }
-	  }, {
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.setState({
-	        selection: e.target.value
-	      });
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        'This is the ',
-	        this.props.race,
-	        ' form',
-	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_subrace', label: 'Select Subrace', choices: this.getChoices(), onUpdate: this.onChange })
-	      );
-	    }
-	  }]);
-
-	  return DwarfForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 168 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.SubraceForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _utilities = __webpack_require__(162);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	var _dropDown = __webpack_require__(163);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var SubraceForm = exports.SubraceForm = function (_React$Component) {
-	  _inherits(SubraceForm, _React$Component);
-
-	  function SubraceForm(props) {
-	    _classCallCheck(this, SubraceForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(SubraceForm).call(this, props));
-
-	    _this.state = {
-	      selection: ''
-	    };
-
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(SubraceForm, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.setState({
-	        selection: e.target.value
-	      });
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var thisRaceData = utilities.getObjectByName(_races2.default, this.props.race);
-	      var choices = [];
-
-	      console.log(this.props.race);
-
-	      if (thisRaceData && thisRaceData.subraces) {
-	        choices = thisRaceData.subraces;
-	      }
-
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_subrace', label: 'Select Subrace', choices: choices, onUpdate: this.onChange })
-	      );
-	    }
-	  }]);
-
-	  return SubraceForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21262,7 +21110,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 170 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21278,7 +21126,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _backgrounds = __webpack_require__(171);
+	var _backgrounds = __webpack_require__(169);
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
@@ -21347,7 +21195,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 171 */
+/* 169 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -21356,11 +21204,47 @@
 		},
 		{
 			"name": "Criminal"
+		},
+		{
+			"name": "Folk Hero"
+		},
+		{
+			"name": "Soldier"
+		},
+		{
+			"name": "Fisherman"
+		},
+		{
+			"name": "Gambler"
+		},
+		{
+			"name": "Noble"
+		},
+		{
+			"name": "Miner"
+		},
+		{
+			"name": "Jeweler"
+		},
+		{
+			"name": "Beggar"
+		},
+		{
+			"name": "Statesman"
+		},
+		{
+			"name": "Slave"
+		},
+		{
+			"name": "Slaver"
+		},
+		{
+			"name": "Shephard"
 		}
 	];
 
 /***/ },
-/* 172 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21376,7 +21260,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _backgrounds = __webpack_require__(171);
+	var _backgrounds = __webpack_require__(169);
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
@@ -21480,7 +21364,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 173 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21573,7 +21457,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 174 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21593,7 +21477,7 @@
 
 	var _characterClasses2 = _interopRequireDefault(_characterClasses);
 
-	var _radioGroup = __webpack_require__(175);
+	var _radioGroup = __webpack_require__(173);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21656,7 +21540,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 175 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
