@@ -1,0 +1,79 @@
+[
+  {
+    "name" : "Template",
+    "id" : "this_template",
+    "hit_dice" : "",
+    "base_stats" : {
+      "hp" : "",
+      "ac" : "",
+      "ac_mods" : []
+    },
+    "proficiencies" : {
+      "armor" : [],
+      "weapons" : [],
+      "saving_throws" : [],
+      "skills" : [],
+      "skill_choices" : []
+    },
+    "starting_equipment" : {
+      "choices" : [[],[]],
+      "given" : []
+    },
+    "feats" : []
+  },
+  {
+    "name" : "Barbarian",
+    "id" : "barbarian",
+    "hit_dice" : "1d12",
+    "base_stats" : {
+      "hp" : "12",
+      "ac" : "10",
+      "ac_mods" : ["dex","con"]
+    },
+    "proficiencies" : {
+      "armor" : ["light","medium","shields"],
+      "weapons" : ["simple_weapon","martial_weapon"],
+      "saving_throws" : ["str","con"],
+      "skills" : ["choice","choice"],
+      "skill_choices" : ["animal_handling","athletics","intimidation","nature","perception","survival"]
+    },
+    "starting_equipment" : {
+      "choices" : [["greataxe","martial_weapon"],["handaxes","simple_weapon"]],
+      "given" : ["explorers_pack", "javelins"]
+    },
+    "feats" : [
+      "rage", "unarmored_defense"
+    ]
+  },
+  {
+    "name" : "Bard",
+    "id" : "bard",
+    "hit_dice" : "1d8",
+    "base_stats" : {
+      "hp" : "8",
+      "ac" : "",
+      "ac_mods" : []
+    },
+    "proficiencies" : {
+      "armor" : ["light"],
+      "weapons" : ["simple_weapon","hand_crossbows","longswords","rapiers","shortswords"],
+      "saving_throws" : ["dex","cha"],
+      "skills" : ["choice","choice","choice"],
+      "skill_choices" : ["acrobatics","animal_handling","arcana","athletics","deception","history","insight","intimidation","investigation","medicine","nature","perception","persuasion","religion","sleight_of_hand","stealth","survival"],
+      "tools" : ["any_instrument","any_instrument","any_instrument"]
+    },
+    "starting_equipment" : {
+      "choices" : [["rapier","longsword","simple_weapon"],["diplomats_pack","explorers_pack"],["any_instrument"]],
+      "given" : ["leather_armor","dagger"]
+    },
+    "spells" : {
+      "modifier" : "cha",
+      "save_dc" : 8,
+      "known" : {
+        "lvl00" : 2,
+        "lvl01" : 4
+      }
+    },
+    "feats" : ["bardic_inspiration"]
+  }
+]

@@ -1,0 +1,82 @@
+{
+  "races" : [
+    {
+      "name" : "Dwarf",
+      "ability_score_increase" : {
+        "con" : "2"
+      },
+      "weight" : {
+        "min" : "110",
+        "max" : "210",
+        "unit" : "lbs"
+      },
+      "height" : {
+        "min" : "42",
+        "max" : "66",
+        "unit" : "inches"
+      },
+      "speed" : "25",
+      "features" : [
+        "Darkvision - Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+        "Your speed is not reduced by wearing heavy armor",
+        "Stonecunning - Whenever you make an Intelligence (History) check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check, instead of your normal proficiency bonus."
+      ],
+      "proficiencies" : {
+        "weapons" : ["battleaxe", "handaxe", "light hammer", "warhammer"],
+        "tools" : ["choice"],
+        "tools_choice" : ["mason","smith","brewer"]
+      },
+      "languages" : ["common", "dwarvish"],
+      "subraces" : [
+        {
+          "name" : "Hill Dwarf",
+          "ability_score_increase" : {
+            "wis" : "1"
+          },
+          "stat_bonus" : {
+            "hp" : "1"
+          },
+          "features" : "Your hit point maximum increases by 1 every time you gain a level (in addition to your usual hp increase)."
+        },
+        {
+          "name" : "Mountain Dwarf",
+          "ability_score_increase" : {
+            "str" : "2"
+          },
+          "proficiencies" : {
+            "armor" : ["light, medium"]
+          }
+        }
+      ],
+      "notes" : {
+        "age" : "Dwarves reach adulthood at age 40 and live about 350 years.",
+        "alignment" : "Most dwarves are lawful",
+        "weight" : "Dwarves average about 150 lbs and are medium sized creatures"
+      }
+
+    }
+  ],
+  "classes" : [
+    {
+      "name" : "Barbarian",
+      "hit_dice" : "1d12",
+      "base_stats" : {
+        "hp" : "12"
+      },
+      "proficiencies" : {
+        "armor" : ["light","medium","shields"],
+        "weapons" : ["simple","martial"],
+        "saving_throws" : {
+          "str" : "1",
+          "con" : "1"
+        },
+        "skills" : ["choice","choice"],
+        "skills_choice" : ["Animal Handling", "Athletics", "Intimidation", "Nature", "Perception", "Survival"]
+      },
+      "equipment" : {
+        "primary_weapon" : "choice",
+        "primary_weapon_choice" : ["greataxe", "martial"]
+      },
+      }, "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Sorcerer", "Warlock", "Wizard"],
+
+}

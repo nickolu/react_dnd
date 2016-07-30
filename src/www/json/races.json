@@ -1,0 +1,117 @@
+[
+  {
+    "name" : "Dwarf",
+    "id" : "dwarf",
+    "ability_score_increase" : {
+      "con" : "2"
+    },
+    "speed" : "25",
+    "feats" : [
+      "darkvision", "stonecunning", "dwarven_resiliance", "armor_speed"
+    ],
+    "proficiencies" : {
+      "weapons" : ["battleaxe", "handaxe", "light hammer", "warhammer"],
+      "tools" : ["choice"],
+      "tools_choice" : ["mason","smith","brewer"],
+      "languages" : ["common", "elvish"]
+    },
+    "subraces" : [
+      {
+        "name" : "Hill Dwarf",
+        "id" : "hill_dwarf",
+        "ability_score_increase" : {
+          "wis" : "1"
+        },
+        "stat_bonus" : {
+          "hp" : "1"
+        },
+        "feats" : ["dwarven_toughness"]
+      },
+      {
+        "name" : "Mountain Dwarf",
+        "id" : "mountain_dwarf",
+        "ability_score_increase" : {
+          "str" : "2"
+        },
+        "proficiencies" : {
+          "armor" : ["light, medium"]
+        }
+      }
+    ],
+    "notes" : {
+      "age" : "Dwarves reach adulthood at age 40 and live about 350 years.",
+      "alignment" : "Most dwarves are lawful",
+      "weight" : "Dwarves average about 150 lbs and are medium sized creatures"
+    }
+
+  },
+  {
+    "name" : "Elf",
+    "ability_score_increase" : {
+      "dex" : "2"
+    },
+    "speed" : "30",
+    "feats" : [
+      "darkvision", "fey_ancestry", "trance"
+    ],
+    "proficiencies" : {
+      "skills" : ["perception"],
+      "languages" : ["common", "elvish"]
+    },
+    "subraces" : [
+      {
+        "name" : "High Elf",
+        "id" : "high_elf",
+        "ability_score_increase" : {
+          "int" : "1"
+        },
+        "proficiencies" : {
+          "weapons" : [
+            "longsword", "shortsword", "shortbow", "longbow"
+          ]
+        },
+        "feats" : ["cantrip_wizard", "extra_language"]
+      },
+      {
+        "name" : "Wood Elf",
+        "id" : "wood_elf",
+        "ability_score_increase" : {
+          "wis" : "1"
+        },
+        "stat_bonus" : {
+          "speed" : "5"
+        },
+        "proficiencies" : {
+          "weapons" : [
+            "longsword", "shortsword", "shortbow", "longbow"
+          ]
+        },
+        "feats" : ["mask_of_the_wild"]
+      },
+      {
+        "name" : "Dark Elf",
+        "id" : "dark_elf",
+        "ability_score_increase" : {
+          "cha" : "1"
+        },
+        "stat_bonus" : {
+          "speed" : "5"
+        },
+        "proficiencies" : {
+          "weapons" : [
+            "rapier", "shortsword", "hand_crossbow"
+          ]
+        },
+        "feats" : [
+          "superior_darkvision", "drow_magic"
+        ]
+      }
+    ],
+    "notes" : {
+      "age" : "Elves reach adulthood around age 100 and live about 750 years.",
+      "alignment" : "",
+      "weight" : "Elves are slender, medium sized creatures"
+    }
+
+  }
+]
