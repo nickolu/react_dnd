@@ -6,9 +6,7 @@ body {
 .output-column {
 	position: relative;
 }
-.character-sheet {
-	position: fixed;
-}
+/*.character-sheet { position: fixed; }*/
 
 .as-label {
 	display: inline-block;

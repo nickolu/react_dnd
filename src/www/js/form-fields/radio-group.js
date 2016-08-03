@@ -24,12 +24,12 @@ export class RadioGroup extends React.Component {
 
     return  <div className={this.props.groupName}>
               <h3>{this.props.groupLabel}</h3>
-              {this.props.choices.map(choice => <label key={choice.value}>{choice.name}
+              {this.props.choices.map(choice => <div key={choice.value}><label>
                      <input type="radio" className={this.props.groupName} name={this.props.groupName}
                        value={choice.value}
                        checked={this.state.selection === choice.value}
-                       onClick={this.onChange}  />
-                  </label>
+                       onClick={this.onChange}  /> {choice.name}
+                  </label></div>
               )}
             </div>
   }

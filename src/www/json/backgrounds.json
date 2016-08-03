@@ -1,6 +1,11 @@
 [
   {"name" : "Acolyte"},
-  {"name" : "Criminal"},
+  {
+    "name" : "Criminal",
+    "feats" : [
+      "has a criminal contact"
+    ]
+  },
   {"name" : "Folk Hero"},
   {"name" : "Soldier"},
   {"name" : "Fisherman"},

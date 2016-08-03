@@ -15,115 +15,69 @@ class DndForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: ["hello", "world"],
       charData : {}
     };
-
-    // let someCharData = {
-    //   player_name : document.querySelector('[name=player_name]').value,
-    //   character_name : document.querySelector('[name=character_name]').value,
-    //   character_class : document.querySelector('[name=select_character_class]').value,
-    //   background : document.querySelector('[name=select_background]').value,
-    //   race : document.querySelector('[name=select_race]').value,
-    //   alignment_moral : this.state.charData.alignment_moral,
-    //   alignment_lawful : this.state.charData.alignment_lawful,
-    //   [dataKey] : e.target.value,
-    //   alignment : {},
-    //   experience_points : '',
-    //   stats : {
-    //     proficiency_bonus : '',
-    //     armor_class : '',
-    //     initiative : '',
-    //     speed : '',
-    //     max_hp : '',
-    //     perception : ''
-    //   },
-    //   ability_scores : {
-    //     str : 10,
-    //     dex : 10,
-    //     con : 10,
-    //     int : 10,
-    //     wis : 10,
-    //     cha : 10
-    //   },
-    //   saving_throws : {
-    //     str : 0,
-    //     dex : 0,
-    //     con : 0,
-    //     int : 0,
-    //     wis : 0,
-    //     cha : 0
-    //   },
-    //   skills : {
-    //     acrobatics : 0,
-    //     animal_handling : 0,
-    //     arcana : 0,
-    //     athletics : 0,
-    //     deception : 0,
-    //     history : 0,
-    //     insight : 0,
-    //     intimidation : 0,
-    //     investigation : 0,
-    //     medicine : 0,
-    //     nature : 0,
-    //     perception : 0,
-    //     performance : 0,
-    //     persuasion : 0,
-    //     religion : 0,
-    //     sleight_of_hand : 0,
-    //     stealth : 0,
-    //     survival : 0
-    //   },
-    //   proficiencies : {
-    //     languages : [],
-    //     tools : [],
-    //     weapons : [],
-    //     armor : [],
-    //     other : []
-    //   },
-    //   physical_traits : {
-    //     height : '',
-    //     weight : '',
-    //     age : '',
-    //     eyes : '',
-    //     hair_color : '',
-    //     appearance : ''
-    //   },
-    //   character_backstory : '',
-    //   treasure : '',
-    //   spellcasting : {
-    //     spell_class : '',
-    //     ability : '',
-    //     save_dc : '',
-    //     attack_bonus : '',
-    //     spells : {
-    //       lvl_0 : [],
-    //       lvl_1 : [],
-    //       lvl_2 : [],
-    //       lvl_3 : [],
-    //       lvl_4 : [],
-    //       lvl_5 : [],
-    //       lvl_6 : [],
-    //       lvl_7 : [],
-    //       lvl_8 : [],
-    //       lvl_9 : []
-    //     }
-    //   }
-    // }
 
     this.update = this.update.bind(this);
   }
 
-  update(e) {
+  getAbilityScoreIncrease(e) {
+    let abilityScoreIncreaseIndex = e.target.name.indexOf('ability_score_increase');
+    let abilityScoreIncrease = this.state.charData.ability_score_increase;
+    let abilityScore = "";
+    let abilityScoreValue = 0;
+    let newAbilityScoreIncreases = {};
+    let newCharData = {};
 
-    let newData = Object.assign({},this.state.charData,{[e.target.name]:e.target.value});
+    if (abilityScoreIncreaseIndex > -1) {
+      if (e.target.checked) {
+        abilityScoreValue = e.target.value;
+      }
+      abilityScore = e.target.name.substring("ability_score_increase_".length,e.target.name.length);
+      newAbilityScoreIncreases = Object.assign({},abilityScoreIncrease,{[abilityScore] : abilityScoreValue});
+      newCharData = Object.assign({},this.state.charData,{"ability_score_increase" : newAbilityScoreIncreases});
+    }
+
+    return newCharData;
+  }
+
+  updateSelectedProficiencies(e) {
+    let arrayIndex = 0;
+    this.state.charData[e.target.name] = this.state.charData[e.target.name] || [];
+
+    if (this.state.charData[e.target.name]) {
+      arrayIndex = this.state.charData[e.target.name].indexOf(e.target.value);
+      if (e.target.checked) {
+        this.state.charData[e.target.name].push(e.target.value);
+      } else {
+        if (arrayIndex > -1) {
+          this.state.charData[e.target.name].splice(arrayIndex, 1);
+        }
+      }
+    }
+  }
+
+  update(e) {
+    let newCharData = {};
+
+    if (e.target.name === "select_race") {
+      
+    }
+
+    if (e.target.name.indexOf('ability_score_increase') > -1) {
+      newCharData = this.getAbilityScoreIncrease(e);
+    } else if (e.target.name.indexOf('proficiency_choice') > -1) {
+      this.updateSelectedProficiencies(e);
+    } else {
+      newCharData = Object.assign({},this.state.charData,{[e.target.name]:e.target.value});
+    }
 
     this.setState({
-      charData : newData
+      charData : Object.assign({},this.state.charData,newCharData)
     });
 
-    console.log(newData);
-
+    console.log("charData from index.js");
+    console.log(this.state.charData);
   }
 
 	render() {

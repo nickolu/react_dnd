@@ -31,8 +31,7 @@ export class ClassForm extends React.Component {
   }
 
   getQuestions() {
-    console.log(this.state.character_class);
-
+    
     switch ( this.state.character_class ) {
       case "Barbarian" :
         return <div>This is the barbarian form</div>
