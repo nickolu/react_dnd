@@ -158,9 +158,6 @@
 	      this.setState({
 	        charData: Object.assign({}, this.state.charData, newCharData)
 	      });
-
-	      console.log("charData from index.js");
-	      console.log(this.state.charData);
 	    }
 	  }, {
 	    key: 'render',
@@ -20019,7 +20016,7 @@
 	        base_score[score_names[i]] = this.props.charData['ability_score_' + score_names[i]] || 0;
 	        race_bonus[score_names[i]] = this.getRaceAbilityScoreBonus(score_names[i], this.props.charData.select_race) ? " + " + this.getRaceAbilityScoreBonus(score_names[i], this.props.charData.select_race) : "";
 	        selected_bonus[score_names[i]] = this.getSelectedAbilityScoreBonus(score_names[i]) ? " + " + this.getSelectedAbilityScoreBonus(score_names[i]) : "";
-	        score_breakdown = this.getAbilityScore(score_names[i]) == base_score[score_names[i]] ? "" : " (" + base_score[score_names[i]] + "" + race_bonus[score_names[i]] + ")";
+	        score_breakdown = this.getAbilityScore(score_names[i]) === base_score[score_names[i]] ? "" : " (" + base_score[score_names[i]] + "" + race_bonus[score_names[i]] + "" + selected_bonus[score_names[i]] + ")";
 	        ability_scores[score_names[i]] = this.getAbilityScore(score_names[i]) + score_breakdown;
 	      }
 
@@ -20226,7 +20223,6 @@
 	          }
 	        }
 	      }
-	      console.log(feats);
 
 	      if (uniqueFeats) {
 	        return uniqueFeats.map(function (obj) {
@@ -20390,16 +20386,6 @@
 	          this.getProficiencies('weapons')
 	        ),
 	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Racial Features'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getRacialFeats(this.props.charData.select_race)
-	        ),
-	        _react2.default.createElement(
 	          'h4',
 	          null,
 	          'Languages'
@@ -20408,6 +20394,16 @@
 	          'ul',
 	          null,
 	          this.getProficiencies('languages')
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Racial Features'
+	        ),
+	        _react2.default.createElement(
+	          'ul',
+	          null,
+	          this.getRacialFeats(this.props.charData.select_race)
 	        ),
 	        _react2.default.createElement(
 	          'h2',
@@ -20479,6 +20475,8 @@
 							"longbow"
 						],
 						"languages": [
+							"common",
+							"elvish",
 							"choice"
 						]
 					},
@@ -21201,46 +21199,17 @@
 	  str = str.replace(/The/gi, 'the');
 	  str = str.replace(/In/gi, 'in');
 	  str = str.charAt(0).toUpperCase() + str.slice(1);
+
 	  return str;
 	};
 
 	var getModifier = exports.getModifier = function getModifier(score) {
-
-	  var score_chart = {
-	    0: "",
-	    1: "-5",
-	    2: "-4",
-	    3: "-4",
-	    4: "-3",
-	    5: "-3",
-	    6: "-2",
-	    7: "-2",
-	    8: "-1",
-	    9: "-1",
-	    10: "+0",
-	    11: "+0",
-	    12: "+1",
-	    13: "+1",
-	    14: "+2",
-	    15: "+2",
-	    16: "+3",
-	    17: "+3",
-	    18: "+4",
-	    19: "+4",
-	    20: "+5",
-	    21: "+5",
-	    22: "+6",
-	    23: "+6",
-	    24: "+7",
-	    25: "+7",
-	    26: "+8",
-	    27: "+8",
-	    29: "+9",
-	    29: "+9",
-	    30: "+10"
-	  };
-
-	  return score_chart[score];
+	  var modifier = Math.floor((score - 10) / 2);
+	  var operator = "+";
+	  if (modifier < 0) {
+	    operator = "-";
+	  }
+	  return operator + "" + Math.abs(modifier);
 	};
 
 /***/ },
@@ -21372,7 +21341,6 @@
 	  _createClass(TextInput, [{
 	    key: 'onChange',
 	    value: function onChange(e) {
-	      console.log(this.state.charData[e.target.name]);
 	      this.setState({
 	        // charData : Object.assign({},this.state.charData,{[e.target.name]:e.target.value})
 	        charData: Object.assign({}, this.state.charData, _defineProperty({}, e.target.name, e.target.value)),
@@ -21591,7 +21559,7 @@
 	      var languageChoiceForm = "";
 	      var abilityScoreChoiceForm = "";
 
-	      var abilityScores = [{ label: "Constitution", name: "ability_score_increase_con", "value": 1, "id": "con" }, { label: "Strength", name: "ability_score_increase_str", "value": 1, "id": "str" }, { label: "Dexterity", name: "ability_score_increase_dex", "value": 1, "id": "dex" }, { label: "Wisdom", name: "ability_score_increase_wis", "value": 1, "id": "wis" }, { label: "Intelligence", name: "ability_score_increase_int", "value": 1, "id": "int" }, { label: "Charisma", name: "ability_score_increase_cha", "value": 1, "id": "cha" }];
+	      var abilityScores = [{ label: "Strength", name: "ability_score_increase_str", "value": 1, "id": "str" }, { label: "Constitution", name: "ability_score_increase_con", "value": 1, "id": "con" }, { label: "Dexterity", name: "ability_score_increase_dex", "value": 1, "id": "dex" }, { label: "Wisdom", name: "ability_score_increase_wis", "value": 1, "id": "wis" }, { label: "Intelligence", name: "ability_score_increase_int", "value": 1, "id": "int" }, { label: "Charisma", name: "ability_score_increase_cha", "value": 1, "id": "cha" }];
 
 	      if (thisRaceData) {
 	        if (thisRaceData.languages && thisRaceData.languages.indexOf("choice") > -1) {
@@ -21693,9 +21661,6 @@
 	      var checkedNumber = document.querySelectorAll('.' + this.props.groupName + ':checked').length || 0;
 	      var thisCheckBox = document.querySelector('.' + this.props.groupName + '[data-id=' + id + ']');
 	      optionsLimit = optionsLimit < 1 ? 1 : optionsLimit;
-
-	      console.log('limit: ' + optionsLimit);
-	      console.log('total: ' + checkedNumber);
 
 	      if (thisCheckBox && !thisCheckBox.checked) {
 	        if (checkedNumber >= optionsLimit) {
@@ -22014,7 +21979,6 @@
 	  }, {
 	    key: 'getQuestions',
 	    value: function getQuestions() {
-	      console.log(this.state.background);
 
 	      switch (this.state.background) {
 	        case "Acolyte":
@@ -22118,7 +22082,6 @@
 	  _createClass(AbilityScoresForm, [{
 	    key: 'onChange',
 	    value: function onChange(e) {
-	      console.log(e.target.value);
 	      this.props.onUpdate(e);
 	    }
 	  }, {
@@ -22285,13 +22248,12 @@
 	  _createClass(RadioGroup, [{
 	    key: 'onChange',
 	    value: function onChange(e) {
-	      console.log("alignment: " + e.target.value);
 	      this.setState({
 	        selection: e.target.value
 	      });
 	      e.target.customData = {};
 	      e.target.customData.key = this.props.groupName;
-	      console.log(e.target.customData);
+
 	      this.props.onUpdate(e);
 	    }
 	  }, {

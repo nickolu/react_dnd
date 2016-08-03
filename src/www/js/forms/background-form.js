@@ -31,7 +31,6 @@ export class BackgroundForm extends React.Component {
   }
 
   getQuestions() {
-    console.log(this.state.background);
 
     switch ( this.state.background ) {
       case "Acolyte" :

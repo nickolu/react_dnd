@@ -19,7 +19,6 @@ export class AbilityScoresForm extends React.Component {
   };
 
   onChange(e) {
-    console.log(e.target.value);
     this.props.onUpdate(e);
   }
 

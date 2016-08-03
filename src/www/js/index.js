@@ -61,7 +61,7 @@ class DndForm extends React.Component {
     let newCharData = {};
 
     if (e.target.name === "select_race") {
-      
+
     }
 
     if (e.target.name.indexOf('ability_score_increase') > -1) {
@@ -75,9 +75,6 @@ class DndForm extends React.Component {
     this.setState({
       charData : Object.assign({},this.state.charData,newCharData)
     });
-
-    console.log("charData from index.js");
-    console.log(this.state.charData);
   }
 
 	render() {

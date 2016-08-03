@@ -11,13 +11,12 @@ export class RadioGroup extends React.Component {
   };
 
   onChange(e) {
-    console.log("alignment: "+e.target.value);
     this.setState({
       selection : e.target.value
     });
     e.target.customData = {};
     e.target.customData.key = this.props.groupName;
-    console.log(e.target.customData);
+    
     this.props.onUpdate(e);
   }
   render() {

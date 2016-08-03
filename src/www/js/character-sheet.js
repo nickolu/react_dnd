@@ -126,7 +126,7 @@ export class CharacterSheet extends React.Component {
       base_score[score_names[i]] = this.props.charData['ability_score_'+score_names[i]] || 0;
       race_bonus[score_names[i]] = this.getRaceAbilityScoreBonus(score_names[i],this.props.charData.select_race) ? " + "+this.getRaceAbilityScoreBonus(score_names[i],this.props.charData.select_race) : "";
       selected_bonus[score_names[i]] = this.getSelectedAbilityScoreBonus(score_names[i]) ? " + "+this.getSelectedAbilityScoreBonus(score_names[i]) : "";
-      score_breakdown = this.getAbilityScore(score_names[i]) == base_score[score_names[i]] ? "" : " ("+base_score[score_names[i]] +""+ race_bonus[score_names[i]]+")";
+      score_breakdown = this.getAbilityScore(score_names[i]) === base_score[score_names[i]] ? "" : " ("+base_score[score_names[i]] +""+ race_bonus[score_names[i]]+""+selected_bonus[score_names[i]]+")";
       ability_scores[score_names[i]] = (this.getAbilityScore(score_names[i])) + score_breakdown;
     }
 
@@ -244,7 +244,6 @@ export class CharacterSheet extends React.Component {
         }
       }
     }
-    console.log(feats);
 
     if (uniqueFeats) {
       return uniqueFeats.map(function(obj){
@@ -356,14 +355,14 @@ export class CharacterSheet extends React.Component {
               {this.getProficiencies('weapons')}
             </ul>
 
-            <h2>Racial Features</h2>
-            <ul>
-              {this.getRacialFeats(this.props.charData.select_race)}
-            </ul>
-
             <h4>Languages</h4>
             <ul>
             {this.getProficiencies('languages')}
+            </ul>
+
+            <h2>Racial Features</h2>
+            <ul>
+              {this.getRacialFeats(this.props.charData.select_race)}
             </ul>
 
             <h2>Class Features</h2>

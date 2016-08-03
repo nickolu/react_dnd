@@ -27,7 +27,7 @@
           "weapons" : [
             "longsword", "shortsword", "shortbow", "longbow"
           ],
-          "languages" : ["choice"]
+          "languages" : ["common","elvish","choice"]
         },
         "feats" : ["cantrip_wizard", "extra_language"]
       },

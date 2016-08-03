@@ -23,9 +23,6 @@ export class CheckBoxGroup extends React.Component {
     let thisCheckBox = document.querySelector('.'+this.props.groupName+'[data-id='+id+']');
     optionsLimit = optionsLimit < 1 ? 1 : optionsLimit;
 
-    console.log('limit: '+optionsLimit);
-    console.log('total: '+checkedNumber);
-
     if (thisCheckBox && !thisCheckBox.checked) {
       if (checkedNumber >= optionsLimit) {
         return "disabled";

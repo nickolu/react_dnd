@@ -13,7 +13,6 @@ export class TextInput extends React.Component {
   };
 
   onChange(e) {
-    console.log(this.state.charData[e.target.name])
     this.setState({
       // charData : Object.assign({},this.state.charData,{[e.target.name]:e.target.value})
       charData : Object.assign({},this.state.charData,{[e.target.name]:e.target.value}),

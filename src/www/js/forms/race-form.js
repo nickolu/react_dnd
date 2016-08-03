@@ -102,8 +102,8 @@ export class RaceForm extends React.Component {
     let abilityScoreChoiceForm = "";
 
     let abilityScores = [
-      {label : "Constitution", name : "ability_score_increase_con", "value" : 1, "id" : "con"},
       {label : "Strength", name : "ability_score_increase_str", "value" : 1, "id" : "str"},
+      {label : "Constitution", name : "ability_score_increase_con", "value" : 1, "id" : "con"},
       {label : "Dexterity", name : "ability_score_increase_dex", "value" : 1, "id" : "dex"},
       {label : "Wisdom", name : "ability_score_increase_wis", "value" : 1, "id" : "wis"},
       {label : "Intelligence", name : "ability_score_increase_int", "value" : 1, "id" : "int"},
