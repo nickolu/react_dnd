@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import * as utilities from "./utilities.js";
+import raceData from '../json/races.json';
 import { CharacterSheet } from './character-sheet.js';
 import { DropDown } from './form-fields/drop-down.js';
 import { TextInput } from './form-fields/text-input.js';
@@ -19,6 +21,7 @@ class DndForm extends React.Component {
     };
 
     this.update = this.update.bind(this);
+    this.getRaceDescription = this.getRaceDescription.bind(this);
   }
 
   update(e) {
@@ -73,19 +76,37 @@ class DndForm extends React.Component {
     }
   }
 
+  getRaceDescription(prop) {
+    let selectedRace = "";
+    let thisRaceData = {}
+    let description = "";
 
+    if (this.state.charData && this.state.charData.select_race) {
+      selectedRace = this.state.charData.select_race;
+      thisRaceData = utilities.getObjectByName(raceData, selectedRace);
+
+      if (thisRaceData[prop]) {
+        description = thisRaceData[prop];
+      } else {
+        description = "no "+prop+" data for this race"
+      }
+    }
+
+    return description;
+  }
 
 	render() {
-  	return <div className="container">
+    return <div className="container">
 
             <div className="row">
               <div className="col-sm-6">
+                <h1>Character Creation Form</h1>
                 <TextInput type="text" label="Your Name (Not your Character's Name)" name="player_name" onChange={this.update}/>
                 <TextInput type="text" label="Your Character's Name" name="character_name" onChange={this.update}/>
                 <RaceForm onUpdate={this.update} charData={this.state.charData}/>
                 <ClassForm onUpdate={this.update} />
                 <BackgroundForm onUpdate={this.update} />
-                <CharacterDetailsForm onUpdate={this.update} charData={this.state.charData} />
+                <CharacterDetailsForm onUpdate={this.update} charData={this.state.charData} formDescription={this.getRaceDescription}/>
                 <AbilityScoresForm onUpdate={this.update} />
 
               </div>

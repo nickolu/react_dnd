@@ -178,9 +178,6 @@ export class CharacterSheet extends React.Component {
     let i = 0;
     let l = 0;
 
-    console.log('chardata to sheet:');
-    console.log(this.props.charData);
-
     // get race proficiencies
     if (thisRaceData.proficiencies) {
       proficiencies = Object.assign({},proficiencies,thisRaceData.proficiencies);

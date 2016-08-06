@@ -56,7 +56,15 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _characterSheet = __webpack_require__(159);
+	var _utilities = __webpack_require__(159);
+
+	var utilities = _interopRequireWildcard(_utilities);
+
+	var _races = __webpack_require__(160);
+
+	var _races2 = _interopRequireDefault(_races);
+
+	var _characterSheet = __webpack_require__(161);
 
 	var _dropDown = __webpack_require__(164);
 
@@ -75,6 +83,8 @@
 	var _abilityScoresForm = __webpack_require__(172);
 
 	var _characterDetailsForm = __webpack_require__(173);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -99,6 +109,7 @@
 	    };
 
 	    _this.update = _this.update.bind(_this);
+	    _this.getRaceDescription = _this.getRaceDescription.bind(_this);
 	    return _this;
 	  }
 
@@ -158,6 +169,26 @@
 	      }
 	    }
 	  }, {
+	    key: 'getRaceDescription',
+	    value: function getRaceDescription(prop) {
+	      var selectedRace = "";
+	      var thisRaceData = {};
+	      var description = "";
+
+	      if (this.state.charData && this.state.charData.select_race) {
+	        selectedRace = this.state.charData.select_race;
+	        thisRaceData = utilities.getObjectByName(_races2.default, selectedRace);
+
+	        if (thisRaceData[prop]) {
+	          description = thisRaceData[prop];
+	        } else {
+	          description = "no " + prop + " data for this race";
+	        }
+	      }
+
+	      return description;
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(
@@ -169,12 +200,17 @@
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'col-sm-6' },
+	            _react2.default.createElement(
+	              'h1',
+	              null,
+	              'Character Creation Form'
+	            ),
 	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Name (Not your Character\'s Name)', name: 'player_name', onChange: this.update }),
 	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Character\'s Name', name: 'character_name', onChange: this.update }),
 	            _react2.default.createElement(_raceForm.RaceForm, { onUpdate: this.update, charData: this.state.charData }),
 	            _react2.default.createElement(_classForm.ClassForm, { onUpdate: this.update }),
 	            _react2.default.createElement(_backgroundForm.BackgroundForm, { onUpdate: this.update }),
-	            _react2.default.createElement(_characterDetailsForm.CharacterDetailsForm, { onUpdate: this.update, charData: this.state.charData }),
+	            _react2.default.createElement(_characterDetailsForm.CharacterDetailsForm, { onUpdate: this.update, charData: this.state.charData, formDescription: this.getRaceDescription }),
 	            _react2.default.createElement(_abilityScoresForm.AbilityScoresForm, { onUpdate: this.update })
 	          ),
 	          _react2.default.createElement(
@@ -19802,6 +19838,730 @@
 
 /***/ },
 /* 159 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var getObjectByName = exports.getObjectByName = function getObjectByName(arr, name) {
+	  var i = 0;
+	  for (i in arr) {
+	    if ('name' in arr[i]) {
+	      if (arr[i].name === name) {
+	        return arr[i];
+	      }
+	    }
+	  }
+	  return false;
+	};
+
+	var countItemInArray = exports.countItemInArray = function countItemInArray(arr, item) {
+	  var l = arr.length;
+	  var i = 0;
+	  var count = 0;
+	  var arrSort = arr.sort();
+
+	  for (i = 0; i < l; i += 1) {
+	    if (arrSort[i] === item) {
+	      count += 1;
+	    } else if (count > 0) {
+	      break;
+	    }
+	  }
+
+	  return count;
+	};
+
+	var titleCase = exports.titleCase = function titleCase(str) {
+	  str = str.replace(/_/gi, ' ');
+	  str = str.toLowerCase().split(' ');
+	  for (var i = 0; i < str.length; i++) {
+	    str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+	  }
+	  str = str.join(' ').replace(/Of/gi, 'of');
+	  str = str.replace(/The/gi, 'the');
+	  str = str.replace(/In/gi, 'in');
+	  str = str.charAt(0).toUpperCase() + str.slice(1);
+
+	  return str;
+	};
+
+	var getModifier = exports.getModifier = function getModifier(score) {
+	  var modifier = Math.floor((score - 10) / 2);
+	  var operator = "+";
+	  if (modifier < 0) {
+	    operator = "-";
+	  }
+	  return operator + "" + Math.abs(modifier);
+	};
+
+/***/ },
+/* 160 */
+/***/ function(module, exports) {
+
+	module.exports = [
+		{
+			"name": "Dwarf",
+			"id": "dwarf",
+			"alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+			"age": "Dwarves mature at the same rate as humans, but they’re considered young until they reach the age of 50. On average, they live about 350 years.",
+			"size": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+			"speed": "25",
+			"ability_score_increase": {
+				"con": "2"
+			},
+			"feats": [
+				"darkvision",
+				"stonecunning",
+				"dwarven_resiliance",
+				"armor_speed"
+			],
+			"proficiencies": {
+				"weapons": [
+					"battleaxe",
+					"handaxe",
+					"light hammer",
+					"warhammer"
+				],
+				"tools": [
+					"choice"
+				],
+				"tools_choice": [
+					"mason",
+					"smith",
+					"brewer"
+				],
+				"languages": [
+					"common",
+					"dwarvish"
+				]
+			},
+			"subraces": [
+				{
+					"name": "Hill Dwarf",
+					"id": "hill_dwarf",
+					"ability_score_increase": {
+						"wis": "1"
+					},
+					"stat_bonus": {
+						"hp": "1"
+					},
+					"feats": [
+						"dwarven_toughness"
+					]
+				},
+				{
+					"name": "Mountain Dwarf",
+					"id": "mountain_dwarf",
+					"ability_score_increase": {
+						"str": "2"
+					},
+					"proficiencies": {
+						"armor": [
+							"light, medium"
+						]
+					}
+				}
+			],
+			"notes": {
+				"age": "Dwarves reach adulthood at age 40 and live about 350 years.",
+				"alignment": "Most dwarves are lawful",
+				"weight": "Dwarves average about 150 lbs and are medium sized creatures"
+			}
+		},
+		{
+			"name": "Elf",
+			"speed": "30",
+			"age": "Elves reach adulthood around age 100 and live about 750 years.",
+			"alignment": "Elves love freedom, variety, and self-expression, so they lean strongly toward the gentler aspects of chaos. They value and protect others' freedom as well as their own, and they are more often good than not. The drow are an exception; their exile into the Underdark has made them vicious and dangerous. Drow are more often evil than not.",
+			"size": "Elves are slender, medium sized creatures. Your size is Medium.",
+			"ability_score_increase": {
+				"dex": "2"
+			},
+			"feats": [
+				"darkvision",
+				"fey_ancestry",
+				"trance"
+			],
+			"proficiencies": {
+				"skills": [
+					"perception"
+				],
+				"languages": [
+					"common",
+					"elvish"
+				]
+			},
+			"subraces": [
+				{
+					"name": "High Elf",
+					"id": "high_elf",
+					"ability_score_increase": {
+						"int": "1"
+					},
+					"proficiencies": {
+						"weapons": [
+							"longsword",
+							"shortsword",
+							"shortbow",
+							"longbow"
+						],
+						"languages": [
+							"common",
+							"elvish",
+							"choice"
+						]
+					},
+					"feats": [
+						"cantrip_wizard",
+						"extra_language"
+					]
+				},
+				{
+					"name": "Wood Elf",
+					"id": "wood_elf",
+					"ability_score_increase": {
+						"wis": "1"
+					},
+					"stat_bonus": {
+						"speed": "5"
+					},
+					"proficiencies": {
+						"weapons": [
+							"longsword",
+							"shortsword",
+							"shortbow",
+							"longbow"
+						]
+					},
+					"feats": [
+						"mask_of_the_wild"
+					]
+				},
+				{
+					"name": "Dark Elf",
+					"id": "dark_elf",
+					"ability_score_increase": {
+						"cha": "1"
+					},
+					"stat_bonus": {
+						"speed": "5"
+					},
+					"proficiencies": {
+						"weapons": [
+							"rapier",
+							"shortsword",
+							"hand_crossbow"
+						]
+					},
+					"feats": [
+						"superior_darkvision",
+						"drow_magic"
+					]
+				}
+			]
+		},
+		{
+			"name": "Halfling",
+			"id": "halfling",
+			"age": "A halfing reaches adulthood at the age of 20 and generally lives into the middle of his or her second century.",
+			"alignment": "Most halflings are lawful good. As a rule, they are good-hearted and kind, hate to see others in pain, and have no tolerance for oppression. They are also very orderly and traditional, leaning heavily on the support of their community and the comfort of their old ways",
+			"size": "Halflings average around 3 ft. tall and weigh around 40-45 lbs. Your size is small.",
+			"speed": "25",
+			"ability_score_increase": {
+				"dex": "2"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"halfling"
+				]
+			},
+			"feats": [
+				"lucky",
+				"brave",
+				"halfling_nimbleness"
+			],
+			"subraces": [
+				{
+					"name": "Lightfoot Halfling",
+					"id": "lightfoot_halfling",
+					"ability_score_increase": {
+						"cha": "1"
+					},
+					"feats": [
+						"naturally_stealthy"
+					]
+				},
+				{
+					"name": "Stout Halfling",
+					"id": "stout_halfling",
+					"ability_score_increase": {
+						"con": "1"
+					},
+					"feats": [
+						"stout_resiliance"
+					]
+				}
+			]
+		},
+		{
+			"name": "Human",
+			"id": "human",
+			"age": "Humans reach adulthood in their late teens and live less than a century",
+			"alignment": "Humans tend toward no particular alignment. The best and worst are found among them.",
+			"size": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium.",
+			"speed": "30",
+			"proficiencies": {
+				"languages": [
+					"common",
+					"choice"
+				]
+			},
+			"ability_score_increase": {
+				"con": "1",
+				"str": "1",
+				"dex": "1",
+				"cha": "1",
+				"int": "1",
+				"wis": "1"
+			}
+		},
+		{
+			"name": "Dragonborn",
+			"id": "dragonborn",
+			"age": "Young dragonborn grow quickly. They walk hours after hatching, attain the size and development of a 10-year-old human child by the age of 3, and reach adulthood by 15. They live to be around 80.",
+			"alignment": "Dragonborn tend to extremes, making a conscious choice for one side or the other in the cosmic war between good and evil (represented by Hahumut and Tiamat, respectively). Most dragonborn are good, but those who side with Tiamat can be terrible villains.",
+			"size": "Dragonborn are taller and heavier than humans, standing well over 6 feet tall and averaging almost 250 pounds. Your size is Medium.",
+			"speed": "30",
+			"proficiencies": {
+				"languages": [
+					"common",
+					"draconic"
+				]
+			},
+			"ability_score_increase": {
+				"str": "2",
+				"cha": "1"
+			},
+			"feats": [
+				"draconic_ancestry",
+				"breath_weapon",
+				"draconic_damage_resistance"
+			],
+			"draconic_ancestry": {
+				"black": {
+					"dragon": "Black",
+					"damage_type": "Acid",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				"blue": {
+					"dragon": "Blue",
+					"damage_type": "Lightning",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				"brass": {
+					"dragon": "Brass",
+					"damage_type": "Fire",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				"bronze": {
+					"dragon": "Bronze",
+					"damage_type": "Lightning",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				"copper": {
+					"dragon": "Copper",
+					"damage_type": "Acid",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				"gold": {
+					"dragon": "Gold",
+					"damage_type": "Fire",
+					"breath_weapon": "15 ft. cone (Dex. save)"
+				},
+				"green": {
+					"dragon": "Green",
+					"damage_type": "Poison",
+					"breath_weapon": "15 ft. cone (Con. save)"
+				},
+				"red": {
+					"dragon": "Red",
+					"damage_type": "Fire",
+					"breath_weapon": "15 ft. cone (Dex. save)"
+				},
+				"silver": {
+					"dragon": "Silver",
+					"damage_type": "Cold",
+					"breath_weapon": "15 ft. cone (Con. save)"
+				},
+				"white": {
+					"dragon": "White",
+					"damage_type": "Cold",
+					"breath_weapon": "15 ft. cone (Con. save)"
+				}
+			}
+		},
+		{
+			"name": "Gnome",
+			"id": "gnome",
+			"age": "Gnomes mature at the same rate humans do, and most are expected to settle down into an adult life by around age 40. They can live 350 to almost 500 years.",
+			"alignment": "Gnomes are most often good. Those who tend toward law are sages, engineers, researchers, scholars, investigators, or inventors. Those who tend toward chaos are minstrels, tricksters, wanderers, and fanciful jewelers. Gnomes are good-hearted, and even the tricksters among them are more playful than viscous.",
+			"size": "Gnomes are between 3-4 feet tall and average around 40 lbs. Your size is Small.",
+			"speed": "25",
+			"proficiencies": {
+				"languages": [
+					"common",
+					"gnomish"
+				]
+			},
+			"ability_score_increase": {
+				"int": "2"
+			},
+			"feats": [
+				"darkvision",
+				"gnome_cunning"
+			],
+			"subraces": [
+				{
+					"name": "Forest Gnome",
+					"id": "forest_gnome",
+					"ability_score_increase": {
+						"dex": "1"
+					},
+					"feats": [
+						"natural_illusionist",
+						"speak_with_small_beasts"
+					]
+				},
+				{
+					"name": "Rock Gnome",
+					"id": "rock_gnome",
+					"ability_score_increase": {
+						"con": "1"
+					},
+					"feats": [
+						"artificers_lore",
+						"tinker"
+					],
+					"proficiencies": {
+						"tools": [
+							"tinker"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Half-Elf",
+			"id": "halfelf",
+			"age": "Half-elves mature at the same rate humans do and reach adulthood around the age of 20. They live much longer than humans, however, often exceeding 180 years.",
+			"alignment": "Half-elves share the chaotic bent of their elven heritage. They value both personal freedom and creative expression, demonstrating neither love of leaders nore desire for followers. They chafe at rules, resent others' demands, and sometimes prove unreliable, or at least unpredictable.",
+			"size": "Half-elves are about the same size as humans, ranging from 5-6 feet tall. Your size is Medium.",
+			"speed": "30",
+			"ability_score_increase": {
+				"cha": "2"
+			},
+			"ability_score_choices": "2",
+			"feats": [
+				"darkvision",
+				"fey_ancestry",
+				"skill_versatility"
+			],
+			"proficiencies": {
+				"skills": [
+					"choice",
+					"choice"
+				],
+				"skills_choice": [
+					"acrobatics",
+					"animal_handling",
+					"arcana",
+					"athletics",
+					"deception",
+					"history",
+					"insight",
+					"intimidation",
+					"investigation",
+					"medicine",
+					"nature",
+					"perception",
+					"persuasion",
+					"religion",
+					"sleight_of_hand",
+					"stealth",
+					"survival"
+				],
+				"languages": [
+					"common",
+					"elvish",
+					"choice"
+				]
+			}
+		},
+		{
+			"name": "Half-Orc",
+			"id": "halforc",
+			"age": "Half-orcs mature a little faster than humans, reaching adulthood around age 14. They age noticeably faster and rarely live longer than 75 years.",
+			"alignment": "Half-orcs inherit a tendency toward chaos from their orc parents and are not strongly inclined toward good. Half-orcs raised among orcs are willing to live out their lives among them are usually evil.",
+			"size": "Half-orcs are somewhat larger and bulkier than humans, and they range from 5 to well over 6 feet tall. Your size is Medium.",
+			"speed": "30",
+			"ability_score_increase": {
+				"con": "1",
+				"str": "2"
+			},
+			"feats": [
+				"menacing",
+				"relentless_endurance",
+				"savage_attacks"
+			],
+			"proficiencies": {
+				"skills": [
+					"indimidation"
+				],
+				"languages": [
+					"common",
+					"orc"
+				]
+			}
+		},
+		{
+			"name": "Tiefling",
+			"id": "tiefling",
+			"age": "Tieflings mature at the same rate as humans but live a few years longer.",
+			"alignment": "Tieflings might not have an innate tendency toward evil, but many of them end up there. Evil or not, an independent nature inclines many tieflings toward a chaotic alignment.",
+			"size": "Tieflings are about he same size and build as humans. Your size is Medium.",
+			"speed": "30",
+			"proficiencies": {
+				"languages": [
+					"common",
+					"infernal"
+				]
+			},
+			"ability_score_increase": {
+				"cha": "2",
+				"int": "1"
+			},
+			"feats": [
+				"hellish_resistance",
+				"infernal_legacy",
+				"darkvision"
+			]
+		},
+		{
+			"name": "Kor",
+			"id": "kor",
+			"age": "Kor mature at the same rate as humans and live about as long.",
+			"alignment": "Most kor are lawful good, with a strong dedication to community and the traditions of their ancestors.",
+			"size": "Kor average nearly 6 feet tall, but are much lighter and more slender than humans. Your size is Medium.",
+			"speed": "30",
+			"proficiencies": {
+				"languages": [
+					"common",
+					"kor"
+				],
+				"skills": [
+					"athletics",
+					"acrobatics"
+				]
+			},
+			"ability_score_increase": {
+				"dex": "2",
+				"wis": "1"
+			},
+			"feats": [
+				"lucky",
+				"brave",
+				"kor_climbing"
+			]
+		},
+		{
+			"name": "Merfolk",
+			"id": "merfolk",
+			"age": "Merfolk mature at the same rate humans do and reach adulthood around the age of 20. They live considerably longer than humans, though, often reaching well over 100 years.",
+			"alignment": "Most merfolk are neutral, though merfolk of the Emeria and Cosi creeds have chaotic leanings.",
+			"size": "Merfolk are about the same size and build as humans. Your size is Medium.",
+			"speed": "30",
+			"ability_score_increase": {
+				"cha": "1"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"merfolk",
+					"choice"
+				],
+				"skills": [
+					"athletics",
+					"acrobatics"
+				]
+			},
+			"subraces": [
+				{
+					"name": "Emeria (Wind) Merfolk",
+					"id": "emeria_merfolk",
+					"ability_score_increase": {
+						"wis": "2"
+					},
+					"proficiencies": {
+						"skills": [
+							"deception",
+							"persuasion"
+						]
+					},
+					"feats": [
+						"druid_cantrip"
+					]
+				},
+				{
+					"name": "Ula (Water) Merfolk",
+					"id": "ula_merfolk",
+					"ability_score_increase": {
+						"int": "2"
+					},
+					"proficiencies": {
+						"tools": [
+							"navigator"
+						],
+						"skills": [
+							"survival"
+						]
+					},
+					"feats": [
+						"wizard_cantrip"
+					]
+				},
+				{
+					"name": "Cosi (Trickster) Merfolk",
+					"id": "cosi_merfolk",
+					"ability_score_increase": {
+						"cha": "1",
+						"int": "1"
+					},
+					"proficiencies": {
+						"skills": [
+							"sleight_of_hand",
+							"stealth"
+						]
+					},
+					"feats": [
+						"bard_cantrip"
+					]
+				}
+			],
+			"feats": [
+				"amphibeous"
+			]
+		},
+		{
+			"name": "Vampire",
+			"id": "vampire",
+			"age": "Vampires don’t mature and age in the same way that other races do. Every living vampire is either a bloodchief, infected by Ulamog’s influence in the distant reaches of history, or was spawned by a bloodchief from a living human. Most vampires are thus very old, but few have any memory of their earliest years.",
+			"alignment": "Vampires have no innate tendency toward evil, but consuming the life energy of other creatures often pushes them to that end. Regardless of their moral bent, the strict hierarchies of their bloodchiefs inclines them toward a lawful alignment.",
+			"size": "Vampires are about the same size and build as humans. Your size is Medium.",
+			"speed": "30",
+			"ability_score_increase": {
+				"cha": "1"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"vampire"
+				]
+			},
+			"feats": [
+				"darkvision",
+				"vampiric_resistance",
+				"blood_thirst"
+			]
+		},
+		{
+			"name": "Goblin",
+			"id": "goblin",
+			"age": "Goblins mature faster than humans, reaching adulthood at around age 12. They also age noticeably faster than humans, and even the most cautious goblins rarely live longer than 50 years.",
+			"alignment": "Most goblins are wildly chaotic, though they have no particular inclination toward good or evil.",
+			"size": " Goblins average about 3 feet tall and weigh about 40 pounds. Your size is Small",
+			"speed": "25",
+			"ability_score_increase": {
+				"con": "2"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"goblin"
+				]
+			},
+			"feats": [
+				"darkvision",
+				"grit"
+			],
+			"subraces": [
+				{
+					"name": "Grotag Tribe Goblin",
+					"id": "grotag_goblin",
+					"proficiencies": {
+						"skills": [
+							"animal_handling"
+						]
+					}
+				},
+				{
+					"name": "Lavastep Tribe Goblin",
+					"id": "lavastep_goblin",
+					"feats": [
+						"lavastep_grit"
+					]
+				},
+				{
+					"name": "Tuktuk Tribe Goblin",
+					"id": "tuktuk_merfolk",
+					"proficiencies": {
+						"tools": [
+							"thief"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Moogle",
+			"id": "moogle",
+			"age": "Moogles reach adulthood within a few months, but can live for hundreds of years.",
+			"alignment": "Moogles tend to be either Neutral or Good. Moogles usually have their own agenda, but they do follow rules of their trade and strive to get things done by their due date. Moogles can be ethier Chaotic or Lawful.",
+			"size": " Moogles average about 3 feet tall and weigh about 40 pounds. Your size is Small",
+			"speed": "25",
+			"ability_score_increase": {
+				"cha": "2",
+				"wis": "1"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"moogle"
+				],
+				"weapons": [
+					"polearms",
+					"spears"
+				],
+				"tools": [
+					"choice"
+				],
+				"tools_choice": [],
+				"armor": [
+					"shields"
+				]
+			},
+			"feats": [
+				"darkvision",
+				"moogle_wings"
+			]
+		}
+	];
+
+/***/ },
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19821,15 +20581,15 @@
 
 	var _races2 = _interopRequireDefault(_races);
 
-	var _characterClasses = __webpack_require__(161);
+	var _characterClasses = __webpack_require__(162);
 
 	var _characterClasses2 = _interopRequireDefault(_characterClasses);
 
-	var _backgrounds = __webpack_require__(162);
+	var _backgrounds = __webpack_require__(163);
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
-	var _utilities = __webpack_require__(163);
+	var _utilities = __webpack_require__(159);
 
 	var utilities = _interopRequireWildcard(_utilities);
 
@@ -20147,9 +20907,6 @@
 	      var i = 0;
 	      var l = 0;
 
-	      console.log('chardata to sheet:');
-	      console.log(this.props.charData);
-
 	      // get race proficiencies
 	      if (thisRaceData.proficiencies) {
 	        proficiencies = Object.assign({}, proficiencies, thisRaceData.proficiencies);
@@ -20449,665 +21206,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 160 */
-/***/ function(module, exports) {
-
-	module.exports = [
-		{
-			"name": "Dwarf",
-			"id": "dwarf",
-			"ability_score_increase": {
-				"con": "2"
-			},
-			"speed": "25",
-			"feats": [
-				"darkvision",
-				"stonecunning",
-				"dwarven_resiliance",
-				"armor_speed"
-			],
-			"proficiencies": {
-				"weapons": [
-					"battleaxe",
-					"handaxe",
-					"light hammer",
-					"warhammer"
-				],
-				"tools": [
-					"choice"
-				],
-				"tools_choice": [
-					"mason",
-					"smith",
-					"brewer"
-				],
-				"languages": [
-					"common",
-					"dwarvish"
-				]
-			},
-			"subraces": [
-				{
-					"name": "Hill Dwarf",
-					"id": "hill_dwarf",
-					"ability_score_increase": {
-						"wis": "1"
-					},
-					"stat_bonus": {
-						"hp": "1"
-					},
-					"feats": [
-						"dwarven_toughness"
-					]
-				},
-				{
-					"name": "Mountain Dwarf",
-					"id": "mountain_dwarf",
-					"ability_score_increase": {
-						"str": "2"
-					},
-					"proficiencies": {
-						"armor": [
-							"light, medium"
-						]
-					}
-				}
-			],
-			"notes": {
-				"age": "Dwarves reach adulthood at age 40 and live about 350 years.",
-				"alignment": "Most dwarves are lawful",
-				"weight": "Dwarves average about 150 lbs and are medium sized creatures"
-			}
-		},
-		{
-			"name": "Elf",
-			"speed": "30",
-			"age": "Elves reach adulthood around age 100 and live about 750 years.",
-			"alignment": "",
-			"size": "Elves are slender, medium sized creatures. Your size is Medium.",
-			"ability_score_increase": {
-				"dex": "2"
-			},
-			"feats": [
-				"darkvision",
-				"fey_ancestry",
-				"trance"
-			],
-			"proficiencies": {
-				"skills": [
-					"perception"
-				],
-				"languages": [
-					"common",
-					"elvish"
-				]
-			},
-			"subraces": [
-				{
-					"name": "High Elf",
-					"id": "high_elf",
-					"ability_score_increase": {
-						"int": "1"
-					},
-					"proficiencies": {
-						"weapons": [
-							"longsword",
-							"shortsword",
-							"shortbow",
-							"longbow"
-						],
-						"languages": [
-							"common",
-							"elvish",
-							"choice"
-						]
-					},
-					"feats": [
-						"cantrip_wizard",
-						"extra_language"
-					]
-				},
-				{
-					"name": "Wood Elf",
-					"id": "wood_elf",
-					"ability_score_increase": {
-						"wis": "1"
-					},
-					"stat_bonus": {
-						"speed": "5"
-					},
-					"proficiencies": {
-						"weapons": [
-							"longsword",
-							"shortsword",
-							"shortbow",
-							"longbow"
-						]
-					},
-					"feats": [
-						"mask_of_the_wild"
-					]
-				},
-				{
-					"name": "Dark Elf",
-					"id": "dark_elf",
-					"ability_score_increase": {
-						"cha": "1"
-					},
-					"stat_bonus": {
-						"speed": "5"
-					},
-					"proficiencies": {
-						"weapons": [
-							"rapier",
-							"shortsword",
-							"hand_crossbow"
-						]
-					},
-					"feats": [
-						"superior_darkvision",
-						"drow_magic"
-					]
-				}
-			]
-		},
-		{
-			"name": "Halfling",
-			"id": "halfling",
-			"age": "A halfing reaches adulthood at the age of 20 and generally lives into the middle of his or her second century.",
-			"alignment": "Most halflings are lawful good. As a rule, they are good-hearted and kind, hate to see others in pain, and have no tolerance for oppression. They are also very orderly and traditional, leaning heavily on the support of their community and the comfort of their old ways",
-			"size": "Halflings average around 3 ft. tall and weigh around 40-45 lbs. Your size is small.",
-			"speed": "25",
-			"ability_score_increase": {
-				"dex": "2"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"halfling"
-				]
-			},
-			"feats": [
-				"lucky",
-				"brave",
-				"halfling_nimbleness"
-			],
-			"subraces": [
-				{
-					"name": "Lightfoot Halfling",
-					"id": "lightfoot_halfling",
-					"ability_score_increase": {
-						"cha": "1"
-					},
-					"feats": [
-						"naturally_stealthy"
-					]
-				},
-				{
-					"name": "Stout Halfling",
-					"id": "stout_halfling",
-					"ability_score_increase": {
-						"con": "1"
-					},
-					"feats": [
-						"stout_resiliance"
-					]
-				}
-			]
-		},
-		{
-			"name": "Human",
-			"id": "human",
-			"age": "Humans reach adulthood in their late teens and live less than a century",
-			"alignment": "Humans tend toward no particular alignment. The best and worst are found among them.",
-			"size": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"choice"
-				]
-			},
-			"ability_score_increase": {
-				"con": "1",
-				"str": "1",
-				"dex": "1",
-				"cha": "1",
-				"int": "1",
-				"wis": "1"
-			}
-		},
-		{
-			"name": "Dragonborn",
-			"id": "dragonborn",
-			"age": "Young dragonborn grow quickly. They walk hours after hatching, attain the size and development of a 10-year-old human child by th eage of 3, and reach adulthood by 15. They live to be around 80.",
-			"alignment": "Dragonborn tend to extremes , making a conscious choice for one side or the other in the cosmic war between good and evil (represented by Hahumut and Tiamat, respectively). Most dragonborn are good, but those who side with Tiamat can be terrible villains.",
-			"size": "Dragonborn are taller and heavier than humans, standing well over 6 feet tall and averaging almost 250 pounds. Your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"draconic"
-				]
-			},
-			"ability_score_increase": {
-				"str": "2",
-				"cha": "1"
-			},
-			"feats": [
-				"draconic_ancestry",
-				"breath_weapon",
-				"draconic_damage_resistance"
-			],
-			"draconic_ancestry": {
-				"black": {
-					"dragon": "Black",
-					"damage_type": "Acid",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				"blue": {
-					"dragon": "Blue",
-					"damage_type": "Lightning",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				"brass": {
-					"dragon": "Brass",
-					"damage_type": "Fire",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				"bronze": {
-					"dragon": "Bronze",
-					"damage_type": "Lightning",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				"copper": {
-					"dragon": "Copper",
-					"damage_type": "Acid",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				"gold": {
-					"dragon": "Gold",
-					"damage_type": "Fire",
-					"breath_weapon": "15 ft. cone (Dex. save)"
-				},
-				"green": {
-					"dragon": "Green",
-					"damage_type": "Poison",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				},
-				"red": {
-					"dragon": "Red",
-					"damage_type": "Fire",
-					"breath_weapon": "15 ft. cone (Dex. save)"
-				},
-				"silver": {
-					"dragon": "Silver",
-					"damage_type": "Cold",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				},
-				"white": {
-					"dragon": "White",
-					"damage_type": "Cold",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				}
-			}
-		},
-		{
-			"name": "Gnome",
-			"id": "gnome",
-			"age": "Gnomes mature at the same rate humans do, and most are expected to settle donw into an adult life by around age 40. They can live 350 to almost 500 years.",
-			"alignment": "Gnomes are most often good. Those who tend toward law are sages, engineers, researchers, scholars, investigators, or inventors. Those who tend toward chaos are minstrels, tricksters, wanderers, and fanciful jewelers. Gnomesa re good-hearted, and event he tricksters among them are more playful than viscous.",
-			"size": "Gnomes are between 3-4 feet tall and average around 40 lbs. Your size is Small.",
-			"speed": "25",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"gnomish"
-				]
-			},
-			"ability_score_increase": {
-				"int": "2"
-			},
-			"feats": [
-				"darkvision",
-				"gnome_cunning"
-			],
-			"subraces": [
-				{
-					"name": "Forest Gnome",
-					"id": "forest_gnome",
-					"ability_score_increase": {
-						"dex": "1"
-					},
-					"feats": [
-						"natural_illusionist",
-						"speak_with_small_beasts"
-					]
-				},
-				{
-					"name": "Rock Gnome",
-					"id": "rock_gnome",
-					"ability_score_increase": {
-						"con": "1"
-					},
-					"feats": [
-						"artificers_lore",
-						"tinker"
-					],
-					"proficiencies": {
-						"tools": [
-							"tinker"
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "Half-Elf",
-			"id": "halfelf",
-			"age": "Half-elves mature at the same rate humans do and reach adulthood around the age of 20. They live much longer than humans, however, often exceeding 180 years.",
-			"alignment": "Half-elves share the chaotic bet of their elven heritage. They value both personal freedom and creative expression, demonstrating neither love of leaders nore desire for followers. They chafe at rules, resent others' demands, and sometimes prove unreliable, or at least unpredictable.",
-			"size": "Half-elves are about the same size as humans, ranging from 5-6 feet tall. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"cha": "2"
-			},
-			"ability_score_choices": "2",
-			"feats": [
-				"darkvision",
-				"fey_ancestry",
-				"skill_versatility"
-			],
-			"proficiencies": {
-				"skills": [
-					"choice",
-					"choice"
-				],
-				"skills_choice": [
-					"acrobatics",
-					"animal_handling",
-					"arcana",
-					"athletics",
-					"deception",
-					"history",
-					"insight",
-					"intimidation",
-					"investigation",
-					"medicine",
-					"nature",
-					"perception",
-					"persuasion",
-					"religion",
-					"sleight_of_hand",
-					"stealth",
-					"survival"
-				],
-				"languages": [
-					"common",
-					"elvish",
-					"choice"
-				]
-			}
-		},
-		{
-			"name": "Half-Orc",
-			"id": "halforc",
-			"age": "Half-orcs mature a little faster than humans, reaching adulthood around age 14. They age noticeable faster and rarely live longer than 75 years.",
-			"alignment": "Half-orcs inherit a tendency toward chaos from their orc parents and are not strongly inclined toward good. Half-orcs raised among orcs and willing to live out their lives among them are usually evil.",
-			"size": "Half-orcs are somewhat larger and bulkier than humans, and they range from 5 to well over 6 feet tall. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"con": "1",
-				"str": "2"
-			},
-			"feats": [
-				"menacing",
-				"relentless_endurance",
-				"savage_attacks"
-			],
-			"proficiencies": {
-				"skills": [
-					"indimidation"
-				],
-				"languages": [
-					"common",
-					"orc"
-				]
-			}
-		},
-		{
-			"name": "Tiefling",
-			"id": "tiefling",
-			"age": "Tieflings mature at the same rate as humans but live a few years longer.",
-			"alignment": "Tieflings might not have an innate tendency toward evil, but many of them end up there. Evil or not, an independent nature inclines many tieflings toward a chaotic alignment.",
-			"size": "Tieflings are about he same size and build as humans. Your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"infernal"
-				]
-			},
-			"ability_score_increase": {
-				"cha": "2",
-				"int": "1"
-			},
-			"feats": [
-				"hellish_resistance",
-				"infernal_legacy",
-				"darkvision"
-			]
-		},
-		{
-			"name": "Kor",
-			"id": "kor",
-			"age": "Kor mature at the same rate as humans and live about as long.",
-			"alignment": "Most kor are lawful good, with a strong dedication to community and the traditions of their ancestors.",
-			"size": "Kor average nearly 6 feet tall, but are much lighter and more slender than humans. Your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"kor"
-				],
-				"skills": [
-					"athletics",
-					"acrobatics"
-				]
-			},
-			"ability_score_increase": {
-				"dex": "2",
-				"wis": "1"
-			},
-			"feats": [
-				"lucky",
-				"brave",
-				"kor_climbing"
-			]
-		},
-		{
-			"name": "Merfolk",
-			"id": "merfolk",
-			"age": "Merfolk mature at the same rate humans do and reach adulthood around the age of 20. They live considerably longer than humans, though, often reaching well over 100 years.",
-			"alignment": "Most merfolk are neutral, though merfolk of the Emeria and Cosi creeds have chaotic leanings.",
-			"size": "Merfolk are about the same size and build as humans. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"cha": "1"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"merfolk",
-					"choice"
-				],
-				"skills": [
-					"athletics",
-					"acrobatics"
-				]
-			},
-			"subraces": [
-				{
-					"name": "Emeria (Wind) Merfolk",
-					"id": "emeria_merfolk",
-					"ability_score_increase": {
-						"wis": "2"
-					},
-					"proficiencies": {
-						"skills": [
-							"deception",
-							"persuasion"
-						]
-					},
-					"feats": [
-						"druid_cantrip"
-					]
-				},
-				{
-					"name": "Ula (Water) Merfolk",
-					"id": "ula_merfolk",
-					"ability_score_increase": {
-						"int": "2"
-					},
-					"proficiencies": {
-						"tools": [
-							"navigator"
-						],
-						"skills": [
-							"survival"
-						]
-					},
-					"feats": [
-						"wizard_cantrip"
-					]
-				},
-				{
-					"name": "Cosi (Trickster) Merfolk",
-					"id": "cosi_merfolk",
-					"ability_score_increase": {
-						"cha": "1",
-						"int": "1"
-					},
-					"proficiencies": {
-						"skills": [
-							"sleight_of_hand",
-							"stealth"
-						]
-					},
-					"feats": [
-						"bard_cantrip"
-					]
-				}
-			],
-			"feats": [
-				"amphibeous",
-				"brave",
-				"kor_climbing"
-			]
-		},
-		{
-			"name": "Vampire",
-			"id": "vampire",
-			"age": "Vampires don’t mature and age in the same way that other races do. Every living vampire is either a bloodchief, infected by Ulamog’s influence in the distant reaches of history, or was spawned by a bloodchief from a living human. Most vampires are thus very old, but few have any memory of their earliest years.",
-			"alignment": "Vampires have no innate tendency toward evil, but consuming the life energy of other creatures often pushes them to that end. Regardless of their moral bent, the strict hierarchies of their bloodchiefs inclines them toward a lawful alignment.",
-			"size": "Vampires are about the same size and build as humans. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"cha": "1"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"vampire"
-				]
-			},
-			"feats": [
-				"darkvision",
-				"vampiric_resistance",
-				"blood_thirst"
-			]
-		},
-		{
-			"name": "Goblin",
-			"id": "goblin",
-			"age": "Goblins mature faster than humans, reaching adulthood at around age 12. They also age noticeably faster than humans, and even the most cautious goblins rarely live longer than 50 years.",
-			"alignment": "Most goblins are wildly chaotic, though they have no particular inclination toward good or evil.",
-			"size": " Goblins average about 3 feet tall and weigh about 40 pounds. Your size is Small",
-			"speed": "25",
-			"ability_score_increase": {
-				"con": "2"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"goblin"
-				]
-			},
-			"feats": [
-				"darkvision",
-				"grit"
-			],
-			"subraces": [
-				{
-					"name": "Grotag Tribe Goblin",
-					"id": "grotag_goblin",
-					"proficiencies": {
-						"skills": [
-							"animal_handling"
-						]
-					}
-				},
-				{
-					"name": "Lavastep Tribe Goblin",
-					"id": "lavastep_goblin",
-					"feats": [
-						"lavastep_grit"
-					]
-				},
-				{
-					"name": "Tuktuk Tribe Goblin",
-					"id": "tuktuk_merfolk",
-					"proficiencies": {
-						"tools": [
-							"thief"
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "Moogle",
-			"id": "moogle",
-			"age": "Moogles reach adulthood within a few months, but can live for hundreds of years.",
-			"alignment": "Moogles are always good with a tendency toward chaos.",
-			"size": " Moogles average about 3 feet tall and weigh about 40 pounds. Your size is Small",
-			"speed": "25",
-			"ability_score_increase": {
-				"cha": "2",
-				"wis": "1"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"moogle"
-				],
-				"weapons": [
-					"polearms",
-					"spears"
-				],
-				"armor": [
-					"shields"
-				]
-			},
-			"feats": [
-				"darkvision",
-				"moogle_wings"
-			]
-		}
-	];
-
-/***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -21388,7 +21487,7 @@
 	];
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -21438,67 +21537,6 @@
 			"name": "Shephard"
 		}
 	];
-
-/***/ },
-/* 163 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var getObjectByName = exports.getObjectByName = function getObjectByName(arr, name) {
-	  var i = 0;
-	  for (i in arr) {
-	    if ('name' in arr[i]) {
-	      if (arr[i].name === name) {
-	        return arr[i];
-	      }
-	    }
-	  }
-	  return false;
-	};
-
-	var countItemInArray = exports.countItemInArray = function countItemInArray(arr, item) {
-	  var l = arr.length;
-	  var i = 0;
-	  var count = 0;
-	  var arrSort = arr.sort();
-
-	  for (i = 0; i < l; i += 1) {
-	    if (arrSort[i] === item) {
-	      count += 1;
-	    } else if (count > 0) {
-	      break;
-	    }
-	  }
-
-	  return count;
-	};
-
-	var titleCase = exports.titleCase = function titleCase(str) {
-	  str = str.replace(/_/gi, ' ');
-	  str = str.toLowerCase().split(' ');
-	  for (var i = 0; i < str.length; i++) {
-	    str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
-	  }
-	  str = str.join(' ').replace(/Of/gi, 'of');
-	  str = str.replace(/The/gi, 'the');
-	  str = str.replace(/In/gi, 'in');
-	  str = str.charAt(0).toUpperCase() + str.slice(1);
-
-	  return str;
-	};
-
-	var getModifier = exports.getModifier = function getModifier(score) {
-	  var modifier = Math.floor((score - 10) / 2);
-	  var operator = "+";
-	  if (modifier < 0) {
-	    operator = "-";
-	  }
-	  return operator + "" + Math.abs(modifier);
-	};
 
 /***/ },
 /* 164 */
@@ -21725,7 +21763,7 @@
 
 	var _races2 = _interopRequireDefault(_races);
 
-	var _utilities = __webpack_require__(163);
+	var _utilities = __webpack_require__(159);
 
 	var utilities = _interopRequireWildcard(_utilities);
 
@@ -22073,7 +22111,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _characterClasses = __webpack_require__(161);
+	var _characterClasses = __webpack_require__(162);
 
 	var _characterClasses2 = _interopRequireDefault(_characterClasses);
 
@@ -22186,7 +22224,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _backgrounds = __webpack_require__(162);
+	var _backgrounds = __webpack_require__(163);
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
@@ -22271,7 +22309,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _backgrounds = __webpack_require__(162);
+	var _backgrounds = __webpack_require__(163);
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
@@ -22482,11 +22520,23 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _characterClasses = __webpack_require__(161);
+	var _characterClasses = __webpack_require__(162);
 
 	var _characterClasses2 = _interopRequireDefault(_characterClasses);
 
+	var _races = __webpack_require__(160);
+
+	var _races2 = _interopRequireDefault(_races);
+
+	var _utilities = __webpack_require__(159);
+
+	var utilities = _interopRequireWildcard(_utilities);
+
 	var _radioGroup = __webpack_require__(174);
+
+	var _textInput = __webpack_require__(165);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22537,7 +22587,34 @@
 	        _react2.default.createElement(
 	          'h3',
 	          null,
+	          'Age'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          this.props.formDescription('age')
+	        ),
+	        _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Age', name: 'select_age' }),
+	        _react2.default.createElement(
+	          'h3',
+	          null,
+	          'Size'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          this.props.formDescription('size')
+	        ),
+	        _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Size', name: 'select_size' }),
+	        _react2.default.createElement(
+	          'h3',
+	          null,
 	          'Alignment'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          this.props.formDescription('alignment')
 	        ),
 	        _react2.default.createElement(_radioGroup.RadioGroup, { groupName: 'alignment_lawful', choices: choices_lawful, onUpdate: this.props.onUpdate }),
 	        _react2.default.createElement(_radioGroup.RadioGroup, { groupName: 'alignment_moral', choices: choices_moral, onUpdate: this.props.onUpdate })
