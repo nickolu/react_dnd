@@ -1,5 +1,50 @@
 [
+  {
+      "name" : "Dwarf",
+      "id" : "dwarf",
+      "ability_score_increase" : {
+        "con" : "2"
+      },
+      "speed" : "25",
+      "feats" : [
+        "darkvision", "stonecunning", "dwarven_resiliance", "armor_speed"
+      ],
+      "proficiencies" : {
+        "weapons" : ["battleaxe", "handaxe", "light hammer", "warhammer"],
+        "tools" : ["choice"],
+        "tools_choice" : ["mason","smith","brewer"],
+        "languages" : ["common", "dwarvish"]
+      },
+      "subraces" : [
+        {
+          "name" : "Hill Dwarf",
+          "id" : "hill_dwarf",
+          "ability_score_increase" : {
+            "wis" : "1"
+          },
+          "stat_bonus" : {
+            "hp" : "1"
+          },
+          "feats" : ["dwarven_toughness"]
+        },
+        {
+          "name" : "Mountain Dwarf",
+          "id" : "mountain_dwarf",
+          "ability_score_increase" : {
+            "str" : "2"
+          },
+          "proficiencies" : {
+            "armor" : ["light, medium"]
+          }
+        }
+      ],
+      "notes" : {
+        "age" : "Dwarves reach adulthood at age 40 and live about 350 years.",
+        "alignment" : "Most dwarves are lawful",
+        "weight" : "Dwarves average about 150 lbs and are medium sized creatures"
+      }
 
+    },
   {
     "name" : "Elf",
     "speed" : "30",
@@ -289,5 +334,162 @@
     "feats" : [
       "hellish_resistance","infernal_legacy","darkvision"
     ]
+  },
+  {
+    "name" : "Kor",
+    "id" : "kor",
+    "age" : "Kor mature at the same rate as humans and live about as long.",
+    "alignment" : "Most kor are lawful good, with a strong dedication to community and the traditions of their ancestors.",
+    "size" : "Kor average nearly 6 feet tall, but are much lighter and more slender than humans. Your size is Medium.",
+    "speed" : "30",
+    "proficiencies" : {
+        "languages" : ["common","kor"],
+        "skills" : ["athletics", "acrobatics"]
+    },
+    "ability_score_increase" : {
+      "dex" : "2",
+      "wis" : "1"
+    },
+    "feats" : [
+      "lucky", "brave", "kor_climbing"
+    ]
+  },
+  {
+    "name" : "Merfolk",
+    "id" : "merfolk",
+    "age" : "Merfolk mature at the same rate humans do and reach adulthood around the age of 20. They live considerably longer than humans, though, often reaching well over 100 years.",
+    "alignment" : "Most merfolk are neutral, though merfolk of the Emeria and Cosi creeds have chaotic leanings.",
+    "size" : "Merfolk are about the same size and build as humans. Your size is Medium.",
+    "speed" : "30",
+    "ability_score_increase" : {
+      "cha" : "1"
+    },
+    "proficiencies" : {
+        "languages" : ["common","merfolk","choice"],
+        "skills" : ["athletics", "acrobatics"]
+    },
+    "subraces" : [
+      {
+        "name" : "Emeria (Wind) Merfolk",
+        "id" : "emeria_merfolk",
+        "ability_score_increase" : {
+          "wis" : "2"
+        },
+        "proficiencies" : {
+          "skills" : ["deception","persuasion"]
+        },
+        "feats" : [
+          "druid_cantrip"
+        ]
+      },
+      {
+        "name" : "Ula (Water) Merfolk",
+        "id" : "ula_merfolk",
+        "ability_score_increase" : {
+          "int" : "2"
+        },
+        "proficiencies" : {
+          "tools" : ["navigator"],
+          "skills" : ["survival"]
+        },
+        "feats" : [
+          "wizard_cantrip"
+        ]
+      },
+      {
+        "name" : "Cosi (Trickster) Merfolk",
+        "id" : "cosi_merfolk",
+        "ability_score_increase" : {
+          "cha" : "1",
+          "int" : "1"
+        },
+        "proficiencies" : {
+          "skills" : ["sleight_of_hand","stealth"]
+        },
+        "feats" : [
+          "bard_cantrip"
+        ]
+      }
+    ],
+    "feats" : [
+      "amphibeous", "brave", "kor_climbing"
+    ]
+  },
+  {
+    "name" : "Vampire",
+    "id" : "vampire",
+    "age" : "Vampires don’t mature and age in the same way that other races do. Every living vampire is either a bloodchief, infected by Ulamog’s influence in the distant reaches of history, or was spawned by a bloodchief from a living human. Most vampires are thus very old, but few have any memory of their earliest years.",
+    "alignment" : "Vampires have no innate tendency toward evil, but consuming the life energy of other creatures often pushes them to that end. Regardless of their moral bent, the strict hierarchies of their bloodchiefs inclines them toward a lawful alignment.",
+    "size" : "Vampires are about the same size and build as humans. Your size is Medium.",
+    "speed" : "30",
+    "ability_score_increase" : {
+      "cha" : "1"
+    },
+    "proficiencies" : {
+        "languages" : ["common","vampire"]
+    },
+    "feats" : [
+      "darkvision", "vampiric_resistance", "blood_thirst"
+    ]
+  },
+  {
+    "name" : "Goblin",
+    "id" : "goblin",
+    "age" : "Goblins mature faster than humans, reaching adulthood at around age 12. They also age noticeably faster than humans, and even the most cautious goblins rarely live longer than 50 years.",
+    "alignment" : "Most goblins are wildly chaotic, though they have no particular inclination toward good or evil.",
+    "size" : " Goblins average about 3 feet tall and weigh about 40 pounds. Your size is Small",
+    "speed" : "25",
+    "ability_score_increase" : {
+      "con" : "2"
+    },
+    "proficiencies" : {
+        "languages" : ["common","goblin"]
+    },
+    "feats" : [
+      "darkvision", "grit"
+    ],
+    "subraces" : [
+      {
+        "name" : "Grotag Tribe Goblin",
+        "id" : "grotag_goblin",
+        "proficiencies" : {
+          "skills" : ["animal_handling"]
+        }
+      },
+      {
+        "name" : "Lavastep Tribe Goblin",
+        "id" : "lavastep_goblin",
+        "feats" : ["lavastep_grit"]
+      },
+      {
+        "name" : "Tuktuk Tribe Goblin",
+        "id" : "tuktuk_merfolk",
+        "proficiencies" : {
+          "tools" : ["thief"]
+        }
+      }
+    ]
+  },
+  {
+    "name" : "Moogle",
+    "id" : "moogle",
+    "age" : "Moogles reach adulthood within a few months, but can live for hundreds of years.",
+    "alignment" : "Moogles are always good with a tendency toward chaos.",
+    "size" : " Moogles average about 3 feet tall and weigh about 40 pounds. Your size is Small",
+    "speed" : "25",
+    "ability_score_increase" : {
+      "cha" : "2",
+      "wis" : "1"
+    },
+    "proficiencies" : {
+        "languages" : ["common","moogle"],
+        "weapons" : ["polearms","spears"],
+        "armor" : ["shields"]
+    },
+    "feats" : [
+      "darkvision", "moogle_wings"
+    ]
   }
+
+
 ]

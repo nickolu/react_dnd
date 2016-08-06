@@ -21,6 +21,22 @@ class DndForm extends React.Component {
     this.update = this.update.bind(this);
   }
 
+  update(e) {
+    let newCharData = {};
+
+    if (e.target.name.indexOf('ability_score_increase') > -1) {
+      newCharData = this.getAbilityScoreIncrease(e);
+    } else if (e.target.name.indexOf('proficiency_choice') > -1) {
+      this.updateSelectedProficiencies(e);
+    } else {
+      newCharData = Object.assign({},this.state.charData,{[e.target.name]:e.target.value});
+    }
+
+    this.setState({
+      charData : Object.assign({},this.state.charData,newCharData)
+    });
+  }
+
   getAbilityScoreIncrease(e) {
     let abilityScoreIncreaseIndex = e.target.name.indexOf('ability_score_increase');
     let abilityScoreIncrease = this.state.charData.ability_score_increase;
@@ -57,25 +73,7 @@ class DndForm extends React.Component {
     }
   }
 
-  update(e) {
-    let newCharData = {};
 
-    if (e.target.name === "select_race") {
-
-    }
-
-    if (e.target.name.indexOf('ability_score_increase') > -1) {
-      newCharData = this.getAbilityScoreIncrease(e);
-    } else if (e.target.name.indexOf('proficiency_choice') > -1) {
-      this.updateSelectedProficiencies(e);
-    } else {
-      newCharData = Object.assign({},this.state.charData,{[e.target.name]:e.target.value});
-    }
-
-    this.setState({
-      charData : Object.assign({},this.state.charData,newCharData)
-    });
-  }
 
 	render() {
   	return <div className="container">
@@ -87,7 +85,7 @@ class DndForm extends React.Component {
                 <RaceForm onUpdate={this.update} charData={this.state.charData}/>
                 <ClassForm onUpdate={this.update} />
                 <BackgroundForm onUpdate={this.update} />
-                <CharacterDetailsForm onUpdate={this.update} />
+                <CharacterDetailsForm onUpdate={this.update} charData={this.state.charData} />
                 <AbilityScoresForm onUpdate={this.update} />
 
               </div>

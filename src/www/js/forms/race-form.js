@@ -4,6 +4,7 @@ import * as utilities from "../utilities.js";
 import { DropDown } from '../form-fields/drop-down.js';
 import { TextInput } from '../form-fields/text-input.js';
 import { CheckBoxGroup } from '../form-fields/checkbox-group.js';
+import { SubmitButton } from '../form-fields/submit-button.js';
 
 export class RaceForm extends React.Component {
   constructor(props) {
@@ -11,6 +12,7 @@ export class RaceForm extends React.Component {
 
     this.state = {};
     this.onChange = this.onChange.bind(this);
+    this.submitLanguageChoice = this.submitLanguageChoice.bind(this);
   };
 
   onChange(e) {
@@ -22,26 +24,42 @@ export class RaceForm extends React.Component {
     this.props.onUpdate(e);
   }
 
+  submitLanguageChoice(e) {
+    let languageElems = document.querySelectorAll('[name=select_extra_language]') || [];
+    let l = languageElems.length;
+    let i = 0;
+
+    this.props.charData.selected_languages = this.props.charData.selected_languages || [];
+
+    if (l > 0) {
+      for (i=0; i<l; i += 1) {
+          this.props.charData.selected_languages.push(languageElems[i].value);
+      }
+    } else {
+      this.props.charData.selected_languages = [];
+    }
+
+    this.props.onUpdate(e);
+  }
 
   resetRaceData() {
-    console.log('resetRaceData:')
-    console.log(this.props.charData);
     this.props.charData.proficiency_choice_tools = [];
     this.props.charData.proficiency_choice_abilities = [];
     this.props.charData.proficiency_choice_weapons = [];
     this.props.charData.proficiency_choice_skills = [];
-    console.log(this.props.charData)
+    this.props.charData.proficiency_choice_languages = [];
+    this.props.charData.selected_languages = [];
   }
 
-  getChoices() {
-    let choices = [];
+  getRaceNames() {
+    let raceNames = [];
     let race = "";
 
     for (race in raceData) {
-      choices.push(raceData[race])
+      raceNames.push(raceData[race])
     }
 
-    return choices;
+    return raceNames;
   }
 
   getProficiencyChoices(thisRaceData) {
@@ -74,9 +92,6 @@ export class RaceForm extends React.Component {
           }
 
 
-
-
-
           proficiencyChoiceForm = <CheckBoxGroup
                                     name="proficiency_choice_form"
                                     label="Select Proficiencies"
@@ -93,9 +108,19 @@ export class RaceForm extends React.Component {
     return proficiencyChoiceForm;
   }
 
+  getThisRaceData() {
+    let raceName = this.props.charData.select_race;
+    let subRaceName = this.props.charData.select_subrace;
+    let thisRaceData = utilities.getObjectByName(raceData,raceName);
+
+    return thisRaceData;
+  }
+
   getSubraceForm() {
     let raceName = this.props.charData.select_race;
-    let thisRaceData = utilities.getObjectByName(raceData,raceName);
+    let subRaceName = this.props.charData.select_subrace;
+    let thisRaceData = this.getThisRaceData();
+    let thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces,subRaceName);;
     let subraces = thisRaceData.subraces;
     let subRaceForm = "";
     let languageChoiceForm = "";
@@ -111,12 +136,22 @@ export class RaceForm extends React.Component {
     ];
 
     if (thisRaceData) {
-      if (thisRaceData.languages && thisRaceData.languages.indexOf("choice") > -1) {
-        languageChoiceForm = <TextInput type="text" label="Extra Language" name="select_extra_language" onChange={this.props.onUpdate}/>
-      }
-
       if (thisRaceData.subraces && thisRaceData.subraces.length) {
         subRaceForm = <DropDown name="select_subrace" label="Select Subrace" choices={subraces} onUpdate={this.props.onUpdate}/>;
+      }
+
+      if (thisRaceData.proficiencies.languages && thisRaceData.proficiencies.languages.indexOf("choice") > -1) {
+        languageChoiceForm = <div><TextInput type="text" label="Extra Language" name="select_extra_language" /><SubmitButton label="Choose" onUpdate={this.submitLanguageChoice} /></div>
+      }
+
+      if (thisSubRaceData) {
+        if (thisSubRaceData.proficiencies && thisSubRaceData.proficiencies.languages && thisSubRaceData.proficiencies.languages.indexOf("choice") > -1) {
+          languageChoiceForm = <div><TextInput type="text" label="Extra Language" name="select_extra_language" /><SubmitButton label="Choose" onUpdate={this.submitLanguageChoice} /></div>
+        }
+      }
+
+      if (this.props.charData.selected_languages && this.props.charData.selected_languages.length > 0) {
+        languageChoiceForm = <div><SubmitButton label="Choose a different language" onUpdate={this.submitLanguageChoice} /></div>
       }
 
       if (raceName === "Half-Elf") {
@@ -137,7 +172,7 @@ export class RaceForm extends React.Component {
     let thisRaceData = utilities.getObjectByName(raceData,this.props.race);
     return  <div className="form-field race-form">
               <h2>Race</h2>
-              <DropDown name="select_race" className="select-race" label="Select Race" choices={this.getChoices()} onUpdate={this.onChange}/>
+              <DropDown name="select_race" className="select-race" label="Select Race" choices={this.getRaceNames()} onUpdate={this.onChange}/>
               {this.getSubraceForm()}
             </div>
   }

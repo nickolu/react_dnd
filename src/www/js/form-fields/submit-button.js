@@ -7,7 +7,8 @@ export class SubmitButton extends React.Component {
 
   };
 
+
   render() {
-    return  <button onClick={this.props.onUpdate}>Submit</button>
+    return  <button onClick={this.props.onUpdate}>{this.props.label}</button>
   }
 }

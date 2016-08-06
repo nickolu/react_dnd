@@ -103,6 +103,23 @@
 	  }
 
 	  _createClass(DndForm, [{
+	    key: 'update',
+	    value: function update(e) {
+	      var newCharData = {};
+
+	      if (e.target.name.indexOf('ability_score_increase') > -1) {
+	        newCharData = this.getAbilityScoreIncrease(e);
+	      } else if (e.target.name.indexOf('proficiency_choice') > -1) {
+	        this.updateSelectedProficiencies(e);
+	      } else {
+	        newCharData = Object.assign({}, this.state.charData, _defineProperty({}, e.target.name, e.target.value));
+	      }
+
+	      this.setState({
+	        charData: Object.assign({}, this.state.charData, newCharData)
+	      });
+	    }
+	  }, {
 	    key: 'getAbilityScoreIncrease',
 	    value: function getAbilityScoreIncrease(e) {
 	      var abilityScoreIncreaseIndex = e.target.name.indexOf('ability_score_increase');
@@ -141,25 +158,6 @@
 	      }
 	    }
 	  }, {
-	    key: 'update',
-	    value: function update(e) {
-	      var newCharData = {};
-
-	      if (e.target.name === "select_race") {}
-
-	      if (e.target.name.indexOf('ability_score_increase') > -1) {
-	        newCharData = this.getAbilityScoreIncrease(e);
-	      } else if (e.target.name.indexOf('proficiency_choice') > -1) {
-	        this.updateSelectedProficiencies(e);
-	      } else {
-	        newCharData = Object.assign({}, this.state.charData, _defineProperty({}, e.target.name, e.target.value));
-	      }
-
-	      this.setState({
-	        charData: Object.assign({}, this.state.charData, newCharData)
-	      });
-	    }
-	  }, {
 	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(
@@ -176,7 +174,7 @@
 	            _react2.default.createElement(_raceForm.RaceForm, { onUpdate: this.update, charData: this.state.charData }),
 	            _react2.default.createElement(_classForm.ClassForm, { onUpdate: this.update }),
 	            _react2.default.createElement(_backgroundForm.BackgroundForm, { onUpdate: this.update }),
-	            _react2.default.createElement(_characterDetailsForm.CharacterDetailsForm, { onUpdate: this.update }),
+	            _react2.default.createElement(_characterDetailsForm.CharacterDetailsForm, { onUpdate: this.update, charData: this.state.charData }),
 	            _react2.default.createElement(_abilityScoresForm.AbilityScoresForm, { onUpdate: this.update })
 	          ),
 	          _react2.default.createElement(
@@ -20139,21 +20137,27 @@
 	    value: function getProficiencies(type) {
 	      var thisRaceData = utilities.getObjectByName(_races2.default, this.props.charData.select_race);
 	      var subraces = thisRaceData.subraces ? thisRaceData.subraces : {};
+	      var selectedSubrace = this.props.charData.select_subrace;
+	      var languageProficiencies = [];
 	      var subRaceProficiencies = {};
 	      var selectedProficiences = {};
 	      var proficiencies = {};
 	      var item = "";
 	      var id = -1;
+	      var i = 0;
 	      var l = 0;
+
+	      console.log('chardata to sheet:');
+	      console.log(this.props.charData);
 
 	      // get race proficiencies
 	      if (thisRaceData.proficiencies) {
-	        proficiencies = thisRaceData.proficiencies;
+	        proficiencies = Object.assign({}, proficiencies, thisRaceData.proficiencies);
 	      }
 
 	      // get subrace proficiencies
-	      if (thisRaceData.subraces && utilities.getObjectByName(thisRaceData.subraces, this.props.charData.select_subrace)) {
-	        subRaceProficiencies = utilities.getObjectByName(thisRaceData.subraces, this.props.charData.select_subrace).proficiencies;
+	      if (thisRaceData.subraces && utilities.getObjectByName(subraces, selectedSubrace)) {
+	        subRaceProficiencies = utilities.getObjectByName(subraces, selectedSubrace).proficiencies;
 
 	        // assign subrace proficiencies to proficiencies
 	        if (subRaceProficiencies) {
@@ -20170,6 +20174,18 @@
 
 	        // assign selected proficiencies to proficiencies
 	        proficiencies = Object.assign({}, proficiencies, selectedProficiences);
+	      }
+
+	      if (type === 'languages') {
+	        languageProficiencies = proficiencies.languages;
+
+	        if (this.props.charData.selected_languages) {
+	          languageProficiencies = proficiencies.languages.concat(this.props.charData.selected_languages);
+	        }
+
+	        proficiencies = Object.assign({}, proficiencies, {
+	          languages: languageProficiencies
+	        });
 	      }
 
 	      if (proficiencies && proficiencies[type]) {
@@ -20437,6 +20453,72 @@
 /***/ function(module, exports) {
 
 	module.exports = [
+		{
+			"name": "Dwarf",
+			"id": "dwarf",
+			"ability_score_increase": {
+				"con": "2"
+			},
+			"speed": "25",
+			"feats": [
+				"darkvision",
+				"stonecunning",
+				"dwarven_resiliance",
+				"armor_speed"
+			],
+			"proficiencies": {
+				"weapons": [
+					"battleaxe",
+					"handaxe",
+					"light hammer",
+					"warhammer"
+				],
+				"tools": [
+					"choice"
+				],
+				"tools_choice": [
+					"mason",
+					"smith",
+					"brewer"
+				],
+				"languages": [
+					"common",
+					"dwarvish"
+				]
+			},
+			"subraces": [
+				{
+					"name": "Hill Dwarf",
+					"id": "hill_dwarf",
+					"ability_score_increase": {
+						"wis": "1"
+					},
+					"stat_bonus": {
+						"hp": "1"
+					},
+					"feats": [
+						"dwarven_toughness"
+					]
+				},
+				{
+					"name": "Mountain Dwarf",
+					"id": "mountain_dwarf",
+					"ability_score_increase": {
+						"str": "2"
+					},
+					"proficiencies": {
+						"armor": [
+							"light, medium"
+						]
+					}
+				}
+			],
+			"notes": {
+				"age": "Dwarves reach adulthood at age 40 and live about 350 years.",
+				"alignment": "Most dwarves are lawful",
+				"weight": "Dwarves average about 150 lbs and are medium sized creatures"
+			}
+		},
 		{
 			"name": "Elf",
 			"speed": "30",
@@ -20814,6 +20896,212 @@
 				"hellish_resistance",
 				"infernal_legacy",
 				"darkvision"
+			]
+		},
+		{
+			"name": "Kor",
+			"id": "kor",
+			"age": "Kor mature at the same rate as humans and live about as long.",
+			"alignment": "Most kor are lawful good, with a strong dedication to community and the traditions of their ancestors.",
+			"size": "Kor average nearly 6 feet tall, but are much lighter and more slender than humans. Your size is Medium.",
+			"speed": "30",
+			"proficiencies": {
+				"languages": [
+					"common",
+					"kor"
+				],
+				"skills": [
+					"athletics",
+					"acrobatics"
+				]
+			},
+			"ability_score_increase": {
+				"dex": "2",
+				"wis": "1"
+			},
+			"feats": [
+				"lucky",
+				"brave",
+				"kor_climbing"
+			]
+		},
+		{
+			"name": "Merfolk",
+			"id": "merfolk",
+			"age": "Merfolk mature at the same rate humans do and reach adulthood around the age of 20. They live considerably longer than humans, though, often reaching well over 100 years.",
+			"alignment": "Most merfolk are neutral, though merfolk of the Emeria and Cosi creeds have chaotic leanings.",
+			"size": "Merfolk are about the same size and build as humans. Your size is Medium.",
+			"speed": "30",
+			"ability_score_increase": {
+				"cha": "1"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"merfolk",
+					"choice"
+				],
+				"skills": [
+					"athletics",
+					"acrobatics"
+				]
+			},
+			"subraces": [
+				{
+					"name": "Emeria (Wind) Merfolk",
+					"id": "emeria_merfolk",
+					"ability_score_increase": {
+						"wis": "2"
+					},
+					"proficiencies": {
+						"skills": [
+							"deception",
+							"persuasion"
+						]
+					},
+					"feats": [
+						"druid_cantrip"
+					]
+				},
+				{
+					"name": "Ula (Water) Merfolk",
+					"id": "ula_merfolk",
+					"ability_score_increase": {
+						"int": "2"
+					},
+					"proficiencies": {
+						"tools": [
+							"navigator"
+						],
+						"skills": [
+							"survival"
+						]
+					},
+					"feats": [
+						"wizard_cantrip"
+					]
+				},
+				{
+					"name": "Cosi (Trickster) Merfolk",
+					"id": "cosi_merfolk",
+					"ability_score_increase": {
+						"cha": "1",
+						"int": "1"
+					},
+					"proficiencies": {
+						"skills": [
+							"sleight_of_hand",
+							"stealth"
+						]
+					},
+					"feats": [
+						"bard_cantrip"
+					]
+				}
+			],
+			"feats": [
+				"amphibeous",
+				"brave",
+				"kor_climbing"
+			]
+		},
+		{
+			"name": "Vampire",
+			"id": "vampire",
+			"age": "Vampires don’t mature and age in the same way that other races do. Every living vampire is either a bloodchief, infected by Ulamog’s influence in the distant reaches of history, or was spawned by a bloodchief from a living human. Most vampires are thus very old, but few have any memory of their earliest years.",
+			"alignment": "Vampires have no innate tendency toward evil, but consuming the life energy of other creatures often pushes them to that end. Regardless of their moral bent, the strict hierarchies of their bloodchiefs inclines them toward a lawful alignment.",
+			"size": "Vampires are about the same size and build as humans. Your size is Medium.",
+			"speed": "30",
+			"ability_score_increase": {
+				"cha": "1"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"vampire"
+				]
+			},
+			"feats": [
+				"darkvision",
+				"vampiric_resistance",
+				"blood_thirst"
+			]
+		},
+		{
+			"name": "Goblin",
+			"id": "goblin",
+			"age": "Goblins mature faster than humans, reaching adulthood at around age 12. They also age noticeably faster than humans, and even the most cautious goblins rarely live longer than 50 years.",
+			"alignment": "Most goblins are wildly chaotic, though they have no particular inclination toward good or evil.",
+			"size": " Goblins average about 3 feet tall and weigh about 40 pounds. Your size is Small",
+			"speed": "25",
+			"ability_score_increase": {
+				"con": "2"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"goblin"
+				]
+			},
+			"feats": [
+				"darkvision",
+				"grit"
+			],
+			"subraces": [
+				{
+					"name": "Grotag Tribe Goblin",
+					"id": "grotag_goblin",
+					"proficiencies": {
+						"skills": [
+							"animal_handling"
+						]
+					}
+				},
+				{
+					"name": "Lavastep Tribe Goblin",
+					"id": "lavastep_goblin",
+					"feats": [
+						"lavastep_grit"
+					]
+				},
+				{
+					"name": "Tuktuk Tribe Goblin",
+					"id": "tuktuk_merfolk",
+					"proficiencies": {
+						"tools": [
+							"thief"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Moogle",
+			"id": "moogle",
+			"age": "Moogles reach adulthood within a few months, but can live for hundreds of years.",
+			"alignment": "Moogles are always good with a tendency toward chaos.",
+			"size": " Moogles average about 3 feet tall and weigh about 40 pounds. Your size is Small",
+			"speed": "25",
+			"ability_score_increase": {
+				"cha": "2",
+				"wis": "1"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"moogle"
+				],
+				"weapons": [
+					"polearms",
+					"spears"
+				],
+				"armor": [
+					"shields"
+				]
+			},
+			"feats": [
+				"darkvision",
+				"moogle_wings"
 			]
 		}
 	];
@@ -21408,7 +21696,7 @@
 	      return _react2.default.createElement(
 	        'button',
 	        { onClick: this.props.onUpdate },
-	        'Submit'
+	        this.props.label
 	      );
 	    }
 	  }]);
@@ -21447,6 +21735,8 @@
 
 	var _checkboxGroup = __webpack_require__(168);
 
+	var _submitButton = __webpack_require__(166);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -21467,6 +21757,7 @@
 
 	    _this.state = {};
 	    _this.onChange = _this.onChange.bind(_this);
+	    _this.submitLanguageChoice = _this.submitLanguageChoice.bind(_this);
 	    return _this;
 	  }
 
@@ -21481,27 +21772,45 @@
 	      this.props.onUpdate(e);
 	    }
 	  }, {
+	    key: 'submitLanguageChoice',
+	    value: function submitLanguageChoice(e) {
+	      var languageElems = document.querySelectorAll('[name=select_extra_language]') || [];
+	      var l = languageElems.length;
+	      var i = 0;
+
+	      this.props.charData.selected_languages = this.props.charData.selected_languages || [];
+
+	      if (l > 0) {
+	        for (i = 0; i < l; i += 1) {
+	          this.props.charData.selected_languages.push(languageElems[i].value);
+	        }
+	      } else {
+	        this.props.charData.selected_languages = [];
+	      }
+
+	      this.props.onUpdate(e);
+	    }
+	  }, {
 	    key: 'resetRaceData',
 	    value: function resetRaceData() {
-	      console.log('resetRaceData:');
-	      console.log(this.props.charData);
 	      this.props.charData.proficiency_choice_tools = [];
 	      this.props.charData.proficiency_choice_abilities = [];
 	      this.props.charData.proficiency_choice_weapons = [];
 	      this.props.charData.proficiency_choice_skills = [];
-	      console.log(this.props.charData);
+	      this.props.charData.proficiency_choice_languages = [];
+	      this.props.charData.selected_languages = [];
 	    }
 	  }, {
-	    key: 'getChoices',
-	    value: function getChoices() {
-	      var choices = [];
+	    key: 'getRaceNames',
+	    value: function getRaceNames() {
+	      var raceNames = [];
 	      var race = "";
 
 	      for (race in _races2.default) {
-	        choices.push(_races2.default[race]);
+	        raceNames.push(_races2.default[race]);
 	      }
 
-	      return choices;
+	      return raceNames;
 	    }
 	  }, {
 	    key: 'getProficiencyChoices',
@@ -21550,10 +21859,21 @@
 	      return proficiencyChoiceForm;
 	    }
 	  }, {
+	    key: 'getThisRaceData',
+	    value: function getThisRaceData() {
+	      var raceName = this.props.charData.select_race;
+	      var subRaceName = this.props.charData.select_subrace;
+	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
+
+	      return thisRaceData;
+	    }
+	  }, {
 	    key: 'getSubraceForm',
 	    value: function getSubraceForm() {
 	      var raceName = this.props.charData.select_race;
-	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
+	      var subRaceName = this.props.charData.select_subrace;
+	      var thisRaceData = this.getThisRaceData();
+	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);;
 	      var subraces = thisRaceData.subraces;
 	      var subRaceForm = "";
 	      var languageChoiceForm = "";
@@ -21562,12 +21882,36 @@
 	      var abilityScores = [{ label: "Strength", name: "ability_score_increase_str", "value": 1, "id": "str" }, { label: "Constitution", name: "ability_score_increase_con", "value": 1, "id": "con" }, { label: "Dexterity", name: "ability_score_increase_dex", "value": 1, "id": "dex" }, { label: "Wisdom", name: "ability_score_increase_wis", "value": 1, "id": "wis" }, { label: "Intelligence", name: "ability_score_increase_int", "value": 1, "id": "int" }, { label: "Charisma", name: "ability_score_increase_cha", "value": 1, "id": "cha" }];
 
 	      if (thisRaceData) {
-	        if (thisRaceData.languages && thisRaceData.languages.indexOf("choice") > -1) {
-	          languageChoiceForm = _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language', onChange: this.props.onUpdate });
-	        }
-
 	        if (thisRaceData.subraces && thisRaceData.subraces.length) {
 	          subRaceForm = _react2.default.createElement(_dropDown.DropDown, { name: 'select_subrace', label: 'Select Subrace', choices: subraces, onUpdate: this.props.onUpdate });
+	        }
+
+	        if (thisRaceData.proficiencies.languages && thisRaceData.proficiencies.languages.indexOf("choice") > -1) {
+	          languageChoiceForm = _react2.default.createElement(
+	            'div',
+	            null,
+	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language' }),
+	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.submitLanguageChoice })
+	          );
+	        }
+
+	        if (thisSubRaceData) {
+	          if (thisSubRaceData.proficiencies && thisSubRaceData.proficiencies.languages && thisSubRaceData.proficiencies.languages.indexOf("choice") > -1) {
+	            languageChoiceForm = _react2.default.createElement(
+	              'div',
+	              null,
+	              _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language' }),
+	              _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.submitLanguageChoice })
+	            );
+	          }
+	        }
+
+	        if (this.props.charData.selected_languages && this.props.charData.selected_languages.length > 0) {
+	          languageChoiceForm = _react2.default.createElement(
+	            'div',
+	            null,
+	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose a different language', onUpdate: this.submitLanguageChoice })
+	          );
 	        }
 
 	        if (raceName === "Half-Elf") {
@@ -21596,7 +21940,7 @@
 	          null,
 	          'Race'
 	        ),
-	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_race', className: 'select-race', label: 'Select Race', choices: this.getChoices(), onUpdate: this.onChange }),
+	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_race', className: 'select-race', label: 'Select Race', choices: this.getRaceNames(), onUpdate: this.onChange }),
 	        this.getSubraceForm()
 	      );
 	    }

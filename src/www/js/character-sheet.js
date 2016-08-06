@@ -35,6 +35,8 @@ export class CharacterSheet extends React.Component {
   }
 
 
+
+
   /**
    * getRaceAbilityScoreBonus - description
    *
@@ -162,24 +164,31 @@ export class CharacterSheet extends React.Component {
    * @param  {string} type type of character proficiencies to get (race, class, background)
    * @return {react object}      view for the list of proficiencies
    */
+
   getProficiencies(type) {
     let thisRaceData = utilities.getObjectByName(raceData, this.props.charData.select_race)
     let subraces = thisRaceData.subraces ? thisRaceData.subraces : {};
+    let selectedSubrace = this.props.charData.select_subrace;
+    let languageProficiencies = [];
     let subRaceProficiencies = {};
     let selectedProficiences = {};
     let proficiencies = {};
     let item = "";
     let id = -1;
+    let i = 0;
     let l = 0;
+
+    console.log('chardata to sheet:');
+    console.log(this.props.charData);
 
     // get race proficiencies
     if (thisRaceData.proficiencies) {
-      proficiencies = thisRaceData.proficiencies;
+      proficiencies = Object.assign({},proficiencies,thisRaceData.proficiencies);
     }
 
     // get subrace proficiencies
-    if (thisRaceData.subraces && utilities.getObjectByName(thisRaceData.subraces,this.props.charData.select_subrace)) {
-      subRaceProficiencies = utilities.getObjectByName(thisRaceData.subraces,this.props.charData.select_subrace).proficiencies;
+    if (thisRaceData.subraces && utilities.getObjectByName(subraces,selectedSubrace)) {
+      subRaceProficiencies = utilities.getObjectByName(subraces,selectedSubrace).proficiencies;
 
       // assign subrace proficiencies to proficiencies
       if (subRaceProficiencies) {
@@ -196,6 +205,18 @@ export class CharacterSheet extends React.Component {
 
       // assign selected proficiencies to proficiencies
       proficiencies = Object.assign({},proficiencies,selectedProficiences);
+    }
+
+    if (type === 'languages') {
+      languageProficiencies = proficiencies.languages;
+
+      if (this.props.charData.selected_languages) {
+          languageProficiencies = proficiencies.languages.concat(this.props.charData.selected_languages);
+      }
+
+      proficiencies = Object.assign({},proficiencies, {
+        languages : languageProficiencies
+      })
     }
 
     if (proficiencies && proficiencies[type]) {
