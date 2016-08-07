@@ -190,58 +190,58 @@
       "breath_weapon",
       "draconic_damage_resistance"
     ],
-    "draconic_ancestry" : {
-      "black" : {
-        "dragon" : "Black",
+    "draconic_ancestry" : [
+      {
+        "name" : "Black",
         "damage_type" : "Acid",
         "breath_weapon" : "5 by 30 ft. line (Dex. save)"
       },
-      "blue" : {
-        "dragon" : "Blue",
+      {
+        "name" : "Blue",
         "damage_type" : "Lightning",
         "breath_weapon" : "5 by 30 ft. line (Dex. save)"
       },
-      "brass" : {
-        "dragon" : "Brass",
+      {
+        "name" : "Brass",
         "damage_type" : "Fire",
         "breath_weapon" : "5 by 30 ft. line (Dex. save)"
       },
-      "bronze" : {
-        "dragon" : "Bronze",
+      {
+        "name" : "Bronze",
         "damage_type" : "Lightning",
         "breath_weapon" : "5 by 30 ft. line (Dex. save)"
       },
-      "copper" : {
-        "dragon" : "Copper",
+      {
+        "name" : "Copper",
         "damage_type" : "Acid",
         "breath_weapon" : "5 by 30 ft. line (Dex. save)"
       },
-      "gold" : {
-        "dragon" : "Gold",
+      {
+        "name" : "Gold",
         "damage_type" : "Fire",
         "breath_weapon" : "15 ft. cone (Dex. save)"
       },
-      "green" : {
-        "dragon" : "Green",
+      {
+        "name" : "Green",
         "damage_type" : "Poison",
         "breath_weapon" : "15 ft. cone (Con. save)"
       },
-      "red" : {
-        "dragon" : "Red",
+      {
+        "name" : "Red",
         "damage_type" : "Fire",
         "breath_weapon" : "15 ft. cone (Dex. save)"
       },
-      "silver" : {
-        "dragon" : "Silver",
+      {
+        "name" : "Silver",
         "damage_type" : "Cold",
         "breath_weapon" : "15 ft. cone (Con. save)"
       },
-      "white" : {
-        "dragon" : "White",
+      {
+        "name" : "White",
         "damage_type" : "Cold",
         "breath_weapon" : "15 ft. cone (Con. save)"
       }
-    }
+    ]
   },
   {
     "name" : "Gnome",

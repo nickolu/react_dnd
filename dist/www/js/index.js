@@ -20151,58 +20151,58 @@
 				"breath_weapon",
 				"draconic_damage_resistance"
 			],
-			"draconic_ancestry": {
-				"black": {
-					"dragon": "Black",
+			"draconic_ancestry": [
+				{
+					"name": "Black",
 					"damage_type": "Acid",
 					"breath_weapon": "5 by 30 ft. line (Dex. save)"
 				},
-				"blue": {
-					"dragon": "Blue",
+				{
+					"name": "Blue",
 					"damage_type": "Lightning",
 					"breath_weapon": "5 by 30 ft. line (Dex. save)"
 				},
-				"brass": {
-					"dragon": "Brass",
+				{
+					"name": "Brass",
 					"damage_type": "Fire",
 					"breath_weapon": "5 by 30 ft. line (Dex. save)"
 				},
-				"bronze": {
-					"dragon": "Bronze",
+				{
+					"name": "Bronze",
 					"damage_type": "Lightning",
 					"breath_weapon": "5 by 30 ft. line (Dex. save)"
 				},
-				"copper": {
-					"dragon": "Copper",
+				{
+					"name": "Copper",
 					"damage_type": "Acid",
 					"breath_weapon": "5 by 30 ft. line (Dex. save)"
 				},
-				"gold": {
-					"dragon": "Gold",
+				{
+					"name": "Gold",
 					"damage_type": "Fire",
 					"breath_weapon": "15 ft. cone (Dex. save)"
 				},
-				"green": {
-					"dragon": "Green",
+				{
+					"name": "Green",
 					"damage_type": "Poison",
 					"breath_weapon": "15 ft. cone (Con. save)"
 				},
-				"red": {
-					"dragon": "Red",
+				{
+					"name": "Red",
 					"damage_type": "Fire",
 					"breath_weapon": "15 ft. cone (Dex. save)"
 				},
-				"silver": {
-					"dragon": "Silver",
+				{
+					"name": "Silver",
 					"damage_type": "Cold",
 					"breath_weapon": "15 ft. cone (Con. save)"
 				},
-				"white": {
-					"dragon": "White",
+				{
+					"name": "White",
 					"damage_type": "Cold",
 					"breath_weapon": "15 ft. cone (Con. save)"
 				}
-			}
+			]
 		},
 		{
 			"name": "Gnome",
@@ -21594,6 +21594,14 @@
 	    key: 'render',
 	    value: function render() {
 	      var concatClasses = this.props.className + " drop-down form-field";
+	      function getChoiceLabel(choices) {
+	        if (choices.label) {
+	          return choices.label;
+	        } else if (choices.name) {
+	          return choices.name;
+	        }
+	        return "";
+	      }
 	      return _react2.default.createElement(
 	        'div',
 	        { className: concatClasses },
@@ -21609,7 +21617,7 @@
 	            return _react2.default.createElement(
 	              'option',
 	              { key: choice.name, 'data-index': choice.id, value: choice.name },
-	              choice.name
+	              getChoiceLabel(choice)
 	            );
 	          })
 	        )
@@ -21795,7 +21803,7 @@
 
 	    _this.state = {};
 	    _this.onChange = _this.onChange.bind(_this);
-	    _this.submitLanguageChoice = _this.submitLanguageChoice.bind(_this);
+	    _this.setLanguageChoice = _this.setLanguageChoice.bind(_this);
 	    return _this;
 	  }
 
@@ -21810,8 +21818,8 @@
 	      this.props.onUpdate(e);
 	    }
 	  }, {
-	    key: 'submitLanguageChoice',
-	    value: function submitLanguageChoice(e) {
+	    key: 'setLanguageChoice',
+	    value: function setLanguageChoice(e) {
 	      var languageElems = document.querySelectorAll('[name=select_extra_language]') || [];
 	      var l = languageElems.length;
 	      var i = 0;
@@ -21897,39 +21905,52 @@
 	      return proficiencyChoiceForm;
 	    }
 	  }, {
-	    key: 'getThisRaceData',
-	    value: function getThisRaceData() {
+	    key: 'getDraconicAncestryForm',
+	    value: function getDraconicAncestryForm(thisRaceData) {
 	      var raceName = this.props.charData.select_race;
-	      var subRaceName = this.props.charData.select_subrace;
-	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
+	      var draconicAncestryForm = "";
+	      var draconicAncestryChoices = [];
+	      var item = "";
 
-	      return thisRaceData;
+	      if (raceName === "Dragonborn") {
+
+	        for (item in thisRaceData.draconic_ancestry) {
+	          draconicAncestryChoices.push({
+	            id: thisRaceData.draconic_ancestry[item].name,
+	            label: thisRaceData.draconic_ancestry[item].name + " | " + thisRaceData.draconic_ancestry[item].damage_type + " | " + thisRaceData.draconic_ancestry[item].breath_weapon,
+	            name: thisRaceData.draconic_ancestry[item].name
+	          });
+	        }
+	        return _react2.default.createElement(_dropDown.DropDown, { name: 'select_draconic_ancestry', className: 'select-race', label: 'Select Draconic Ancestry', choices: draconicAncestryChoices, onUpdate: this.onChange });
+	      }
+
+	      return false;
 	    }
 	  }, {
-	    key: 'getSubraceForm',
-	    value: function getSubraceForm() {
+	    key: 'getAbilityScoreChoiceForm',
+	    value: function getAbilityScoreChoiceForm(thisRaceData) {
+	      var raceName = this.props.charData.select_race;
+	      var abilityScores = [{ label: "Strength", name: "ability_score_increase_str", value: 1, id: "str" }, { label: "Constitution", name: "ability_score_increase_con", value: 1, id: "con" }, { label: "Dexterity", name: "ability_score_increase_dex", value: 1, id: "dex" }, { label: "Wisdom", name: "ability_score_increase_wis", value: 1, id: "wis" }, { label: "Intelligence", name: "ability_score_increase_int", value: 1, id: "int" }, { label: "Charisma", name: "ability_score_increase_cha", value: 1, id: "cha" }];
+
+	      if (raceName === "Half-Elf") {
+	        return _react2.default.createElement(_checkboxGroup.CheckBoxGroup, { name: 'half_elf_abilities', label: 'Select Abilities', choices: abilityScores, groupLabel: 'Select Two Abilities', groupName: 'halfelf_ability_score', optionsLimit: thisRaceData.ability_score_choices, onUpdate: this.props.onUpdate });
+	      }
+	    }
+	  }, {
+	    key: 'getLanguageChoiceForm',
+	    value: function getLanguageChoiceForm(thisRaceData) {
 	      var raceName = this.props.charData.select_race;
 	      var subRaceName = this.props.charData.select_subrace;
-	      var thisRaceData = this.getThisRaceData();
 	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);;
-	      var subraces = thisRaceData.subraces;
-	      var subRaceForm = "";
 	      var languageChoiceForm = "";
-	      var abilityScoreChoiceForm = "";
-
-	      var abilityScores = [{ label: "Strength", name: "ability_score_increase_str", "value": 1, "id": "str" }, { label: "Constitution", name: "ability_score_increase_con", "value": 1, "id": "con" }, { label: "Dexterity", name: "ability_score_increase_dex", "value": 1, "id": "dex" }, { label: "Wisdom", name: "ability_score_increase_wis", "value": 1, "id": "wis" }, { label: "Intelligence", name: "ability_score_increase_int", "value": 1, "id": "int" }, { label: "Charisma", name: "ability_score_increase_cha", "value": 1, "id": "cha" }];
 
 	      if (thisRaceData) {
-	        if (thisRaceData.subraces && thisRaceData.subraces.length) {
-	          subRaceForm = _react2.default.createElement(_dropDown.DropDown, { name: 'select_subrace', label: 'Select Subrace', choices: subraces, onUpdate: this.props.onUpdate });
-	        }
-
 	        if (thisRaceData.proficiencies.languages && thisRaceData.proficiencies.languages.indexOf("choice") > -1) {
 	          languageChoiceForm = _react2.default.createElement(
 	            'div',
 	            null,
 	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language' }),
-	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.submitLanguageChoice })
+	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.setLanguageChoice })
 	          );
 	        }
 
@@ -21939,7 +21960,7 @@
 	              'div',
 	              null,
 	              _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language' }),
-	              _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.submitLanguageChoice })
+	              _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.setLanguageChoice })
 	            );
 	          }
 	        }
@@ -21948,28 +21969,44 @@
 	          languageChoiceForm = _react2.default.createElement(
 	            'div',
 	            null,
-	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose a different language', onUpdate: this.submitLanguageChoice })
+	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose a different language', onUpdate: this.setLanguageChoice })
 	          );
-	        }
-
-	        if (raceName === "Half-Elf") {
-	          abilityScoreChoiceForm = _react2.default.createElement(_checkboxGroup.CheckBoxGroup, { name: 'half_elf_abilities', label: 'Select Abilities', choices: abilityScores, groupLabel: 'Select Two Abilities', groupName: 'halfelf_ability_score', optionsLimit: thisRaceData.ability_score_choices, onUpdate: this.props.onUpdate });
 	        }
 	      }
 
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        subRaceForm,
-	        languageChoiceForm,
-	        abilityScoreChoiceForm,
-	        this.getProficiencyChoices(thisRaceData)
-	      );
+	      return languageChoiceForm;
+	    }
+	  }, {
+	    key: 'getSubraceForm',
+	    value: function getSubraceForm(thisRaceData) {
+	      var raceName = this.props.charData.select_race;
+	      var subRaceName = this.props.charData.select_subrace;
+	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);;
+	      var subraces = thisRaceData.subraces;
+	      var subRaceForm = "";
+
+	      if (thisRaceData) {
+	        if (subraces && subraces.length) {
+	          subRaceForm = _react2.default.createElement(_dropDown.DropDown, { name: 'select_subrace', label: 'Select Subrace', choices: subraces, onUpdate: this.props.onUpdate });
+	        }
+	      }
+
+	      return subRaceForm;
+	    }
+	  }, {
+	    key: 'getThisRaceData',
+	    value: function getThisRaceData() {
+	      var raceName = this.props.charData.select_race;
+	      var subRaceName = this.props.charData.select_subrace;
+	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
+
+	      return thisRaceData;
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var thisRaceData = utilities.getObjectByName(_races2.default, this.props.race);
+	      var thisRaceData = this.getThisRaceData();
+
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'form-field race-form' },
@@ -21979,7 +22016,11 @@
 	          'Race'
 	        ),
 	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_race', className: 'select-race', label: 'Select Race', choices: this.getRaceNames(), onUpdate: this.onChange }),
-	        this.getSubraceForm()
+	        this.getSubraceForm(thisRaceData),
+	        this.getLanguageChoiceForm(thisRaceData),
+	        this.getAbilityScoreChoiceForm(thisRaceData),
+	        this.getProficiencyChoices(thisRaceData),
+	        this.getDraconicAncestryForm(thisRaceData)
 	      );
 	    }
 	  }]);

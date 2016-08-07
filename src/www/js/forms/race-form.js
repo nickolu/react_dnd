@@ -12,7 +12,7 @@ export class RaceForm extends React.Component {
 
     this.state = {};
     this.onChange = this.onChange.bind(this);
-    this.submitLanguageChoice = this.submitLanguageChoice.bind(this);
+    this.setLanguageChoice = this.setLanguageChoice.bind(this);
   };
 
   onChange(e) {
@@ -24,7 +24,7 @@ export class RaceForm extends React.Component {
     this.props.onUpdate(e);
   }
 
-  submitLanguageChoice(e) {
+  setLanguageChoice(e) {
     let languageElems = document.querySelectorAll('[name=select_extra_language]') || [];
     let l = languageElems.length;
     let i = 0;
@@ -108,72 +108,105 @@ export class RaceForm extends React.Component {
     return proficiencyChoiceForm;
   }
 
-  getThisRaceData() {
+  getDraconicAncestryForm(thisRaceData) {
     let raceName = this.props.charData.select_race;
-    let subRaceName = this.props.charData.select_subrace;
-    let thisRaceData = utilities.getObjectByName(raceData,raceName);
+    let draconicAncestryForm = "";
+    let draconicAncestryChoices = [];
+    let item = "";
 
-    return thisRaceData;
+    if (raceName === "Dragonborn") {
+
+      for (item in thisRaceData.draconic_ancestry) {
+        draconicAncestryChoices.push({
+          id : thisRaceData.draconic_ancestry[item].name,
+          label : thisRaceData.draconic_ancestry[item].name+" | "+thisRaceData.draconic_ancestry[item].damage_type+" | "+thisRaceData.draconic_ancestry[item].breath_weapon,
+          name : thisRaceData.draconic_ancestry[item].name
+        });
+      }
+      return <DropDown name="select_draconic_ancestry" className="select-race" label="Select Draconic Ancestry" choices={draconicAncestryChoices} onUpdate={this.onChange}/>;
+    }
+
+    return false;
   }
 
-  getSubraceForm() {
+  getAbilityScoreChoiceForm (thisRaceData) {
     let raceName = this.props.charData.select_race;
-    let subRaceName = this.props.charData.select_subrace;
-    let thisRaceData = this.getThisRaceData();
-    let thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces,subRaceName);;
-    let subraces = thisRaceData.subraces;
-    let subRaceForm = "";
-    let languageChoiceForm = "";
-    let abilityScoreChoiceForm = "";
-
     let abilityScores = [
-      {label : "Strength", name : "ability_score_increase_str", "value" : 1, "id" : "str"},
-      {label : "Constitution", name : "ability_score_increase_con", "value" : 1, "id" : "con"},
-      {label : "Dexterity", name : "ability_score_increase_dex", "value" : 1, "id" : "dex"},
-      {label : "Wisdom", name : "ability_score_increase_wis", "value" : 1, "id" : "wis"},
-      {label : "Intelligence", name : "ability_score_increase_int", "value" : 1, "id" : "int"},
-      {label : "Charisma", name : "ability_score_increase_cha", "value" : 1, "id" : "cha"}
+      {label : "Strength", name : "ability_score_increase_str", value : 1, id : "str"},
+      {label : "Constitution", name : "ability_score_increase_con", value : 1, id : "con"},
+      {label : "Dexterity", name : "ability_score_increase_dex", value : 1, id : "dex"},
+      {label : "Wisdom", name : "ability_score_increase_wis", value : 1, id : "wis"},
+      {label : "Intelligence", name : "ability_score_increase_int", value : 1, id : "int"},
+      {label : "Charisma", name : "ability_score_increase_cha", value : 1, id : "cha"}
     ];
 
-    if (thisRaceData) {
-      if (thisRaceData.subraces && thisRaceData.subraces.length) {
-        subRaceForm = <DropDown name="select_subrace" label="Select Subrace" choices={subraces} onUpdate={this.props.onUpdate}/>;
-      }
+    if (raceName === "Half-Elf") {
+      return <CheckBoxGroup name="half_elf_abilities" label="Select Abilities" choices={abilityScores} groupLabel="Select Two Abilities" groupName="halfelf_ability_score" optionsLimit={thisRaceData.ability_score_choices} onUpdate={this.props.onUpdate} />;
+    }
+  }
 
+  getLanguageChoiceForm (thisRaceData) {
+    let raceName = this.props.charData.select_race;
+    let subRaceName = this.props.charData.select_subrace;
+    let thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces,subRaceName);;
+    let languageChoiceForm = "";
+
+    if (thisRaceData) {
       if (thisRaceData.proficiencies.languages && thisRaceData.proficiencies.languages.indexOf("choice") > -1) {
-        languageChoiceForm = <div><TextInput type="text" label="Extra Language" name="select_extra_language" /><SubmitButton label="Choose" onUpdate={this.submitLanguageChoice} /></div>
+        languageChoiceForm = <div><TextInput type="text" label="Extra Language" name="select_extra_language" /><SubmitButton label="Choose" onUpdate={this.setLanguageChoice} /></div>
       }
 
       if (thisSubRaceData) {
         if (thisSubRaceData.proficiencies && thisSubRaceData.proficiencies.languages && thisSubRaceData.proficiencies.languages.indexOf("choice") > -1) {
-          languageChoiceForm = <div><TextInput type="text" label="Extra Language" name="select_extra_language" /><SubmitButton label="Choose" onUpdate={this.submitLanguageChoice} /></div>
+          languageChoiceForm = <div><TextInput type="text" label="Extra Language" name="select_extra_language" /><SubmitButton label="Choose" onUpdate={this.setLanguageChoice} /></div>
         }
       }
 
       if (this.props.charData.selected_languages && this.props.charData.selected_languages.length > 0) {
-        languageChoiceForm = <div><SubmitButton label="Choose a different language" onUpdate={this.submitLanguageChoice} /></div>
-      }
-
-      if (raceName === "Half-Elf") {
-        abilityScoreChoiceForm = <CheckBoxGroup name="half_elf_abilities" label="Select Abilities" choices={abilityScores} groupLabel="Select Two Abilities" groupName="halfelf_ability_score" optionsLimit={thisRaceData.ability_score_choices} onUpdate={this.props.onUpdate} />;
+        languageChoiceForm = <div><SubmitButton label="Choose a different language" onUpdate={this.setLanguageChoice} /></div>
       }
     }
 
-    return  <div>
-              {subRaceForm}
-              {languageChoiceForm}
-              {abilityScoreChoiceForm}
-              {this.getProficiencyChoices(thisRaceData)}
-            </div>;
+    return languageChoiceForm
+  }
+
+  getSubraceForm(thisRaceData) {
+    let raceName = this.props.charData.select_race;
+    let subRaceName = this.props.charData.select_subrace;
+    let thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces,subRaceName);;
+    let subraces = thisRaceData.subraces;
+    let subRaceForm = "";
+
+    if (thisRaceData) {
+      if (subraces && subraces.length) {
+        subRaceForm = <DropDown name="select_subrace" label="Select Subrace" choices={subraces} onUpdate={this.props.onUpdate}/>;
+      }
+    }
+
+    return subRaceForm;
   }
 
 
+    getThisRaceData() {
+      let raceName = this.props.charData.select_race;
+      let subRaceName = this.props.charData.select_subrace;
+      let thisRaceData = utilities.getObjectByName(raceData,raceName);
+
+      return thisRaceData;
+    }
+
+
   render() {
-    let thisRaceData = utilities.getObjectByName(raceData,this.props.race);
+    let thisRaceData = this.getThisRaceData();
+
     return  <div className="form-field race-form">
               <h2>Race</h2>
               <DropDown name="select_race" className="select-race" label="Select Race" choices={this.getRaceNames()} onUpdate={this.onChange}/>
-              {this.getSubraceForm()}
+              {this.getSubraceForm(thisRaceData)}
+              {this.getLanguageChoiceForm(thisRaceData)}
+              {this.getAbilityScoreChoiceForm(thisRaceData)}
+              {this.getProficiencyChoices(thisRaceData)}
+              {this.getDraconicAncestryForm(thisRaceData)}
             </div>
   }
 
