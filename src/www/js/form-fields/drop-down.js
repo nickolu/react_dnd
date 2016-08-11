@@ -12,13 +12,13 @@ export class DropDown extends React.Component {
   };
 
   onChange(e) {
-
     this.setState({
       selection : e.target.value
     });
 
     this.props.onUpdate(e);
-  }
+  };
+
   render() {
     let concatClasses = this.props.className+" drop-down form-field"
     function getChoiceLabel(choices) {

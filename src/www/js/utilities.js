@@ -13,9 +13,9 @@ export const getObjectByName = function(arr,name) {
 export const countItemInArray = function(arr,item) {
   let l = arr.length;
   let i = 0;
-  let count = 0;
+  let count = arr.indexOf('count') > -1 ? 1 : 0;
   let arrSort = arr.sort();
-
+  console.log(count);
   for (i = 0; i < l; i += 1) {
     if (arrSort[i] === item) {
       count += 1;

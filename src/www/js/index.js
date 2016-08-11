@@ -26,18 +26,70 @@ class DndForm extends React.Component {
 
   update(e) {
     let newCharData = {};
+    let raceName = "";
+    let thisCharData = {};
+    let thisSubRaceData = {};
 
     if (e.target.name.indexOf('ability_score_increase') > -1) {
       newCharData = this.getAbilityScoreIncrease(e);
-    } else if (e.target.name.indexOf('proficiency_choice') > -1) {
-      this.updateSelectedProficiencies(e);
     } else {
       newCharData = Object.assign({},this.state.charData,{[e.target.name]:e.target.value});
     }
 
+    if (document.querySelector('select_race')) {
+        thisCharData = utilities.getObjectByName(raceData, e.target.name) || utilities.getObjectByName(raceData, document.querySelector('select_race').value);
+        newCharData.proficiencies = thisCharData.proficiencies;
+    }
+
+    if (document.querySelector('select_subrace')) {
+        thisSubRaceData = utilities.getObjectByName(raceData, e.target.name);
+        newCharData.proficiencies = thisCharData.proficiencies;
+    }
+
+
     this.setState({
       charData : Object.assign({},this.state.charData,newCharData)
     });
+
+    // raceName = this.state.charData.select_race
+    // thisCharData = utilities.getObjectByName(raceData,raceName);
+    // thisSubRaceData = utilities.getObjectByName(thisCharData.subraces, this.state.charData.select_race) || {};
+    //
+    // newCharData.proficiencies = thisCharData.proficiencies || [];
+    //
+    // if (thisSubRaceData && thisSubRaceData.proficiencies) {
+    //   debugger;
+    //     newCharData.proficiencies = newCharData.proficiencies.concat(thisSubRaceData.proficiencies);
+    // }
+    //
+    //
+    // console.log(newCharData);
+    // console.log(raceName);
+    // console.log(thisCharData.proficiencies);
+    // debugger;
+    //
+    // this.setState({
+    //   charData : Object.assign({},this.state.charData,newCharData)
+    // });
+
+  }
+
+  setProficiencies() {
+    let thisRaceData = this.getThisRaceData();
+    let subRaceName = this.state.charData.select_subrace || "";
+    let thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces,subRaceName);
+    let subraceProficiencies = thisRaceData.proficiencies || {};
+
+
+    this.state.charData.proficiencies = Object.assign({},thisRaceData.proficiencies,this.state.charData.proficiencies,subraceProficiencies);
+
+  }
+
+  getThisRaceData() {
+    let raceName = this.state.charData.select_race;
+    let thisRaceData = utilities.getObjectByName(raceData,raceName);
+
+    return thisRaceData;
   }
 
   getAbilityScoreIncrease(e) {

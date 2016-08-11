@@ -165,66 +165,40 @@ export class CharacterSheet extends React.Component {
    * @return {react object}      view for the list of proficiencies
    */
 
-  getProficiencies(type) {
-    let thisRaceData = utilities.getObjectByName(raceData, this.props.charData.select_race)
-    let subraces = thisRaceData.subraces ? thisRaceData.subraces : {};
-    let selectedSubrace = this.props.charData.select_subrace;
-    let languageProficiencies = [];
-    let subRaceProficiencies = {};
-    let selectedProficiences = {};
-    let proficiencies = {};
-    let item = "";
-    let id = -1;
-    let i = 0;
-    let l = 0;
+   getProficiencies(type) {
+     let raceName = document.querySelector('[name=select_race]') ? document.querySelector('[name=select_race]').value : "";
+     let subraceName = document.querySelector('[name=select_subrace]') ? document.querySelector('[name=select_subrace]').value : "";
+     let thisCharData = this.props.charData || {};
+     let thisRaceData = utilities.getObjectByName(raceData, raceName);
+     let thisSubraceData = utilities.getObjectByName(thisRaceData.subraces, subraceName);
+     let proficiencies = {};
+     let id = -1;
 
-    // get race proficiencies
-    if (thisRaceData.proficiencies) {
-      proficiencies = Object.assign({},proficiencies,thisRaceData.proficiencies);
-    }
+     proficiencies[type] = [];
 
-    // get subrace proficiencies
-    if (thisRaceData.subraces && utilities.getObjectByName(subraces,selectedSubrace)) {
-      subRaceProficiencies = utilities.getObjectByName(subraces,selectedSubrace).proficiencies;
+     if (thisCharData.proficiencies && thisCharData.proficiencies[type]) {
+       proficiencies[type] = proficiencies[type].concat(thisCharData.proficiencies[type]);
+     }
 
-      // assign subrace proficiencies to proficiencies
-      if (subRaceProficiencies) {
-        proficiencies = Object.assign({},proficiencies,subRaceProficiencies);
-      }
-    }
+     if (thisRaceData.proficiencies && thisRaceData.proficiencies[type] && type === 'languages') {
+       proficiencies[type] = proficiencies[type].concat(thisRaceData.proficiencies[type]);
+     }
 
-    // get selected proficiencies
-    if (this.props.charData['proficiency_choice_'+type] && this.props.charData['proficiency_choice_'+type].length) {
-      for (item in this.props.charData['proficiency_choice_'+type]) {
-        selectedProficiences[type] = selectedProficiences[type] || [];
-        selectedProficiences[type].push(this.props.charData['proficiency_choice_'+type][item]);
-      }
+     if (thisSubraceData.proficiencies && thisSubraceData.proficiencies[type]) {
+       proficiencies[type] = proficiencies[type].concat(thisSubraceData.proficiencies[type]);
+     }
 
-      // assign selected proficiencies to proficiencies
-      proficiencies = Object.assign({},proficiencies,selectedProficiences);
-    }
+     if (proficiencies[type]) {
+       return proficiencies[type].map(function(obj) {
+         id += 1;
 
-    if (type === 'languages') {
-      languageProficiencies = proficiencies.languages;
+         if (obj !== "choice") {
+           return <li key={id}>{obj}</li>
+         }
+       });
+     }
 
-      if (this.props.charData.selected_languages) {
-          languageProficiencies = proficiencies.languages.concat(this.props.charData.selected_languages);
-      }
-
-      proficiencies = Object.assign({},proficiencies, {
-        languages : languageProficiencies
-      })
-    }
-
-    if (proficiencies && proficiencies[type]) {
-
-      return proficiencies[type].map(function(obj) {
-        id++;
-        return <li key={id}>{obj}</li>
-      });
-    }
-
-  }
+   }
 
   /**
    * getRacialFeats - gets list of features of selected race and subrace
@@ -252,7 +226,11 @@ export class CharacterSheet extends React.Component {
         allFeats = feats.concat(subrace.feats) || feats;
         feats = allFeats;
       }
+    }
 
+    if (this.props.charData.feats) {
+      allFeats = feats.concat(this.props.charData.feats) || allFeats;
+      feats = allFeats;
     }
 
     if (feats) {
@@ -375,7 +353,7 @@ export class CharacterSheet extends React.Component {
 
             <h4>Languages</h4>
             <ul>
-            {this.getProficiencies('languages')}
+              {this.getProficiencies('languages')}
             </ul>
 
             <h2>Racial Features</h2>

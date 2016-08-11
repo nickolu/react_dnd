@@ -117,18 +117,68 @@
 	    key: 'update',
 	    value: function update(e) {
 	      var newCharData = {};
+	      var raceName = "";
+	      var thisCharData = {};
+	      var thisSubRaceData = {};
 
 	      if (e.target.name.indexOf('ability_score_increase') > -1) {
 	        newCharData = this.getAbilityScoreIncrease(e);
-	      } else if (e.target.name.indexOf('proficiency_choice') > -1) {
-	        this.updateSelectedProficiencies(e);
 	      } else {
 	        newCharData = Object.assign({}, this.state.charData, _defineProperty({}, e.target.name, e.target.value));
+	      }
+
+	      if (document.querySelector('select_race')) {
+	        thisCharData = utilities.getObjectByName(_races2.default, e.target.name) || utilities.getObjectByName(_races2.default, document.querySelector('select_race').value);
+	        newCharData.proficiencies = thisCharData.proficiencies;
+	      }
+
+	      if (document.querySelector('select_subrace')) {
+	        thisSubRaceData = utilities.getObjectByName(_races2.default, e.target.name);
+	        newCharData.proficiencies = thisCharData.proficiencies;
 	      }
 
 	      this.setState({
 	        charData: Object.assign({}, this.state.charData, newCharData)
 	      });
+
+	      // raceName = this.state.charData.select_race
+	      // thisCharData = utilities.getObjectByName(raceData,raceName);
+	      // thisSubRaceData = utilities.getObjectByName(thisCharData.subraces, this.state.charData.select_race) || {};
+	      //
+	      // newCharData.proficiencies = thisCharData.proficiencies || [];
+	      //
+	      // if (thisSubRaceData && thisSubRaceData.proficiencies) {
+	      //   debugger;
+	      //     newCharData.proficiencies = newCharData.proficiencies.concat(thisSubRaceData.proficiencies);
+	      // }
+	      //
+	      //
+	      // console.log(newCharData);
+	      // console.log(raceName);
+	      // console.log(thisCharData.proficiencies);
+	      // debugger;
+	      //
+	      // this.setState({
+	      //   charData : Object.assign({},this.state.charData,newCharData)
+	      // });
+	    }
+	  }, {
+	    key: 'setProficiencies',
+	    value: function setProficiencies() {
+	      var thisRaceData = this.getThisRaceData();
+	      var subRaceName = this.state.charData.select_subrace || "";
+	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);
+	      var subraceProficiencies = thisRaceData.proficiencies || {};
+
+	      this.state.charData.proficiencies = Object.assign({}, thisRaceData.proficiencies, this.state.charData.proficiencies, subraceProficiencies);
+	    }
+	  }, {
+	    key: 'getThisRaceData',
+	    value: function getThisRaceData() {
+	      var raceName = this.state.charData.select_race;
+	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
+
+	      return thisRaceData;
 	    }
 	  }, {
 	    key: 'getAbilityScoreIncrease',
@@ -19860,9 +19910,9 @@
 	var countItemInArray = exports.countItemInArray = function countItemInArray(arr, item) {
 	  var l = arr.length;
 	  var i = 0;
-	  var count = 0;
+	  var count = arr.indexOf('count') > -1 ? 1 : 0;
 	  var arrSort = arr.sort();
-
+	  console.log(count);
 	  for (i = 0; i < l; i += 1) {
 	    if (arrSort[i] === item) {
 	      count += 1;
@@ -19902,6 +19952,81 @@
 /***/ function(module, exports) {
 
 	module.exports = [
+		{
+			"name": "Dragonborn",
+			"id": "dragonborn",
+			"age": "Young dragonborn grow quickly. They walk hours after hatching, attain the size and development of a 10-year-old human child by the age of 3, and reach adulthood by 15. They live to be around 80.",
+			"alignment": "Dragonborn tend to extremes, making a conscious choice for one side or the other in the cosmic war between good and evil (represented by Hahumut and Tiamat, respectively). Most dragonborn are good, but those who side with Tiamat can be terrible villains.",
+			"size": "Dragonborn are taller and heavier than humans, standing well over 6 feet tall and averaging almost 250 pounds. Your size is Medium.",
+			"speed": "30",
+			"proficiencies": {
+				"languages": [
+					"common",
+					"draconic"
+				]
+			},
+			"ability_score_increase": {
+				"str": "2",
+				"cha": "1"
+			},
+			"feats": [
+				"draconic_ancestry",
+				"breath_weapon",
+				"draconic_damage_resistance"
+			],
+			"draconic_ancestry": [
+				{
+					"name": "Black",
+					"damage_type": "Acid",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				{
+					"name": "Blue",
+					"damage_type": "Lightning",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				{
+					"name": "Brass",
+					"damage_type": "Fire",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				{
+					"name": "Bronze",
+					"damage_type": "Lightning",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				{
+					"name": "Copper",
+					"damage_type": "Acid",
+					"breath_weapon": "5 by 30 ft. line (Dex. save)"
+				},
+				{
+					"name": "Gold",
+					"damage_type": "Fire",
+					"breath_weapon": "15 ft. cone (Dex. save)"
+				},
+				{
+					"name": "Green",
+					"damage_type": "Poison",
+					"breath_weapon": "15 ft. cone (Con. save)"
+				},
+				{
+					"name": "Red",
+					"damage_type": "Fire",
+					"breath_weapon": "15 ft. cone (Dex. save)"
+				},
+				{
+					"name": "Silver",
+					"damage_type": "Cold",
+					"breath_weapon": "15 ft. cone (Con. save)"
+				},
+				{
+					"name": "White",
+					"damage_type": "Cold",
+					"breath_weapon": "15 ft. cone (Con. save)"
+				}
+			]
+		},
 		{
 			"name": "Dwarf",
 			"id": "dwarf",
@@ -20009,8 +20134,6 @@
 							"longbow"
 						],
 						"languages": [
-							"common",
-							"elvish",
 							"choice"
 						]
 					},
@@ -20064,147 +20187,6 @@
 			]
 		},
 		{
-			"name": "Halfling",
-			"id": "halfling",
-			"age": "A halfing reaches adulthood at the age of 20 and generally lives into the middle of his or her second century.",
-			"alignment": "Most halflings are lawful good. As a rule, they are good-hearted and kind, hate to see others in pain, and have no tolerance for oppression. They are also very orderly and traditional, leaning heavily on the support of their community and the comfort of their old ways",
-			"size": "Halflings average around 3 ft. tall and weigh around 40-45 lbs. Your size is small.",
-			"speed": "25",
-			"ability_score_increase": {
-				"dex": "2"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"halfling"
-				]
-			},
-			"feats": [
-				"lucky",
-				"brave",
-				"halfling_nimbleness"
-			],
-			"subraces": [
-				{
-					"name": "Lightfoot Halfling",
-					"id": "lightfoot_halfling",
-					"ability_score_increase": {
-						"cha": "1"
-					},
-					"feats": [
-						"naturally_stealthy"
-					]
-				},
-				{
-					"name": "Stout Halfling",
-					"id": "stout_halfling",
-					"ability_score_increase": {
-						"con": "1"
-					},
-					"feats": [
-						"stout_resiliance"
-					]
-				}
-			]
-		},
-		{
-			"name": "Human",
-			"id": "human",
-			"age": "Humans reach adulthood in their late teens and live less than a century",
-			"alignment": "Humans tend toward no particular alignment. The best and worst are found among them.",
-			"size": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"choice"
-				]
-			},
-			"ability_score_increase": {
-				"con": "1",
-				"str": "1",
-				"dex": "1",
-				"cha": "1",
-				"int": "1",
-				"wis": "1"
-			}
-		},
-		{
-			"name": "Dragonborn",
-			"id": "dragonborn",
-			"age": "Young dragonborn grow quickly. They walk hours after hatching, attain the size and development of a 10-year-old human child by the age of 3, and reach adulthood by 15. They live to be around 80.",
-			"alignment": "Dragonborn tend to extremes, making a conscious choice for one side or the other in the cosmic war between good and evil (represented by Hahumut and Tiamat, respectively). Most dragonborn are good, but those who side with Tiamat can be terrible villains.",
-			"size": "Dragonborn are taller and heavier than humans, standing well over 6 feet tall and averaging almost 250 pounds. Your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"draconic"
-				]
-			},
-			"ability_score_increase": {
-				"str": "2",
-				"cha": "1"
-			},
-			"feats": [
-				"draconic_ancestry",
-				"breath_weapon",
-				"draconic_damage_resistance"
-			],
-			"draconic_ancestry": [
-				{
-					"name": "Black",
-					"damage_type": "Acid",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Blue",
-					"damage_type": "Lightning",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Brass",
-					"damage_type": "Fire",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Bronze",
-					"damage_type": "Lightning",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Copper",
-					"damage_type": "Acid",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Gold",
-					"damage_type": "Fire",
-					"breath_weapon": "15 ft. cone (Dex. save)"
-				},
-				{
-					"name": "Green",
-					"damage_type": "Poison",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				},
-				{
-					"name": "Red",
-					"damage_type": "Fire",
-					"breath_weapon": "15 ft. cone (Dex. save)"
-				},
-				{
-					"name": "Silver",
-					"damage_type": "Cold",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				},
-				{
-					"name": "White",
-					"damage_type": "Cold",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				}
-			]
-		},
-		{
 			"name": "Gnome",
 			"id": "gnome",
 			"age": "Gnomes mature at the same rate humans do, and most are expected to settle down into an adult life by around age 40. They can live 350 to almost 500 years.",
@@ -20249,6 +20231,54 @@
 					"proficiencies": {
 						"tools": [
 							"tinker"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Goblin",
+			"id": "goblin",
+			"age": "Goblins mature faster than humans, reaching adulthood at around age 12. They also age noticeably faster than humans, and even the most cautious goblins rarely live longer than 50 years.",
+			"alignment": "Most goblins are wildly chaotic, though they have no particular inclination toward good or evil.",
+			"size": " Goblins average about 3 feet tall and weigh about 40 pounds. Your size is Small",
+			"speed": "25",
+			"ability_score_increase": {
+				"con": "2"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"goblin"
+				]
+			},
+			"feats": [
+				"darkvision",
+				"grit"
+			],
+			"subraces": [
+				{
+					"name": "Grotag Tribe Goblin",
+					"id": "grotag_goblin",
+					"proficiencies": {
+						"skills": [
+							"animal_handling"
+						]
+					}
+				},
+				{
+					"name": "Lavastep Tribe Goblin",
+					"id": "lavastep_goblin",
+					"feats": [
+						"lavastep_grit"
+					]
+				},
+				{
+					"name": "Tuktuk Tribe Goblin",
+					"id": "tuktuk_merfolk",
+					"proficiencies": {
+						"tools": [
+							"thief"
 						]
 					}
 				}
@@ -20328,27 +20358,70 @@
 			}
 		},
 		{
-			"name": "Tiefling",
-			"id": "tiefling",
-			"age": "Tieflings mature at the same rate as humans but live a few years longer.",
-			"alignment": "Tieflings might not have an innate tendency toward evil, but many of them end up there. Evil or not, an independent nature inclines many tieflings toward a chaotic alignment.",
-			"size": "Tieflings are about he same size and build as humans. Your size is Medium.",
+			"name": "Halfling",
+			"id": "halfling",
+			"age": "A halfing reaches adulthood at the age of 20 and generally lives into the middle of his or her second century.",
+			"alignment": "Most halflings are lawful good. As a rule, they are good-hearted and kind, hate to see others in pain, and have no tolerance for oppression. They are also very orderly and traditional, leaning heavily on the support of their community and the comfort of their old ways",
+			"size": "Halflings average around 3 ft. tall and weigh around 40-45 lbs. Your size is small.",
+			"speed": "25",
+			"ability_score_increase": {
+				"dex": "2"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"halfling"
+				]
+			},
+			"feats": [
+				"lucky",
+				"brave",
+				"halfling_nimbleness"
+			],
+			"subraces": [
+				{
+					"name": "Lightfoot Halfling",
+					"id": "lightfoot_halfling",
+					"ability_score_increase": {
+						"cha": "1"
+					},
+					"feats": [
+						"naturally_stealthy"
+					]
+				},
+				{
+					"name": "Stout Halfling",
+					"id": "stout_halfling",
+					"ability_score_increase": {
+						"con": "1"
+					},
+					"feats": [
+						"stout_resiliance"
+					]
+				}
+			]
+		},
+		{
+			"name": "Human",
+			"id": "human",
+			"age": "Humans reach adulthood in their late teens and live less than a century",
+			"alignment": "Humans tend toward no particular alignment. The best and worst are found among them.",
+			"size": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium.",
 			"speed": "30",
 			"proficiencies": {
 				"languages": [
 					"common",
-					"infernal"
+					"choice"
 				]
 			},
 			"ability_score_increase": {
-				"cha": "2",
-				"int": "1"
-			},
-			"feats": [
-				"hellish_resistance",
-				"infernal_legacy",
-				"darkvision"
-			]
+				"con": "1",
+				"str": "1",
+				"dex": "1",
+				"cha": "1",
+				"int": "1",
+				"wis": "1"
+			}
 		},
 		{
 			"name": "Kor",
@@ -20456,76 +20529,6 @@
 			]
 		},
 		{
-			"name": "Vampire",
-			"id": "vampire",
-			"age": "Vampires don’t mature and age in the same way that other races do. Every living vampire is either a bloodchief, infected by Ulamog’s influence in the distant reaches of history, or was spawned by a bloodchief from a living human. Most vampires are thus very old, but few have any memory of their earliest years.",
-			"alignment": "Vampires have no innate tendency toward evil, but consuming the life energy of other creatures often pushes them to that end. Regardless of their moral bent, the strict hierarchies of their bloodchiefs inclines them toward a lawful alignment.",
-			"size": "Vampires are about the same size and build as humans. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"cha": "1"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"vampire"
-				]
-			},
-			"feats": [
-				"darkvision",
-				"vampiric_resistance",
-				"blood_thirst"
-			]
-		},
-		{
-			"name": "Goblin",
-			"id": "goblin",
-			"age": "Goblins mature faster than humans, reaching adulthood at around age 12. They also age noticeably faster than humans, and even the most cautious goblins rarely live longer than 50 years.",
-			"alignment": "Most goblins are wildly chaotic, though they have no particular inclination toward good or evil.",
-			"size": " Goblins average about 3 feet tall and weigh about 40 pounds. Your size is Small",
-			"speed": "25",
-			"ability_score_increase": {
-				"con": "2"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"goblin"
-				]
-			},
-			"feats": [
-				"darkvision",
-				"grit"
-			],
-			"subraces": [
-				{
-					"name": "Grotag Tribe Goblin",
-					"id": "grotag_goblin",
-					"proficiencies": {
-						"skills": [
-							"animal_handling"
-						]
-					}
-				},
-				{
-					"name": "Lavastep Tribe Goblin",
-					"id": "lavastep_goblin",
-					"feats": [
-						"lavastep_grit"
-					]
-				},
-				{
-					"name": "Tuktuk Tribe Goblin",
-					"id": "tuktuk_merfolk",
-					"proficiencies": {
-						"tools": [
-							"thief"
-						]
-					}
-				}
-			]
-		},
-		{
 			"name": "Moogle",
 			"id": "moogle",
 			"age": "Moogles reach adulthood within a few months, but can live for hundreds of years.",
@@ -20548,7 +20551,25 @@
 				"tools": [
 					"choice"
 				],
-				"tools_choice": [],
+				"tools_choice": [
+					"alchemist",
+					"brewer",
+					"calligrapher",
+					"carpenter",
+					"cartographer",
+					"cobbler",
+					"cook ",
+					"glassblower",
+					"jeweler",
+					"leatherworker",
+					"mason",
+					"painter",
+					"potter",
+					"smith",
+					"tinker",
+					"weaver",
+					"woodcarver"
+				],
 				"armor": [
 					"shields"
 				]
@@ -20556,6 +20577,51 @@
 			"feats": [
 				"darkvision",
 				"moogle_wings"
+			]
+		},
+		{
+			"name": "Tiefling",
+			"id": "tiefling",
+			"age": "Tieflings mature at the same rate as humans but live a few years longer.",
+			"alignment": "Tieflings might not have an innate tendency toward evil, but many of them end up there. Evil or not, an independent nature inclines many tieflings toward a chaotic alignment.",
+			"size": "Tieflings are about he same size and build as humans. Your size is Medium.",
+			"speed": "30",
+			"proficiencies": {
+				"languages": [
+					"common",
+					"infernal"
+				]
+			},
+			"ability_score_increase": {
+				"cha": "2",
+				"int": "1"
+			},
+			"feats": [
+				"hellish_resistance",
+				"infernal_legacy",
+				"darkvision"
+			]
+		},
+		{
+			"name": "Vampire",
+			"id": "vampire",
+			"age": "Vampires don’t mature and age in the same way that other races do. Every living vampire is either a bloodchief, infected by Ulamog’s influence in the distant reaches of history, or was spawned by a bloodchief from a living human. Most vampires are thus very old, but few have any memory of their earliest years.",
+			"alignment": "Vampires have no innate tendency toward evil, but consuming the life energy of other creatures often pushes them to that end. Regardless of their moral bent, the strict hierarchies of their bloodchiefs inclines them toward a lawful alignment.",
+			"size": "Vampires are about the same size and build as humans. Your size is Medium.",
+			"speed": "30",
+			"ability_score_increase": {
+				"cha": "1"
+			},
+			"proficiencies": {
+				"languages": [
+					"common",
+					"vampire"
+				]
+			},
+			"feats": [
+				"darkvision",
+				"vampiric_resistance",
+				"blood_thirst"
 			]
 		}
 	];
@@ -20895,65 +20961,39 @@
 	  }, {
 	    key: 'getProficiencies',
 	    value: function getProficiencies(type) {
-	      var thisRaceData = utilities.getObjectByName(_races2.default, this.props.charData.select_race);
-	      var subraces = thisRaceData.subraces ? thisRaceData.subraces : {};
-	      var selectedSubrace = this.props.charData.select_subrace;
-	      var languageProficiencies = [];
-	      var subRaceProficiencies = {};
-	      var selectedProficiences = {};
+	      var raceName = document.querySelector('[name=select_race]') ? document.querySelector('[name=select_race]').value : "";
+	      var subraceName = document.querySelector('[name=select_subrace]') ? document.querySelector('[name=select_subrace]').value : "";
+	      var thisCharData = this.props.charData || {};
+	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
+	      var thisSubraceData = utilities.getObjectByName(thisRaceData.subraces, subraceName);
 	      var proficiencies = {};
-	      var item = "";
 	      var id = -1;
-	      var i = 0;
-	      var l = 0;
 
-	      // get race proficiencies
-	      if (thisRaceData.proficiencies) {
-	        proficiencies = Object.assign({}, proficiencies, thisRaceData.proficiencies);
+	      proficiencies[type] = [];
+
+	      if (thisCharData.proficiencies && thisCharData.proficiencies[type]) {
+	        proficiencies[type] = proficiencies[type].concat(thisCharData.proficiencies[type]);
 	      }
 
-	      // get subrace proficiencies
-	      if (thisRaceData.subraces && utilities.getObjectByName(subraces, selectedSubrace)) {
-	        subRaceProficiencies = utilities.getObjectByName(subraces, selectedSubrace).proficiencies;
-
-	        // assign subrace proficiencies to proficiencies
-	        if (subRaceProficiencies) {
-	          proficiencies = Object.assign({}, proficiencies, subRaceProficiencies);
-	        }
+	      if (thisRaceData.proficiencies && thisRaceData.proficiencies[type] && type === 'languages') {
+	        proficiencies[type] = proficiencies[type].concat(thisRaceData.proficiencies[type]);
 	      }
 
-	      // get selected proficiencies
-	      if (this.props.charData['proficiency_choice_' + type] && this.props.charData['proficiency_choice_' + type].length) {
-	        for (item in this.props.charData['proficiency_choice_' + type]) {
-	          selectedProficiences[type] = selectedProficiences[type] || [];
-	          selectedProficiences[type].push(this.props.charData['proficiency_choice_' + type][item]);
-	        }
-
-	        // assign selected proficiencies to proficiencies
-	        proficiencies = Object.assign({}, proficiencies, selectedProficiences);
+	      if (thisSubraceData.proficiencies && thisSubraceData.proficiencies[type]) {
+	        proficiencies[type] = proficiencies[type].concat(thisSubraceData.proficiencies[type]);
 	      }
 
-	      if (type === 'languages') {
-	        languageProficiencies = proficiencies.languages;
-
-	        if (this.props.charData.selected_languages) {
-	          languageProficiencies = proficiencies.languages.concat(this.props.charData.selected_languages);
-	        }
-
-	        proficiencies = Object.assign({}, proficiencies, {
-	          languages: languageProficiencies
-	        });
-	      }
-
-	      if (proficiencies && proficiencies[type]) {
-
+	      if (proficiencies[type]) {
 	        return proficiencies[type].map(function (obj) {
-	          id++;
-	          return _react2.default.createElement(
-	            'li',
-	            { key: id },
-	            obj
-	          );
+	          id += 1;
+
+	          if (obj !== "choice") {
+	            return _react2.default.createElement(
+	              'li',
+	              { key: id },
+	              obj
+	            );
+	          }
 	        });
 	      }
 	    }
@@ -20987,6 +21027,11 @@
 	          allFeats = feats.concat(subrace.feats) || feats;
 	          feats = allFeats;
 	        }
+	      }
+
+	      if (this.props.charData.feats) {
+	        allFeats = feats.concat(this.props.charData.feats) || allFeats;
+	        feats = allFeats;
 	      }
 
 	      if (feats) {
@@ -21583,7 +21628,6 @@
 	  _createClass(DropDown, [{
 	    key: 'onChange',
 	    value: function onChange(e) {
-
 	      this.setState({
 	        selection: e.target.value
 	      });
@@ -21804,6 +21848,8 @@
 	    _this.state = {};
 	    _this.onChange = _this.onChange.bind(_this);
 	    _this.setLanguageChoice = _this.setLanguageChoice.bind(_this);
+	    _this.setProficiencyChoices = _this.setProficiencyChoices.bind(_this);
+	    _this.setDraconicAncestry = _this.setDraconicAncestry.bind(_this);
 	    return _this;
 	  }
 
@@ -21822,15 +21868,29 @@
 	    value: function setLanguageChoice(e) {
 	      var languageElems = document.querySelectorAll('[name=select_extra_language]') || [];
 	      var l = languageElems.length;
+	      var index = 0;
 	      var i = 0;
 
 	      this.props.charData.selected_languages = this.props.charData.selected_languages || [];
+	      this.props.charData.proficiencies = this.props.charData.proficiencies || {};
+	      this.props.charData.proficiencies.languages = this.props.charData.proficiencies.languages || [];
 
 	      if (l > 0) {
 	        for (i = 0; i < l; i += 1) {
 	          this.props.charData.selected_languages.push(languageElems[i].value);
+	          this.props.charData.proficiencies.languages.push(languageElems[i].value);
 	        }
 	      } else {
+	        if (this.props.charData.selected_languages) {
+	          l = this.props.charData.selected_languages.length;
+	          for (i = 0; i < l; i += 1) {
+	            index = this.props.charData.proficiencies.languages.indexOf(this.props.charData.selected_languages[i]);
+	            if (index > -1) {
+	              this.props.charData.proficiencies.languages.splice(index, 1);
+	            }
+	            this.props.charData.proficiencies.languages.push('choice');
+	          }
+	        }
 	        this.props.charData.selected_languages = [];
 	      }
 
@@ -21839,12 +21899,9 @@
 	  }, {
 	    key: 'resetRaceData',
 	    value: function resetRaceData() {
-	      this.props.charData.proficiency_choice_tools = [];
-	      this.props.charData.proficiency_choice_abilities = [];
-	      this.props.charData.proficiency_choice_weapons = [];
-	      this.props.charData.proficiency_choice_skills = [];
-	      this.props.charData.proficiency_choice_languages = [];
+	      this.props.charData.proficiencies = {};
 	      this.props.charData.selected_languages = [];
+	      this.props.charData.feats = [];
 	    }
 	  }, {
 	    key: 'getRaceNames',
@@ -21859,10 +21916,34 @@
 	      return raceNames;
 	    }
 	  }, {
-	    key: 'getProficiencyChoices',
-	    value: function getProficiencyChoices(thisRaceData) {
+	    key: 'setProficiencyChoices',
+	    value: function setProficiencyChoices(e) {
+	      var type = e.target.getAttribute("name");
+	      var proficiency = e.target.value;
+	      var thisRaceData = this.getThisRaceData();
+	      var subRaceName = this.props.charData.select_subrace || "";
+	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);
+	      var subraceProficiencies = thisRaceData.proficiencies || {};
+
+	      this.props.charData.proficiencies = Object.assign({}, thisRaceData.proficiencies, this.props.charData.proficiencies, subraceProficiencies);
+	      this.props.charData.proficiencies[type] = this.props.charData.proficiencies[type] || [];
+
+	      if (e.target.checked) {
+	        this.props.charData.proficiencies[type].push(proficiency);
+	      } else {
+	        if (this.props.charData.proficiencies[type].indexOf(proficiency) > -1) {
+	          this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
+	        }
+	      }
+
+	      this.props.onUpdate(e);
+	    }
+	  }, {
+	    key: 'getProficiencyChoiceForm',
+	    value: function getProficiencyChoiceForm(thisRaceData) {
 	      var proficiencyChoiceForm = "";
 	      var proficiencyChoices = [];
+	      var optionsLimit = 0;
 	      var choiceName = "";
 	      var choice = "";
 	      var item = "";
@@ -21874,35 +21955,58 @@
 	        for (item in thisRaceData.proficiencies) {
 	          if (thisRaceData.proficiencies[item].indexOf('choice') > -1) {
 	            choiceName = item + "_choice";
-	            if (thisRaceData.proficiencies[choiceName]) {
-	              l = thisRaceData.proficiencies[choiceName].length;
 
-	              for (j = 0; j < l; j += 1) {
-	                choice = thisRaceData.proficiencies[choiceName][j];
+	            if (item !== "languages") {
+	              if (thisRaceData.proficiencies[choiceName]) {
+	                l = thisRaceData.proficiencies[choiceName].length;
 
-	                proficiencyChoices.push({
-	                  "name": "proficiency_choice_" + item,
-	                  "label": utilities.titleCase(choice) + " " + utilities.titleCase(item),
-	                  "value": choice,
-	                  "id": choice
+	                for (j = 0; j < l; j += 1) {
+	                  choice = thisRaceData.proficiencies[choiceName][j];
+
+	                  proficiencyChoices.push({
+	                    "name": item,
+	                    "label": utilities.titleCase(choice) + " " + utilities.titleCase(item),
+	                    "value": choice,
+	                    "id": choice
+	                  });
+	                }
+	                proficiencyChoiceForm = _react2.default.createElement(_checkboxGroup.CheckBoxGroup, {
+	                  name: 'proficiency_choice_form',
+	                  label: 'Select Proficiencies',
+	                  choices: proficiencyChoices,
+	                  groupLabel: 'Select Skill Proficiencies',
+	                  groupName: 'proficieny_choices',
+	                  optionsLimit: utilities.countItemInArray(thisRaceData.proficiencies[item], "choice"),
+	                  onUpdate: this.setProficiencyChoices
 	                });
 	              }
 	            }
-
-	            proficiencyChoiceForm = _react2.default.createElement(_checkboxGroup.CheckBoxGroup, {
-	              name: 'proficiency_choice_form',
-	              label: 'Select Proficiencies',
-	              choices: proficiencyChoices,
-	              groupLabel: 'Select Skill Proficiencies',
-	              groupName: 'proficieny_choices',
-	              optionsLimit: utilities.countItemInArray(thisRaceData.proficiencies[item], "choice"),
-	              onUpdate: this.props.onUpdate
-	            });
 	          }
 	        }
 	      }
 
 	      return proficiencyChoiceForm;
+	    }
+	  }, {
+	    key: 'setDraconicAncestry',
+	    value: function setDraconicAncestry(e) {
+	      var i = 0;
+	      var l = 0;
+
+	      if (this.props.charData) {
+	        this.props.charData.feats = this.props.charData.feats || [];
+	        l = this.props.charData.feats.length;
+
+	        for (i = 0; i < l; i += 1) {
+	          if (this.props.charData.feats && this.props.charData.feats[i] && this.props.charData.feats[i].indexOf("draconic_ancestry_") > -1) {
+	            this.props.charData.feats.splice(i, 1);
+	          }
+	        }
+
+	        this.props.charData.feats.push("draconic_ancestry_" + e.target.value.toLowerCase());
+	      }
+
+	      this.props.onUpdate(e);
 	    }
 	  }, {
 	    key: 'getDraconicAncestryForm',
@@ -21921,7 +22025,7 @@
 	            name: thisRaceData.draconic_ancestry[item].name
 	          });
 	        }
-	        return _react2.default.createElement(_dropDown.DropDown, { name: 'select_draconic_ancestry', className: 'select-race', label: 'Select Draconic Ancestry', choices: draconicAncestryChoices, onUpdate: this.onChange });
+	        return _react2.default.createElement(_dropDown.DropDown, { name: 'select_draconic_ancestry', className: 'select-race', label: 'Select Draconic Ancestry', choices: draconicAncestryChoices, onUpdate: this.setDraconicAncestry });
 	      }
 
 	      return false;
@@ -21943,9 +22047,19 @@
 	      var subRaceName = this.props.charData.select_subrace;
 	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);;
 	      var languageChoiceForm = "";
+	      var raceIndex = 0;
+	      var subraceIndex = 0;
 
 	      if (thisRaceData) {
-	        if (thisRaceData.proficiencies.languages && thisRaceData.proficiencies.languages.indexOf("choice") > -1) {
+	        raceIndex = thisRaceData.proficiencies.languages.indexOf("choice");
+	        if (thisRaceData.proficiencies.languages && raceIndex > -1) {
+	          languageChoiceForm = _react2.default.createElement(
+	            'div',
+	            null,
+	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language' }),
+	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.setLanguageChoice })
+	          );
+	        } else if (this.props.charData && this.props.charData.proficiences && this.props.charData.proficiences.languages && this.props.charData.proficiences.languages.indexOf('choice') > -1) {
 	          languageChoiceForm = _react2.default.createElement(
 	            'div',
 	            null,
@@ -21954,8 +22068,9 @@
 	          );
 	        }
 
-	        if (thisSubRaceData) {
-	          if (thisSubRaceData.proficiencies && thisSubRaceData.proficiencies.languages && thisSubRaceData.proficiencies.languages.indexOf("choice") > -1) {
+	        if (thisSubRaceData && thisSubRaceData.proficiencies && thisSubRaceData.proficiencies.languages) {
+	          subraceIndex = thisSubRaceData.proficiencies.languages.indexOf("choice");
+	          if (subraceIndex > -1) {
 	            languageChoiceForm = _react2.default.createElement(
 	              'div',
 	              null,
@@ -21997,7 +22112,6 @@
 	    key: 'getThisRaceData',
 	    value: function getThisRaceData() {
 	      var raceName = this.props.charData.select_race;
-	      var subRaceName = this.props.charData.select_subrace;
 	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
 
 	      return thisRaceData;
@@ -22019,7 +22133,7 @@
 	        this.getSubraceForm(thisRaceData),
 	        this.getLanguageChoiceForm(thisRaceData),
 	        this.getAbilityScoreChoiceForm(thisRaceData),
-	        this.getProficiencyChoices(thisRaceData),
+	        this.getProficiencyChoiceForm(thisRaceData),
 	        this.getDraconicAncestryForm(thisRaceData)
 	      );
 	    }
