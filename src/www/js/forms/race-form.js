@@ -24,6 +24,7 @@ export class RaceForm extends React.Component {
 
     this.resetRaceData();
     this.props.onUpdate(e);
+    this.setProficiencyChoices(e);
   }
 
   setLanguageChoice(e) {
@@ -58,10 +59,13 @@ export class RaceForm extends React.Component {
     this.props.onUpdate(e);
   }
 
-  resetRaceData() {
+  resetRaceData(e) {
     this.props.charData.proficiencies = {}
     this.props.charData.selected_languages = [];
     this.props.charData.feats = [];
+    if (e && e.target && e.target.getAttribute('name') === "select_race") {
+        this.props.charData.ability_score_increase = {};
+    }
   }
 
   getRaceNames() {
@@ -80,20 +84,31 @@ export class RaceForm extends React.Component {
     let proficiency = e.target.value;
     let thisRaceData = this.getThisRaceData();
     let subRaceName = this.props.charData.select_subrace || "";
-    let thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces,subRaceName);
-    let subraceProficiencies = thisRaceData.proficiencies || {};
+    let thisSubRaceData =  utilities.getObjectByName(thisRaceData.subraces,subRaceName);
+    let subraceProficiencies = thisSubRaceData.proficiencies || {};
 
-    this.props.charData.proficiencies = Object.assign({},thisRaceData.proficiencies,this.props.charData.proficiencies,subraceProficiencies);
-    this.props.charData.proficiencies[type] = this.props.charData.proficiencies[type] || [];
-
-    if (e.target.checked) {
-      this.props.charData.proficiencies[type].push(proficiency);
+    if (e.target.getAttribute("name") === "select_subrace") {
+      thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, e.target.value);
     } else {
-      if (this.props.charData.proficiencies[type].indexOf(proficiency) > -1) {
-        this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
+      thisSubRaceData = {};
+    }
+
+    if (e.target.getAttribute("name") === "select_race") {
+      thisRaceData = utilities.getObjectByName(raceData, e.target.value);
+      thisSubRaceData = {};
+    }
+
+    if (e.target.getAttribute('type') === "checkbox") {
+      if (e.target.checked) {
+        this.props.charData.proficiencies[type].push(e.target.value);
+      } else {
+        if (this.props.charData.proficiencies[type].indexOf(e.target.value) > -1) {
+          this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
+        }
       }
     }
 
+    this.props.charData.proficiencies = Object.assign(this.props.charData.proficiencies,thisRaceData.proficiencies,thisSubRaceData.proficiencies);
     this.props.onUpdate(e);
   }
 

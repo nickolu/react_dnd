@@ -46,43 +46,9 @@ class DndForm extends React.Component {
         newCharData.proficiencies = thisCharData.proficiencies;
     }
 
-
     this.setState({
       charData : Object.assign({},this.state.charData,newCharData)
     });
-
-    // raceName = this.state.charData.select_race
-    // thisCharData = utilities.getObjectByName(raceData,raceName);
-    // thisSubRaceData = utilities.getObjectByName(thisCharData.subraces, this.state.charData.select_race) || {};
-    //
-    // newCharData.proficiencies = thisCharData.proficiencies || [];
-    //
-    // if (thisSubRaceData && thisSubRaceData.proficiencies) {
-    //   debugger;
-    //     newCharData.proficiencies = newCharData.proficiencies.concat(thisSubRaceData.proficiencies);
-    // }
-    //
-    //
-    // console.log(newCharData);
-    // console.log(raceName);
-    // console.log(thisCharData.proficiencies);
-    // debugger;
-    //
-    // this.setState({
-    //   charData : Object.assign({},this.state.charData,newCharData)
-    // });
-
-  }
-
-  setProficiencies() {
-    let thisRaceData = this.getThisRaceData();
-    let subRaceName = this.state.charData.select_subrace || "";
-    let thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces,subRaceName);
-    let subraceProficiencies = thisRaceData.proficiencies || {};
-
-
-    this.state.charData.proficiencies = Object.assign({},thisRaceData.proficiencies,this.state.charData.proficiencies,subraceProficiencies);
-
   }
 
   getThisRaceData() {

@@ -2,6 +2,7 @@ import React from 'react';
 import raceData from '../json/races.json';
 import classData from '../json/character-classes.json';
 import backgroundData from '../json/backgrounds.json';
+import featsData from '../json/feats.json';
 import * as utilities from './utilities.js';
 
 
@@ -45,31 +46,22 @@ export class CharacterSheet extends React.Component {
    * @return {number}         ability score bonus for selected race
    */
   getRaceAbilityScoreBonus(ability,race) {
+    let thisRaceData = utilities.getObjectByName(raceData, race);
+    let subraceSelect = document.querySelector('[name=select_subrace]');
     let bonus = 0;
-    let specialty_selection = document.querySelector('[name=select_subrace]');
-    let thisRaceData = {};
-    let item = {};
-    let i = 0;
+    let subraceName = "";
+    let thisSubRaceData = {};
 
-    for (i=0;i<raceData.length;i++) {
-      if (raceData[i].name === race) {
-        thisRaceData = raceData[i];
-        break;
-      }
+    if (subraceSelect) {
+      thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subraceSelect.value);
     }
 
     if (thisRaceData.ability_score_increase && thisRaceData.ability_score_increase[ability]) {
       bonus = Number(thisRaceData.ability_score_increase[ability]) || 0;
     }
 
-    if (thisRaceData.subraces) {
-      if (specialty_selection && specialty_selection.value) {
-        for (item in thisRaceData.subraces) {
-          if (thisRaceData.subraces[item].name === specialty_selection.value) {
-            bonus += Number(thisRaceData.subraces[item].ability_score_increase[ability]) || 0;
-          }
-        }
-      }
+    if (thisSubRaceData && thisSubRaceData.ability_score_increase && thisSubRaceData.ability_score_increase[ability]) {
+      bonus += Number(thisSubRaceData.ability_score_increase[ability]) || 0;
     }
 
     return Number(bonus);
@@ -180,10 +172,6 @@ export class CharacterSheet extends React.Component {
        proficiencies[type] = proficiencies[type].concat(thisCharData.proficiencies[type]);
      }
 
-     if (thisRaceData.proficiencies && thisRaceData.proficiencies[type] && type === 'languages') {
-       proficiencies[type] = proficiencies[type].concat(thisRaceData.proficiencies[type]);
-     }
-
      if (thisSubraceData.proficiencies && thisSubraceData.proficiencies[type]) {
        proficiencies[type] = proficiencies[type].concat(thisSubraceData.proficiencies[type]);
      }
@@ -236,7 +224,14 @@ export class CharacterSheet extends React.Component {
     if (feats) {
       for (i in feats) {
         if (uniqueFeats.indexOf(feats[i]) === -1) {
-          uniqueFeats.push(feats[i]);
+          if (featsData[feats[i]]) {
+            uniqueFeats.push(featsData[feats[i]]);
+          } else {
+            uniqueFeats.push({
+              "name" : feats[i],
+              "description" : "feat not defined"
+            });
+          }
         }
       }
     }
@@ -244,7 +239,10 @@ export class CharacterSheet extends React.Component {
     if (uniqueFeats) {
       return uniqueFeats.map(function(obj){
         j += 1;
-        return <li key={j}>{obj}</li>
+        return  <li key={j}>
+                  <h4>{obj.name}</h4>
+                  <p>{obj.description}</p>
+                </li>
       });
     }
 

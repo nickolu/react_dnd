@@ -66,23 +66,23 @@
 
 	var _characterSheet = __webpack_require__(161);
 
-	var _dropDown = __webpack_require__(164);
+	var _dropDown = __webpack_require__(165);
 
-	var _textInput = __webpack_require__(165);
+	var _textInput = __webpack_require__(166);
 
-	var _submitButton = __webpack_require__(166);
+	var _submitButton = __webpack_require__(167);
 
-	var _raceForm = __webpack_require__(167);
+	var _raceForm = __webpack_require__(168);
 
-	var _classForm = __webpack_require__(169);
+	var _classForm = __webpack_require__(170);
 
-	var _characterBiographyForm = __webpack_require__(170);
+	var _characterBiographyForm = __webpack_require__(171);
 
-	var _backgroundForm = __webpack_require__(171);
+	var _backgroundForm = __webpack_require__(172);
 
-	var _abilityScoresForm = __webpack_require__(172);
+	var _abilityScoresForm = __webpack_require__(173);
 
-	var _characterDetailsForm = __webpack_require__(173);
+	var _characterDetailsForm = __webpack_require__(174);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -140,37 +140,6 @@
 	      this.setState({
 	        charData: Object.assign({}, this.state.charData, newCharData)
 	      });
-
-	      // raceName = this.state.charData.select_race
-	      // thisCharData = utilities.getObjectByName(raceData,raceName);
-	      // thisSubRaceData = utilities.getObjectByName(thisCharData.subraces, this.state.charData.select_race) || {};
-	      //
-	      // newCharData.proficiencies = thisCharData.proficiencies || [];
-	      //
-	      // if (thisSubRaceData && thisSubRaceData.proficiencies) {
-	      //   debugger;
-	      //     newCharData.proficiencies = newCharData.proficiencies.concat(thisSubRaceData.proficiencies);
-	      // }
-	      //
-	      //
-	      // console.log(newCharData);
-	      // console.log(raceName);
-	      // console.log(thisCharData.proficiencies);
-	      // debugger;
-	      //
-	      // this.setState({
-	      //   charData : Object.assign({},this.state.charData,newCharData)
-	      // });
-	    }
-	  }, {
-	    key: 'setProficiencies',
-	    value: function setProficiencies() {
-	      var thisRaceData = this.getThisRaceData();
-	      var subRaceName = this.state.charData.select_subrace || "";
-	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);
-	      var subraceProficiencies = thisRaceData.proficiencies || {};
-
-	      this.state.charData.proficiencies = Object.assign({}, thisRaceData.proficiencies, this.state.charData.proficiencies, subraceProficiencies);
 	    }
 	  }, {
 	    key: 'getThisRaceData',
@@ -20275,7 +20244,7 @@
 				},
 				{
 					"name": "Tuktuk Tribe Goblin",
-					"id": "tuktuk_merfolk",
+					"id": "tuktuk_goblin",
 					"proficiencies": {
 						"tools": [
 							"thief"
@@ -20343,6 +20312,7 @@
 				"str": "2"
 			},
 			"feats": [
+				"darkvision",
 				"menacing",
 				"relentless_endurance",
 				"savage_attacks"
@@ -20465,12 +20435,12 @@
 					"common",
 					"merfolk",
 					"choice"
-				],
-				"skills": [
-					"athletics",
-					"acrobatics"
 				]
 			},
+			"feats": [
+				"amphibeous",
+				"merfolk_swim_speed"
+			],
 			"subraces": [
 				{
 					"name": "Emeria (Wind) Merfolk",
@@ -20523,9 +20493,6 @@
 						"bard_cantrip"
 					]
 				}
-			],
-			"feats": [
-				"amphibeous"
 			]
 		},
 		{
@@ -20576,7 +20543,10 @@
 			},
 			"feats": [
 				"darkvision",
-				"moogle_wings"
+				"moogle_wings",
+				"snow_camouflage",
+				"mask_of_the_wild",
+				"naturally_stealthy"
 			]
 		},
 		{
@@ -20654,6 +20624,10 @@
 	var _backgrounds = __webpack_require__(163);
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
+
+	var _feats = __webpack_require__(164);
+
+	var _feats2 = _interopRequireDefault(_feats);
 
 	var _utilities = __webpack_require__(159);
 
@@ -20751,31 +20725,22 @@
 	  }, {
 	    key: 'getRaceAbilityScoreBonus',
 	    value: function getRaceAbilityScoreBonus(ability, race) {
+	      var thisRaceData = utilities.getObjectByName(_races2.default, race);
+	      var subraceSelect = document.querySelector('[name=select_subrace]');
 	      var bonus = 0;
-	      var specialty_selection = document.querySelector('[name=select_subrace]');
-	      var thisRaceData = {};
-	      var item = {};
-	      var i = 0;
+	      var subraceName = "";
+	      var thisSubRaceData = {};
 
-	      for (i = 0; i < _races2.default.length; i++) {
-	        if (_races2.default[i].name === race) {
-	          thisRaceData = _races2.default[i];
-	          break;
-	        }
+	      if (subraceSelect) {
+	        thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subraceSelect.value);
 	      }
 
 	      if (thisRaceData.ability_score_increase && thisRaceData.ability_score_increase[ability]) {
 	        bonus = Number(thisRaceData.ability_score_increase[ability]) || 0;
 	      }
 
-	      if (thisRaceData.subraces) {
-	        if (specialty_selection && specialty_selection.value) {
-	          for (item in thisRaceData.subraces) {
-	            if (thisRaceData.subraces[item].name === specialty_selection.value) {
-	              bonus += Number(thisRaceData.subraces[item].ability_score_increase[ability]) || 0;
-	            }
-	          }
-	        }
+	      if (thisSubRaceData && thisSubRaceData.ability_score_increase && thisSubRaceData.ability_score_increase[ability]) {
+	        bonus += Number(thisSubRaceData.ability_score_increase[ability]) || 0;
 	      }
 
 	      return Number(bonus);
@@ -20975,10 +20940,6 @@
 	        proficiencies[type] = proficiencies[type].concat(thisCharData.proficiencies[type]);
 	      }
 
-	      if (thisRaceData.proficiencies && thisRaceData.proficiencies[type] && type === 'languages') {
-	        proficiencies[type] = proficiencies[type].concat(thisRaceData.proficiencies[type]);
-	      }
-
 	      if (thisSubraceData.proficiencies && thisSubraceData.proficiencies[type]) {
 	        proficiencies[type] = proficiencies[type].concat(thisSubraceData.proficiencies[type]);
 	      }
@@ -21037,7 +20998,14 @@
 	      if (feats) {
 	        for (i in feats) {
 	          if (uniqueFeats.indexOf(feats[i]) === -1) {
-	            uniqueFeats.push(feats[i]);
+	            if (_feats2.default[feats[i]]) {
+	              uniqueFeats.push(_feats2.default[feats[i]]);
+	            } else {
+	              uniqueFeats.push({
+	                "name": feats[i],
+	                "description": "feat not defined"
+	              });
+	            }
 	          }
 	        }
 	      }
@@ -21048,7 +21016,16 @@
 	          return _react2.default.createElement(
 	            'li',
 	            { key: j },
-	            obj
+	            _react2.default.createElement(
+	              'h4',
+	              null,
+	              obj.name
+	            ),
+	            _react2.default.createElement(
+	              'p',
+	              null,
+	              obj.description
+	            )
 	          );
 	        });
 	      }
@@ -21585,6 +21562,233 @@
 
 /***/ },
 /* 164 */
+/***/ function(module, exports) {
+
+	module.exports = {
+		"darkvision": {
+			"name": "Darkvision",
+			"description": "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+		},
+		"fey_ancestry": {
+			"name": "Fey Ancestry",
+			"description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep."
+		},
+		"trance": {
+			"name": "Trance",
+			"description": "You don't need to sleep. Instead, you meditate deeply, remaining semiconscious for 4 hours a day. After resting in this way, you gain the same benefit that a human does from 8 hours of sleep."
+		},
+		"dwarven_resiliance": {
+			"name": "Dwarven Resiliance",
+			"description": "You have advantage on saving throws against poison, and you have resistance against poison damage."
+		},
+		"dwarven_toughness": {
+			"name": "Dwarven Toughness",
+			"description": "Your hit point maximum increases by 1 every time you gain a level (in addition to your usual hp increase)."
+		},
+		"stonecunning": {
+			"name": "Stonecunning",
+			"description": "Whenever you make an Intelligence (History) check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check, instead of your normal proficiency bonus."
+		},
+		"armor_speed": {
+			"name": "Armor Speed",
+			"description": "Your speed is not reduced by wearing heavy armor."
+		},
+		"cantrip_wizard": {
+			"name": "Wizard Cantrip",
+			"description": "You know one cantrip of your choice from the wizard spell list. Intelligence is your spellcasting ability for it."
+		},
+		"extra_language": {
+			"name": "Extra Language",
+			"description": "You know one extra language of your choice."
+		},
+		"mask_of_the_wild": {
+			"name": "Mask of the Wild",
+			"description": "You can attempt to hide even when you are only lightly obscured by foliage, heavy rain, falling snow, mist, and other natural phenomena."
+		},
+		"superior_darkvision": {
+			"name": "Superior Darkvision",
+			"description": "Your darkvision has a radius of 120 feet."
+		},
+		"sunlight_sensitivity": {
+			"name": "Sunlight Sensitivity",
+			"description": "You have disadvantage on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in direct sunlight."
+		},
+		"drow_magic": {
+			"name": "Drow Magic",
+			"description": "You know the dancing lights cantrip. When you reach 3rd level, you can cast the faerie fire spell once with this trait and regain the ability to do so when you finish a long rest. When you reach 5th level, you can cast the darkness spell once with this trait and regain the ability to do so when you finish a long rest. Charisma is your spellcasting ability for these spells."
+		},
+		"lucky": {
+			"name": "Lucky",
+			"description": "When you roll a 1 on the d20 for an attack roll, ability check, or saving throw, you can reroll the die and must use the new roll."
+		},
+		"brave": {
+			"name": "Brave",
+			"description": "You have advantage on saving throws against being frightened."
+		},
+		"halfling_nimbleness": {
+			"name": "Halfling Nimbleness",
+			"description": "You can move through the space of any creature that is of a size larger than yours."
+		},
+		"naturally_stealthy": {
+			"name": "Naturally Stealthy",
+			"description": "You can attempt to hide even when you are obscured only by a creature that is at least one size larger than you."
+		},
+		"stout_resiliance": {
+			"name": "Stout Resiliance",
+			"description": "You have advantage on saving throws against poison, and you have resistance against poison damage."
+		},
+		"breath_weapon": {
+			"name": "Breath Weapon",
+			"description": "You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation. <br> When you use your breath weapon, each creature in the area of the exhalation must make a saving throw, the type of which is is determined by your draconic ancestry. The DC for this saving throw equals 8 + your Constitution modifier + your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level"
+		},
+		"draconic_ancestry": {
+			"name": "Draconic Ancestry",
+			"description": "You choose a draconic ancestry which determines your color, breath weapon damage type, and elemental resistance"
+		},
+		"draconic_ancestry_black": {
+			"name": "Black Draconic Ancestry",
+			"description": "You have Black draconic ancestry. This means your breath weapon does acid damage in a 5 by 30 ft. line (Dex. save). You have resistance to acid damage."
+		},
+		"draconic_ancestry_blue": {
+			"name": "Blue Draconic Ancestry",
+			"description": "You have Blue draconic ancestry. This means your breath weapon does lightning damage in a 5 by 30 ft. line (Dex. save). You have resistance to lightning damage."
+		},
+		"draconic_ancestry_brass": {
+			"name": "Brass Draconic Ancestry",
+			"description": "You have Brass draconic ancestry. This means your breath weapon does fire damage in a 5 by 30 ft. line (Dex. save). You have resistance to fire damage."
+		},
+		"draconic_ancestry_bronze": {
+			"name": "Bronze Draconic Ancestry",
+			"description": "You have Bronze draconic ancestry. This means your breath weapon does lightning damage in a 5 by 30 ft. line (Dex. save). You have resistance to lightning damage."
+		},
+		"draconic_ancestry_copper": {
+			"name": "Copper Draconic Ancestry",
+			"description": "You have Copper draconic ancestry. This means your breath weapon does acid damage in a 5 by 30 ft. line (Dex. save). You have resistance to _element_ damage."
+		},
+		"draconic_ancestry_gold": {
+			"name": "Gold Draconic Ancestry",
+			"description": "You have Gold draconic ancestry. This means your breath weapon does fire damage in a 15 ft. cone (Dex. save). You have resistance to fire damage."
+		},
+		"draconic_ancestry_green": {
+			"name": "Green Draconic Ancestry",
+			"description": "You have Green draconic ancestry. This means your breath weapon does poison damage in a 15 ft. cone (Con. save). You have resistance to poison damage."
+		},
+		"draconic_ancestry_red": {
+			"name": "Red Draconic Ancestry",
+			"description": "You have Red draconic ancestry. This means your breath weapon does fire damage in a 15 ft. cone (Dex. save). You have resistance to fire damage."
+		},
+		"draconic_ancestry_white": {
+			"name": "White Draconic Ancestry",
+			"description": "You have White draconic ancestry. This means your breath weapon does cold damage in a 15 ft. cone (Con. save). You have resistance to cold damage."
+		},
+		"draconic_ancestry_silver": {
+			"name": "Silver Draconic Ancestry",
+			"description": "You have Silver draconic ancestry. This means your breath weapon does cold damage in a 15 ft. cone (Con. save). You have resistance to cold damage."
+		},
+		"draconic_damage_resistance": {
+			"name": "Damage Resistance",
+			"description": "You have resistance to the damage type associated with your draconic ancestry."
+		},
+		"amphibeous": {
+			"name": "Amphibeous",
+			"description": "You can breathe air or water."
+		},
+		"merfolk_swim_speed": {
+			"name": "Merfolk Swim Speed",
+			"description": "You have a swim speed of 30 ft."
+		},
+		"gnome_cunning": {
+			"name": "Gnome Cunning",
+			"description": "You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic."
+		},
+		"skill_versatility": {
+			"name": "Skill Versatility",
+			"description": "You gain proficiency in two skills of your choice."
+		},
+		"natural_illusionist": {
+			"name": "Natural Illusionist",
+			"description": "You know the minor illusion cantrip. Intelligence is your spellcasting ability for it."
+		},
+		"speak_with_small_beasts": {
+			"name": "Speak with Small Beasts",
+			"description": "Through sounds and gestures, you can communicate simple ideas with Small or smaller beasts. Forest gnomes love animals and often keep squirrels, badgers, rabbits, moles, woodpeckers, and other creatures as beloved pets."
+		},
+		"artificers_lore": {
+			"name": "Artificers Lore",
+			"description": "Whenever you make an Intelligence (History) check related to magic items, alchemical objects, or technological devices, you can add twice your proficiency bonus, instead of any proficiency bonus you normally apply."
+		},
+		"tinker": {
+			"name": "Tinker",
+			"description": "You have proficiency with artican's tools (tikder's tools). Using those tools, you can spend 1 hour and 10gp worth of materials to construct a Tiny clockwork device (AC 5, 1 hp). The device ceases to function after 24 hours (unless you spend 1 hour repairing to keep the device functioning), or when you use your action to dismantle it; at that time, you can reclaim the materials used to create it. You can have up to three such devices active at a time."
+		},
+		"moogle_wings": {
+			"name": "Moogle Wings",
+			"description": "Your tiny wings aren't strong enough for flight, but they can help ease your decents. When you fall any distance, you take no falling damage as long as you are not incapacitated, your wings are not obstructed, and you are not wearing heavy armor."
+		},
+		"druid_cantrip": {
+			"name": "Druid Cantrip",
+			"description": "You know one cantrip of your choice from the druid spell list. Wisdom is your spellcasting ability for it."
+		},
+		"wizard_cantrip": {
+			"name": "Wizard Cantrip",
+			"description": "You know one cantrip of your choice from the wizard spell list. Intelligence is your spellcasting ability for it."
+		},
+		"bard_cantrip": {
+			"name": "Bard Cantrip",
+			"description": "You know one cantrip of your choice from the bard spell list. Charisma is your spellcasting ability for it."
+		},
+		"hellish_resistance": {
+			"name": "Hellish Resistance",
+			"description": "You have resistance to fire damage."
+		},
+		"infernal_legacy": {
+			"name": "Infernal Legacy",
+			"description": "You know the thaumaturgy cantrip. Once you reach 3rd level, you can cast the hellish rebuke spell once per day as a 2nd-level spell. Once you reach 5th level, you can also cast the darkness spell once per day. Charisma is your spellcasting ability for these spells."
+		},
+		"vampiric_resistance": {
+			"name": "Vampiric Resistance",
+			"description": "You have resistance to necrotic damage."
+		},
+		"blood_thirst": {
+			"name": "Blood Thirst",
+			"description": "You can drain blood and life energy from a willing creature, or one that is grappled by you, incapacitated, or restrained. Make a melee attack against the target. If you hit, you deal 1 piercing damage and 1d6 necrotic damage. The target’s hit point maximum is reduced by an amount equal to the necrotic damage taken, and you regain hit points equal to that amount. The reduction lasts until the target finishes a long rest. The target dies if this effect reduces its hit point maximum to 0. A humanoid killed in this way becomes a null."
+		},
+		"snow_camouflage": {
+			"name": "Snow Camouflage",
+			"description": "Your white fur and small stature make you hard to spot in snowy conditions. You have advantage on Dexterity (Stealth) checks made to hide in snowy or icy environments."
+		},
+		"kor_climbing": {
+			"name": "Kor Climbing",
+			"description": "You have proficiency in the Athletics and Acrobatics skills. You also have advantage on athletics or acrobatics checks related to climbing"
+		},
+		"grit": {
+			"name": "Grit",
+			"description": "You have resistance to fire damage and psychic damage. In addition, when you are wearing no armor, your AC is equal to 11 + your Dexterity modifier."
+		},
+		"lavastep_grit": {
+			"name": "Lavastep Grit",
+			"description": "You have advantage on Dexterity (Stealth) checks made to hide in rocky or subterranean environments."
+		},
+		"menacing": {
+			"name": "Menacing",
+			"description": "You gain proficiency in the Intimidation skill."
+		},
+		"relentless_endurance": {
+			"name": "Relentless Endurance",
+			"description": "When you are reduced to 0 hit points but not killed outright, you can drop to 1 hit point instead. You can’t use this feature again until you finish a long rest."
+		},
+		"savage_attacks": {
+			"name": "Savage Attacks",
+			"description": "When you score a critical hit with a melee weapon attack, you can roll one of the weapon’s damage dice one additional time and add it to the extra damage of the critical hit."
+		},
+		"template": {
+			"name": "",
+			"description": ""
+		}
+	};
+
+/***/ },
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21673,7 +21877,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21747,7 +21951,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21795,7 +21999,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 167 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21819,13 +22023,13 @@
 
 	var utilities = _interopRequireWildcard(_utilities);
 
-	var _dropDown = __webpack_require__(164);
+	var _dropDown = __webpack_require__(165);
 
-	var _textInput = __webpack_require__(165);
+	var _textInput = __webpack_require__(166);
 
-	var _checkboxGroup = __webpack_require__(168);
+	var _checkboxGroup = __webpack_require__(169);
 
-	var _submitButton = __webpack_require__(166);
+	var _submitButton = __webpack_require__(167);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -21862,6 +22066,7 @@
 
 	      this.resetRaceData();
 	      this.props.onUpdate(e);
+	      this.setProficiencyChoices(e);
 	    }
 	  }, {
 	    key: 'setLanguageChoice',
@@ -21898,10 +22103,13 @@
 	    }
 	  }, {
 	    key: 'resetRaceData',
-	    value: function resetRaceData() {
+	    value: function resetRaceData(e) {
 	      this.props.charData.proficiencies = {};
 	      this.props.charData.selected_languages = [];
 	      this.props.charData.feats = [];
+	      if (e && e.target && e.target.getAttribute('name') === "select_race") {
+	        this.props.charData.ability_score_increase = {};
+	      }
 	    }
 	  }, {
 	    key: 'getRaceNames',
@@ -21923,19 +22131,30 @@
 	      var thisRaceData = this.getThisRaceData();
 	      var subRaceName = this.props.charData.select_subrace || "";
 	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);
-	      var subraceProficiencies = thisRaceData.proficiencies || {};
+	      var subraceProficiencies = thisSubRaceData.proficiencies || {};
 
-	      this.props.charData.proficiencies = Object.assign({}, thisRaceData.proficiencies, this.props.charData.proficiencies, subraceProficiencies);
-	      this.props.charData.proficiencies[type] = this.props.charData.proficiencies[type] || [];
-
-	      if (e.target.checked) {
-	        this.props.charData.proficiencies[type].push(proficiency);
+	      if (e.target.getAttribute("name") === "select_subrace") {
+	        thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, e.target.value);
 	      } else {
-	        if (this.props.charData.proficiencies[type].indexOf(proficiency) > -1) {
-	          this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
+	        thisSubRaceData = {};
+	      }
+
+	      if (e.target.getAttribute("name") === "select_race") {
+	        thisRaceData = utilities.getObjectByName(_races2.default, e.target.value);
+	        thisSubRaceData = {};
+	      }
+
+	      if (e.target.getAttribute('type') === "checkbox") {
+	        if (e.target.checked) {
+	          this.props.charData.proficiencies[type].push(e.target.value);
+	        } else {
+	          if (this.props.charData.proficiencies[type].indexOf(e.target.value) > -1) {
+	            this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
+	          }
 	        }
 	      }
 
+	      this.props.charData.proficiencies = Object.assign(this.props.charData.proficiencies, thisRaceData.proficiencies, thisSubRaceData.proficiencies);
 	      this.props.onUpdate(e);
 	    }
 	  }, {
@@ -22143,7 +22362,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 168 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22250,7 +22469,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 169 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22270,7 +22489,7 @@
 
 	var _characterClasses2 = _interopRequireDefault(_characterClasses);
 
-	var _dropDown = __webpack_require__(164);
+	var _dropDown = __webpack_require__(165);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22363,7 +22582,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 170 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22383,7 +22602,7 @@
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
-	var _dropDown = __webpack_require__(164);
+	var _dropDown = __webpack_require__(165);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22448,7 +22667,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 171 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22468,7 +22687,7 @@
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
-	var _dropDown = __webpack_require__(164);
+	var _dropDown = __webpack_require__(165);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22567,7 +22786,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 172 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22583,9 +22802,9 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _dropDown = __webpack_require__(164);
+	var _dropDown = __webpack_require__(165);
 
-	var _textInput = __webpack_require__(165);
+	var _textInput = __webpack_require__(166);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22659,7 +22878,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 173 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22687,9 +22906,9 @@
 
 	var utilities = _interopRequireWildcard(_utilities);
 
-	var _radioGroup = __webpack_require__(174);
+	var _radioGroup = __webpack_require__(175);
 
-	var _textInput = __webpack_require__(165);
+	var _textInput = __webpack_require__(166);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -22781,7 +23000,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 174 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

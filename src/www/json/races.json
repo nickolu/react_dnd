@@ -260,7 +260,7 @@
       },
       {
         "name" : "Tuktuk Tribe Goblin",
-        "id" : "tuktuk_merfolk",
+        "id" : "tuktuk_goblin",
         "proficiencies" : {
           "tools" : ["thief"]
         }
@@ -296,7 +296,7 @@
       "con" : "1",
       "str" : "2"
     },
-    "feats" : ["menacing","relentless_endurance","savage_attacks"],
+    "feats" : ["darkvision","menacing","relentless_endurance","savage_attacks"],
     "proficiencies" : {
       "skills" : ["indimidation"],
       "languages" : ["common","orc"]
@@ -388,9 +388,11 @@
       "cha" : "1"
     },
     "proficiencies" : {
-        "languages" : ["common","merfolk","choice"],
-        "skills" : ["athletics", "acrobatics"]
+        "languages" : ["common","merfolk","choice"]
     },
+    "feats" : [
+      "amphibeous", "merfolk_swim_speed"
+    ],
     "subraces" : [
       {
         "name" : "Emeria (Wind) Merfolk",
@@ -433,9 +435,6 @@
           "bard_cantrip"
         ]
       }
-    ],
-    "feats" : [
-      "amphibeous"
     ]
   },
   {
@@ -457,7 +456,7 @@
         "armor" : ["shields"]
     },
     "feats" : [
-      "darkvision", "moogle_wings"
+      "darkvision", "moogle_wings", "snow_camouflage", "mask_of_the_wild", "naturally_stealthy"
     ]
   },
   {
@@ -486,7 +485,8 @@
     "size" : "Vampires are about the same size and build as humans. Your size is Medium.",
     "speed" : "30",
     "ability_score_increase" : {
-      "cha" : "1"
+      "int" : "1",
+      "cha" : "2"
     },
     "proficiencies" : {
         "languages" : ["common","vampire"]
