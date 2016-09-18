@@ -9,16 +9,29 @@ import { SubmitButton } from './form-fields/submit-button.js';
 class DndForm extends React.Component {
   constructor(props) {
     super(props);
+
+    var sortedSpellData = this.sortSpellsByName(spellData);
+
     this.state = {
-      spells : spellData
+      spells : sortedSpellData,
+      filterSpells : []
     };
 
     this.update = this.update.bind(this);
   }
 
   update(e) {
+    var i;
+    var spellsToUse;
+    var sortedSpellData = this.sortSpellsByName(spellData);
+
+    for (i=0; i<this.state.filterSpells.length; i+=1) {
+      sortedSpellData = this.getFilteredSpells(sortedSpellData, this.state.filterSpells[i].key, this.state.filterSpells[i].value)
+    }
+
     this.setState({
-      charData : Object.assign({},this.state.charData,newCharData)
+      spells : sortedSpellData,
+      filterSpells : this.state.filterSpells
     });
   }
 
@@ -32,33 +45,70 @@ class DndForm extends React.Component {
     } else {
       return classes.join(', ');
     }
-    
   }
 
-  filterSpellPropertyButton(key,val) {
-    var _this = this;
-    var spells = [];
+  getFilteredSpells(spells,key,val) {
+    var filteredSpells = [];
+    var i;
+    var prop, prop2;
 
-    for (var i = 0; i < spellData.length; i++) {
-      for (var prop in spellData[i][key]) {
-        
-        if (prop === val) {
-          spells.push(spellData[i]);
+    for (i = 0; i < spells.length; i+=1) {
+      for (prop in spells[i]) {
+        if (typeof spells[i][prop] === "object") {
+          for (prop2 in spells[i][prop]) {
+            if (prop2 === val) {
+              filteredSpells.push(spells[i]);
+              break;
+            }
+          }
+        } else if (spells[i][key] === val) {
+          filteredSpells.push(spells[i]);
+          break;
         }
       }
     }
-    
-    function filter() {
-        _this.setState({
-          spells : spells
-        }); 
+
+    return this.sortSpellsByName(filteredSpells);
+  }
+
+
+  sortSpellsByName (spells) {
+    var i;
+    var l = spells.length;
+    var nameArray = [];
+    var newSpellSort = [];
+
+    for (i=0; i<l; i+=1) {
+      nameArray.push(spells[i].name);
     }
 
-    return <SubmitButton label={val} onUpdate={filter} />
+    nameArray.sort();
+
+    for (i=0, l=nameArray.length; i<l; i+=1) {
+      newSpellSort.push(utilities.getObjectByName(spells,nameArray[i]));
+    }
+
+    return newSpellSort;
+
+  }
+
+  removeObject(arr,obj) {
+    var i;
+    var l = arr.length;
+    var prop;
+    
+    for (i=0; i<l; i+=1) {
+      if (arr[i] && arr[i].value === obj.value && arr[i].key === obj.key) {
+        arr.splice(i,1);
+      }
+    }
+
+    return arr;
   }
 
   getSpells() {
-    return <div>{this.state.spells.map(spell => <div key={spell.name}>
+
+    var spells = <div>{this.state.spells.map(spell => <div key={spell.name}>
                      <div className="spell-card col-xs-12 col-sm-6 col-md-4 ">
                       <div className="spell-card-inner">
                         <h2 className="spell_name">{spell.name}</h2>
@@ -75,17 +125,65 @@ class DndForm extends React.Component {
                        
                      </div>
                    </div>
-              )}</div>
+              )}</div>;
+    if (this.state.spells.length === 0) {
+      spells = <h4 className="no-spells">No spells matching the selected filters</h4>
+    }
+
+    return spells;
   }
 
-  filterButton(label,prop,name) {
+  filterButton(key,val,label) {
     var _this = this;
-    function filter() {
-    _this.setState({
-        spells : utilities.getObjectsByProp(spellData, prop, name)
-      });  
+    var spells = [];
+    var label = label || val;
+
+    for (var i = 0; i < spellData.length; i++) {
+      for (var prop in spellData[i][key]) {
+        
+        if (prop === val) {
+          spells.push(spellData[i]);
+        }
+      }
     }
+    
+    function filter(e) {
+      
+      var filter = {
+        "key" : key,
+        "value" : val
+      };
+      
+
+      if (e.target.className.indexOf("active") > -1) {
+        e.target.className = e.target.className.replace(/active/g,'');
+        
+        _this.setState({
+          spells : _this.sortSpellsByName(spellData),
+          filterSpells : _this.removeObject(_this.state.filterSpells,filter)
+        });
+      } else {
+        e.target.className += " active";
+        _this.state.filterSpells.push(filter);
+      }
+      
+      _this.update(e);
+    }
+      
+
     return <SubmitButton label={label} onUpdate={filter} />
+  }
+
+  arrayUnique(array) {
+      var a = array.concat();
+      for(var i=0; i<a.length; ++i) {
+          for(var j=i+1; j<a.length; ++j) {
+              if(a[i] === a[j])
+                  a.splice(j--, 1);
+          }
+      }
+
+      return a;
   }
 
 
@@ -95,42 +193,42 @@ class DndForm extends React.Component {
     return <div className="container">
             <div className="row">
               <div className="col-sm-12">
-                <h2>Spells</h2>
-                {this.filterButton("Concentration","concentration","yes")}
-                {this.filterButton("Ritual","ritual","yes")}
+                <h2>Spells ({this.state.spells.length})</h2>
+                {this.filterButton("concentration","yes","Concentration")}
+                {this.filterButton("ritual","yes","Ritual")}
                 <div>
                   <h3>Class</h3>
-                  {this.filterSpellPropertyButton("class","Bard")}
-                  {this.filterSpellPropertyButton("class","Cleric")}
-                  {this.filterSpellPropertyButton("class","Druid")}
-                  {this.filterSpellPropertyButton("class","Sorcerer")}
-                  {this.filterSpellPropertyButton("class","Warlock")}
-                  {this.filterSpellPropertyButton("class","Wizard")}
+                  {this.filterButton("class","Bard")}
+                  {this.filterButton("class","Cleric")}
+                  {this.filterButton("class","Druid")}
+                  {this.filterButton("class","Sorcerer")}
+                  {this.filterButton("class","Warlock")}
+                  {this.filterButton("class","Wizard")}
                 </div>
 
                 <div>
                   <h3>School</h3>
-                  {this.filterButton("Conjuration","school","Conjuration")}
-                  {this.filterButton("Divination","school","Divination")}
-                  {this.filterButton("Enchantment","school","Enchantment")}
-                  {this.filterButton("Evocation","school","Evocation")}
-                  {this.filterButton("Illusion","school","Illusion")}
-                  {this.filterButton("Necromancy","school","Necromancy")}
-                  {this.filterButton("Transmutation","school","Transmutation")}
+                  {this.filterButton("school","Conjuration")}
+                  {this.filterButton("school","Divination")}
+                  {this.filterButton("school","Enchantment")}
+                  {this.filterButton("school","Evocation")}
+                  {this.filterButton("school","Illusion")}
+                  {this.filterButton("school","Necromancy")}
+                  {this.filterButton("school","Transmutation")}
                 </div>
                 
                 <div>
                   <h3>Level</h3>
-                  {this.filterButton("Cantrip","level","Cantrip")}
-                  {this.filterButton("1st Level","level","1st")}
-                  {this.filterButton("2nd Level","level","2nd")}
-                  {this.filterButton("3rd Level","level","3rd")}
-                  {this.filterButton("4th Level","level","4th")}
-                  {this.filterButton("5th Level","level","5th")}
-                  {this.filterButton("6th Level","level","6th")}
-                  {this.filterButton("7th Level","level","7th")}
-                  {this.filterButton("8th Level","level","8th")}
-                  {this.filterButton("9th Level","level","9th")}
+                  {this.filterButton("level","Cantrip")}
+                  {this.filterButton("level","1st")}
+                  {this.filterButton("level","2nd")}
+                  {this.filterButton("level","3rd")}
+                  {this.filterButton("level","4th")}
+                  {this.filterButton("level","5th")}
+                  {this.filterButton("level","6th")}
+                  {this.filterButton("level","7th")}
+                  {this.filterButton("level","8th")}
+                  {this.filterButton("level","9th")}
                 </div>
                 {this.getSpells()}
                 

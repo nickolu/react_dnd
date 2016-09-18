@@ -46,6 +46,8 @@
 
 	'use strict';
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(1);
@@ -88,8 +90,11 @@
 
 	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(DndForm).call(this, props));
 
+	    var sortedSpellData = _this2.sortSpellsByName(_spells2.default);
+
 	    _this2.state = {
-	      spells: _spells2.default
+	      spells: sortedSpellData,
+	      filterSpells: []
 	    };
 
 	    _this2.update = _this2.update.bind(_this2);
@@ -99,8 +104,17 @@
 	  _createClass(DndForm, [{
 	    key: 'update',
 	    value: function update(e) {
+	      var i;
+	      var spellsToUse;
+	      var sortedSpellData = this.sortSpellsByName(_spells2.default);
+
+	      for (i = 0; i < this.state.filterSpells.length; i += 1) {
+	        sortedSpellData = this.getFilteredSpells(sortedSpellData, this.state.filterSpells[i].key, this.state.filterSpells[i].value);
+	      }
+
 	      this.setState({
-	        charData: Object.assign({}, this.state.charData, newCharData)
+	        spells: sortedSpellData,
+	        filterSpells: this.state.filterSpells
 	      });
 	    }
 	  }, {
@@ -117,34 +131,71 @@
 	      }
 	    }
 	  }, {
-	    key: 'filterSpellPropertyButton',
-	    value: function filterSpellPropertyButton(key, val) {
-	      var _this = this;
-	      var spells = [];
+	    key: 'getFilteredSpells',
+	    value: function getFilteredSpells(spells, key, val) {
+	      var filteredSpells = [];
+	      var i;
+	      var prop, prop2;
 
-	      for (var i = 0; i < _spells2.default.length; i++) {
-	        for (var prop in _spells2.default[i][key]) {
-
-	          if (prop === val) {
-	            spells.push(_spells2.default[i]);
+	      for (i = 0; i < spells.length; i += 1) {
+	        for (prop in spells[i]) {
+	          if (_typeof(spells[i][prop]) === "object") {
+	            for (prop2 in spells[i][prop]) {
+	              if (prop2 === val) {
+	                filteredSpells.push(spells[i]);
+	                break;
+	              }
+	            }
+	          } else if (spells[i][key] === val) {
+	            filteredSpells.push(spells[i]);
+	            break;
 	          }
 	        }
 	      }
 
-	      function filter() {
-	        _this.setState({
-	          spells: spells
-	        });
+	      return this.sortSpellsByName(filteredSpells);
+	    }
+	  }, {
+	    key: 'sortSpellsByName',
+	    value: function sortSpellsByName(spells) {
+	      var i;
+	      var l = spells.length;
+	      var nameArray = [];
+	      var newSpellSort = [];
+
+	      for (i = 0; i < l; i += 1) {
+	        nameArray.push(spells[i].name);
 	      }
 
-	      return _react2.default.createElement(_submitButton.SubmitButton, { label: val, onUpdate: filter });
+	      nameArray.sort();
+
+	      for (i = 0, l = nameArray.length; i < l; i += 1) {
+	        newSpellSort.push(utilities.getObjectByName(spells, nameArray[i]));
+	      }
+
+	      return newSpellSort;
+	    }
+	  }, {
+	    key: 'removeObject',
+	    value: function removeObject(arr, obj) {
+	      var i;
+	      var l = arr.length;
+	      var prop;
+
+	      for (i = 0; i < l; i += 1) {
+	        if (arr[i] && arr[i].value === obj.value && arr[i].key === obj.key) {
+	          arr.splice(i, 1);
+	        }
+	      }
+
+	      return arr;
 	    }
 	  }, {
 	    key: 'getSpells',
 	    value: function getSpells() {
 	      var _this3 = this;
 
-	      return _react2.default.createElement(
+	      var spells = _react2.default.createElement(
 	        'div',
 	        null,
 	        this.state.spells.map(function (spell) {
@@ -221,17 +272,67 @@
 	          );
 	        })
 	      );
+	      if (this.state.spells.length === 0) {
+	        spells = _react2.default.createElement(
+	          'h4',
+	          { className: 'no-spells' },
+	          'No spells matching the selected filters'
+	        );
+	      }
+
+	      return spells;
 	    }
 	  }, {
 	    key: 'filterButton',
-	    value: function filterButton(label, prop, name) {
+	    value: function filterButton(key, val, label) {
 	      var _this = this;
-	      function filter() {
-	        _this.setState({
-	          spells: utilities.getObjectsByProp(_spells2.default, prop, name)
-	        });
+	      var spells = [];
+	      var label = label || val;
+
+	      for (var i = 0; i < _spells2.default.length; i++) {
+	        for (var prop in _spells2.default[i][key]) {
+
+	          if (prop === val) {
+	            spells.push(_spells2.default[i]);
+	          }
+	        }
 	      }
+
+	      function filter(e) {
+
+	        var filter = {
+	          "key": key,
+	          "value": val
+	        };
+
+	        if (e.target.className.indexOf("active") > -1) {
+	          e.target.className = e.target.className.replace(/active/g, '');
+
+	          _this.setState({
+	            spells: _this.sortSpellsByName(_spells2.default),
+	            filterSpells: _this.removeObject(_this.state.filterSpells, filter)
+	          });
+	        } else {
+	          e.target.className += " active";
+	          _this.state.filterSpells.push(filter);
+	        }
+
+	        _this.update(e);
+	      }
+
 	      return _react2.default.createElement(_submitButton.SubmitButton, { label: label, onUpdate: filter });
+	    }
+	  }, {
+	    key: 'arrayUnique',
+	    value: function arrayUnique(array) {
+	      var a = array.concat();
+	      for (var i = 0; i < a.length; ++i) {
+	        for (var j = i + 1; j < a.length; ++j) {
+	          if (a[i] === a[j]) a.splice(j--, 1);
+	        }
+	      }
+
+	      return a;
 	    }
 	  }, {
 	    key: 'render',
@@ -249,10 +350,12 @@
 	            _react2.default.createElement(
 	              'h2',
 	              null,
-	              'Spells'
+	              'Spells (',
+	              this.state.spells.length,
+	              ')'
 	            ),
-	            this.filterButton("Concentration", "concentration", "yes"),
-	            this.filterButton("Ritual", "ritual", "yes"),
+	            this.filterButton("concentration", "yes", "Concentration"),
+	            this.filterButton("ritual", "yes", "Ritual"),
 	            _react2.default.createElement(
 	              'div',
 	              null,
@@ -261,12 +364,12 @@
 	                null,
 	                'Class'
 	              ),
-	              this.filterSpellPropertyButton("class", "Bard"),
-	              this.filterSpellPropertyButton("class", "Cleric"),
-	              this.filterSpellPropertyButton("class", "Druid"),
-	              this.filterSpellPropertyButton("class", "Sorcerer"),
-	              this.filterSpellPropertyButton("class", "Warlock"),
-	              this.filterSpellPropertyButton("class", "Wizard")
+	              this.filterButton("class", "Bard"),
+	              this.filterButton("class", "Cleric"),
+	              this.filterButton("class", "Druid"),
+	              this.filterButton("class", "Sorcerer"),
+	              this.filterButton("class", "Warlock"),
+	              this.filterButton("class", "Wizard")
 	            ),
 	            _react2.default.createElement(
 	              'div',
@@ -276,13 +379,13 @@
 	                null,
 	                'School'
 	              ),
-	              this.filterButton("Conjuration", "school", "Conjuration"),
-	              this.filterButton("Divination", "school", "Divination"),
-	              this.filterButton("Enchantment", "school", "Enchantment"),
-	              this.filterButton("Evocation", "school", "Evocation"),
-	              this.filterButton("Illusion", "school", "Illusion"),
-	              this.filterButton("Necromancy", "school", "Necromancy"),
-	              this.filterButton("Transmutation", "school", "Transmutation")
+	              this.filterButton("school", "Conjuration"),
+	              this.filterButton("school", "Divination"),
+	              this.filterButton("school", "Enchantment"),
+	              this.filterButton("school", "Evocation"),
+	              this.filterButton("school", "Illusion"),
+	              this.filterButton("school", "Necromancy"),
+	              this.filterButton("school", "Transmutation")
 	            ),
 	            _react2.default.createElement(
 	              'div',
@@ -292,16 +395,16 @@
 	                null,
 	                'Level'
 	              ),
-	              this.filterButton("Cantrip", "level", "Cantrip"),
-	              this.filterButton("1st Level", "level", "1st"),
-	              this.filterButton("2nd Level", "level", "2nd"),
-	              this.filterButton("3rd Level", "level", "3rd"),
-	              this.filterButton("4th Level", "level", "4th"),
-	              this.filterButton("5th Level", "level", "5th"),
-	              this.filterButton("6th Level", "level", "6th"),
-	              this.filterButton("7th Level", "level", "7th"),
-	              this.filterButton("8th Level", "level", "8th"),
-	              this.filterButton("9th Level", "level", "9th")
+	              this.filterButton("level", "Cantrip"),
+	              this.filterButton("level", "1st"),
+	              this.filterButton("level", "2nd"),
+	              this.filterButton("level", "3rd"),
+	              this.filterButton("level", "4th"),
+	              this.filterButton("level", "5th"),
+	              this.filterButton("level", "6th"),
+	              this.filterButton("level", "7th"),
+	              this.filterButton("level", "8th"),
+	              this.filterButton("level", "9th")
 	            ),
 	            this.getSpells()
 	          )

@@ -23,3 +23,11 @@ body {
 	height: 375px;
 	border: 1px solid;
 }
+
+button.active {
+	background-color: #ccc;
+}
+
+.no-spells {
+	margin-top: 32px;
+}
