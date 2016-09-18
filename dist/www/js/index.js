@@ -240,20 +240,6 @@
 	            { className: 'col-sm-6 output-column' },
 	            _react2.default.createElement(_characterSheet.CharacterSheet, { charData: this.state.charData })
 	          )
-	        ),
-	        _react2.default.createElement('hr', null),
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'row' },
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'col-sm-12' },
-	            _react2.default.createElement(
-	              'h2',
-	              null,
-	              'Spells'
-	            )
-	          )
 	        )
 	      );
 	    }
@@ -19891,6 +19877,20 @@
 	    }
 	  }
 	  return false;
+	};
+
+	var getObjectsByProp = exports.getObjectsByProp = function getObjectsByProp(arr, prop, name) {
+	  var i = 0;
+	  var objects = [];
+
+	  for (i in arr) {
+	    if (prop in arr[i]) {
+	      if (arr[i][prop] === name) {
+	        objects.push(arr[i]);
+	      }
+	    }
+	  }
+	  return objects;
 	};
 
 	var countItemInArray = exports.countItemInArray = function countItemInArray(arr, item) {

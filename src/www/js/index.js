@@ -135,14 +135,6 @@ class DndForm extends React.Component {
                 <CharacterSheet charData={this.state.charData}/>
               </div>
             </div>
-            <hr />
-            <div className="row">
-              <div className="col-sm-12">
-                <h2>Spells</h2>
-              </div>
-            </div>
-
-
       		</div>;
 	}
 }

@@ -6,12 +6,12 @@ const webpackStream = require('webpack-stream');
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 
-const serverAppFiles = ['src/**/*.js','!src/www/**'];
+const serverAppFiles = ['src/**/*.jsx','!src/www/**'];
 const webAppFiles = ['src/www/**/*.js'];
 const webAppHtmlFiles = ['src/www/**/*.html'];
 const webAppCssFiles = ['src/www/css/**/*.css'];
 
-const entryPoints = [ './src/www/js/index.js' ];
+const entryPoints = [ './src/www/js/index.js','./src/www/js/spells.js' ];
 
 gulp.task('process-server-app', () =>
 	gulp.src(serverAppFiles)
@@ -65,8 +65,13 @@ gulp.task('server', () =>
 	fs.readFile('./config.json', (err, data) =>
 		err ? console.dir(err)
 			: require('./dist/server.js').default(JSON.parse(data))));
-
 gulp.task('default', [
+	'process-server-app',
+	'process-web-app-html',
+	'process-web-app-css',
+	'process-web-app-js'
+]);
+gulp.task('localdev', [
 	'process-server-app',
 	'process-web-app-html',
 	'process-web-app-css',

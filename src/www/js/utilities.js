@@ -10,6 +10,20 @@ export const getObjectByName = function(arr,name) {
   return false;
 };
 
+export const getObjectsByProp = function(arr,prop,name) {
+  let i = 0;
+  let objects = [];
+
+  for (i in arr) {
+    if (prop in arr[i]) {
+      if (arr[i][prop] === name) {
+        objects.push(arr[i]);
+      }
+    }
+  }
+  return objects;
+};
+
 export const countItemInArray = function(arr,item) {
   let l = arr.length;
   let i = 0;

@@ -12,3 +12,14 @@ body {
 	display: inline-block;
 	width: 105px;
 }
+
+.spell-card {
+	height: 380px;
+	padding: 1%;
+}
+
+.spell-card-inner {
+	padding: 2% 5%;
+	height: 375px;
+	border: 1px solid;
+}
