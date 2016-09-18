@@ -36,6 +36,7 @@ export class CheckBoxGroup extends React.Component {
     var key = 0;
     return  <div>
               <h3>{this.props.groupLabel}</h3>
+              <p className="info">(choose {this.props.optionsLimit})</p>
               {this.props.choices.map(choice => <div key={choice.id}>
                     <label>
                        <input

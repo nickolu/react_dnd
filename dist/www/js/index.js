@@ -66,23 +66,25 @@
 
 	var _characterSheet = __webpack_require__(161);
 
-	var _dropDown = __webpack_require__(165);
+	var _dropDown = __webpack_require__(169);
 
-	var _textInput = __webpack_require__(166);
+	var _textInput = __webpack_require__(170);
 
-	var _submitButton = __webpack_require__(167);
+	var _submitButton = __webpack_require__(171);
 
-	var _raceForm = __webpack_require__(168);
+	var _raceForm = __webpack_require__(172);
 
-	var _classForm = __webpack_require__(170);
+	var _classForm = __webpack_require__(175);
 
-	var _characterBiographyForm = __webpack_require__(171);
+	var _characterBiographyForm = __webpack_require__(176);
 
-	var _backgroundForm = __webpack_require__(172);
+	var _backgroundForm = __webpack_require__(177);
 
-	var _abilityScoresForm = __webpack_require__(173);
+	var _abilityScoresForm = __webpack_require__(178);
 
-	var _characterDetailsForm = __webpack_require__(174);
+	var _characterDetailsForm = __webpack_require__(179);
+
+	var _skillsForm = __webpack_require__(174);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -227,15 +229,30 @@
 	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Name (Not your Character\'s Name)', name: 'player_name', onChange: this.update }),
 	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Character\'s Name', name: 'character_name', onChange: this.update }),
 	            _react2.default.createElement(_raceForm.RaceForm, { onUpdate: this.update, charData: this.state.charData }),
-	            _react2.default.createElement(_classForm.ClassForm, { onUpdate: this.update }),
-	            _react2.default.createElement(_backgroundForm.BackgroundForm, { onUpdate: this.update }),
+	            _react2.default.createElement(_classForm.ClassForm, { onUpdate: this.update, charData: this.state.charData }),
+	            _react2.default.createElement(_backgroundForm.BackgroundForm, { onUpdate: this.update, charData: this.state.charData }),
 	            _react2.default.createElement(_characterDetailsForm.CharacterDetailsForm, { onUpdate: this.update, charData: this.state.charData, formDescription: this.getRaceDescription }),
-	            _react2.default.createElement(_abilityScoresForm.AbilityScoresForm, { onUpdate: this.update })
+	            _react2.default.createElement(_abilityScoresForm.AbilityScoresForm, { onUpdate: this.update, charData: this.state.charData }),
+	            _react2.default.createElement(_skillsForm.SkillsForm, { charData: this.state.charData, onUpdate: this.update })
 	          ),
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'col-sm-6 output-column' },
 	            _react2.default.createElement(_characterSheet.CharacterSheet, { charData: this.state.charData })
+	          )
+	        ),
+	        _react2.default.createElement('hr', null),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'row' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col-sm-12' },
+	            _react2.default.createElement(
+	              'h2',
+	              null,
+	              'Spells'
+	            )
 	          )
 	        )
 	      );
@@ -20580,7 +20597,8 @@
 			"size": "Vampires are about the same size and build as humans. Your size is Medium.",
 			"speed": "30",
 			"ability_score_increase": {
-				"cha": "1"
+				"int": "1",
+				"cha": "2"
 			},
 			"proficiencies": {
 				"languages": [
@@ -20613,27 +20631,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _races = __webpack_require__(160);
+	var _proficiencySheet = __webpack_require__(162);
 
-	var _races2 = _interopRequireDefault(_races);
+	var _featuresSheet = __webpack_require__(166);
 
-	var _characterClasses = __webpack_require__(162);
+	var _abilityScoresSheet = __webpack_require__(167);
 
-	var _characterClasses2 = _interopRequireDefault(_characterClasses);
-
-	var _backgrounds = __webpack_require__(163);
-
-	var _backgrounds2 = _interopRequireDefault(_backgrounds);
-
-	var _feats = __webpack_require__(164);
-
-	var _feats2 = _interopRequireDefault(_feats);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	var _profileSheet = __webpack_require__(168);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -20659,262 +20663,99 @@
 	  }
 
 	  _createClass(CharacterSheet, [{
-	    key: 'getProfileInfo',
+	    key: 'render',
 
 
 	    /**
-	     * getProfileInfo - gets the markup for profile information
+	     * render - renders content to the DOM
 	     *
-	     * @return {react object} view for the profile information block
+	     * @return {type}  view for CharacterSheet
 	     */
-	    value: function getProfileInfo() {
-	      var selected_race = this.props.charData.select_subrace || this.props.charData.select_race || "";
-
+	    value: function render() {
 	      return _react2.default.createElement(
 	        'div',
-	        null,
+	        { className: 'character-sheet' },
 	        _react2.default.createElement(
-	          'div',
+	          'h1',
 	          null,
-	          'Player Name: ',
-	          this.props.charData.player_name
+	          'Character Sheet'
 	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Character Name: ',
-	          this.props.charData.character_name
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Race: ',
-	          selected_race
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Class: ',
-	          this.props.charData.select_class
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Background: ',
-	          this.props.charData.select_background
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Alignment: ',
-	          this.props.charData.alignment_lawful,
-	          ' ',
-	          this.props.charData.alignment_moral
-	        )
+	        _react2.default.createElement(_profileSheet.ProfileSheet, { charData: this.props.charData }),
+	        _react2.default.createElement(_abilityScoresSheet.AbilityScoresSheet, { charData: this.props.charData }),
+	        _react2.default.createElement(_proficiencySheet.ProficiencySheet, { charData: this.props.charData }),
+	        _react2.default.createElement(_featuresSheet.FeaturesSheet, { charData: this.props.charData })
 	      );
 	    }
+	  }]);
 
-	    /**
-	     * getRaceAbilityScoreBonus - description
-	     *
-	     * @param  {string} ability name of the ability score to return
-	     * @param  {string} race    name of the race to check
-	     * @return {number}         ability score bonus for selected race
-	     */
+	  return CharacterSheet;
+	}(_react2.default.Component);
 
-	  }, {
-	    key: 'getRaceAbilityScoreBonus',
-	    value: function getRaceAbilityScoreBonus(ability, race) {
-	      var thisRaceData = utilities.getObjectByName(_races2.default, race);
-	      var subraceSelect = document.querySelector('[name=select_subrace]');
-	      var bonus = 0;
-	      var subraceName = "";
-	      var thisSubRaceData = {};
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
 
-	      if (subraceSelect) {
-	        thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subraceSelect.value);
-	      }
+	'use strict';
 
-	      if (thisRaceData.ability_score_increase && thisRaceData.ability_score_increase[ability]) {
-	        bonus = Number(thisRaceData.ability_score_increase[ability]) || 0;
-	      }
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.ProficiencySheet = undefined;
 
-	      if (thisSubRaceData && thisSubRaceData.ability_score_increase && thisSubRaceData.ability_score_increase[ability]) {
-	        bonus += Number(thisSubRaceData.ability_score_increase[ability]) || 0;
-	      }
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	      return Number(bonus);
-	    }
+	var _react = __webpack_require__(1);
 
-	    /**
-	     * getSelectedAbilityScoreBonus - gets ability score bonuses selected by the user
-	     *
-	     * @param  {string} ability name of the ability score to return
-	     * @return {number}         ability score bonus for selected ability
-	     */
+	var _react2 = _interopRequireDefault(_react);
 
-	  }, {
-	    key: 'getSelectedAbilityScoreBonus',
-	    value: function getSelectedAbilityScoreBonus(ability) {
-	      var thisRaceData = this.props.charData;
-	      var bonus = 0;
+	var _races = __webpack_require__(160);
 
-	      if (thisRaceData && thisRaceData.ability_score_increase && thisRaceData.ability_score_increase[ability]) {
-	        bonus = thisRaceData.ability_score_increase[ability] || 0;
-	      }
+	var _races2 = _interopRequireDefault(_races);
 
-	      return Number(bonus);
-	    }
+	var _characterClasses = __webpack_require__(163);
 
-	    /**
-	     * getAbilityScore - gets the total ability score for selected ability
-	     *
-	     * @param  {string} name ability score to return
-	     * @return {number}      total ability score for selected ability from all sources
-	     */
+	var _characterClasses2 = _interopRequireDefault(_characterClasses);
 
-	  }, {
-	    key: 'getAbilityScore',
-	    value: function getAbilityScore(name) {
-	      var base = Number(this.props.charData['ability_score_' + name]) || 0;
-	      var raceBonus = Number(this.getRaceAbilityScoreBonus(name, this.props.charData.select_race)) || 0;
-	      var selectedBonus = Number(this.getSelectedAbilityScoreBonus(name)) || 0;
+	var _backgrounds = __webpack_require__(164);
 
-	      return Number(base + raceBonus + selectedBonus) || 0;
-	    }
+	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
-	    /**
-	     * getAbilityScores - gets the markup for ability scores
-	     *
-	     * @return {react object}  view for the ability scores block
-	     */
+	var _feats = __webpack_require__(165);
 
-	  }, {
-	    key: 'getAbilityScores',
-	    value: function getAbilityScores() {
-	      var selected_race = this.props.charData.select_subrace || this.props.charData.select_race || "";
-	      var score_names = ['str', 'con', 'dex', 'wis', 'int', 'cha'];
-	      var i = 0;
-	      var ability_scores = {};
-	      var race_bonus = {};
-	      var selected_bonus = {};
-	      var base_score = {};
-	      var score_breakdown = "";
+	var _feats2 = _interopRequireDefault(_feats);
 
-	      for (i in score_names) {
-	        base_score[score_names[i]] = this.props.charData['ability_score_' + score_names[i]] || 0;
-	        race_bonus[score_names[i]] = this.getRaceAbilityScoreBonus(score_names[i], this.props.charData.select_race) ? " + " + this.getRaceAbilityScoreBonus(score_names[i], this.props.charData.select_race) : "";
-	        selected_bonus[score_names[i]] = this.getSelectedAbilityScoreBonus(score_names[i]) ? " + " + this.getSelectedAbilityScoreBonus(score_names[i]) : "";
-	        score_breakdown = this.getAbilityScore(score_names[i]) === base_score[score_names[i]] ? "" : " (" + base_score[score_names[i]] + "" + race_bonus[score_names[i]] + "" + selected_bonus[score_names[i]] + ")";
-	        ability_scores[score_names[i]] = this.getAbilityScore(score_names[i]) + score_breakdown;
-	      }
+	var _utilities = __webpack_require__(159);
 
-	      return _react2.default.createElement(
-	        'ul',
-	        null,
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Strength:'
-	          ),
-	          ' ',
-	          ability_scores.str,
-	          ' ',
-	          this.getAbilityModifier('str')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Constitution:'
-	          ),
-	          ' ',
-	          ability_scores.con,
-	          ' ',
-	          this.getAbilityModifier('con')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Dexterity:'
-	          ),
-	          ' ',
-	          ability_scores.dex,
-	          ' ',
-	          this.getAbilityModifier('dex')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Wisdom:'
-	          ),
-	          ' ',
-	          ability_scores.wis,
-	          ' ',
-	          this.getAbilityModifier('wis')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Intelligence:'
-	          ),
-	          ' ',
-	          ability_scores.int,
-	          ' ',
-	          this.getAbilityModifier('int')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Charisma:'
-	          ),
-	          ' ',
-	          ability_scores.cha,
-	          ' ',
-	          this.getAbilityModifier('cha')
-	        )
-	      );
-	    }
+	var utilities = _interopRequireWildcard(_utilities);
 
-	    /**
-	     * getAbilityModifier - gets the ability modifier for an ability score
-	     *
-	     * @param  {string} ability name of the ability modifier to return
-	     * @return {number}         total modifier for the ability score
-	     */
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	  }, {
-	    key: 'getAbilityModifier',
-	    value: function getAbilityModifier(ability) {
-	      if (this.props.charData['ability_score_' + ability]) {
-	        if (utilities.getModifier(this.getAbilityScore(ability)) && this.getAbilityScore(ability) > 0) {
-	          return _react2.default.createElement(
-	            'span',
-	            null,
-	            '[Modifier: ',
-	            utilities.getModifier(this.getAbilityScore(ability)),
-	            ']'
-	          );
-	        }
-	      }
-	    }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * CharacterSheet
+	 *
+	 * Represents the output for the character builder form
+	 */
+
+	var ProficiencySheet = exports.ProficiencySheet = function (_React$Component) {
+	  _inherits(ProficiencySheet, _React$Component);
+
+	  function ProficiencySheet(props) {
+	    _classCallCheck(this, ProficiencySheet);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ProficiencySheet).call(this, props));
+	  }
+
+	  _createClass(ProficiencySheet, [{
+	    key: 'getProficiencies',
+
 
 	    /**
 	     * getProficiencies - gets the markup for the list of proficiences from selected type
@@ -20923,14 +20764,8 @@
 	     * @return {react object}      view for the list of proficiencies
 	     */
 
-	  }, {
-	    key: 'getProficiencies',
 	    value: function getProficiencies(type) {
-	      var raceName = document.querySelector('[name=select_race]') ? document.querySelector('[name=select_race]').value : "";
-	      var subraceName = document.querySelector('[name=select_subrace]') ? document.querySelector('[name=select_subrace]').value : "";
 	      var thisCharData = this.props.charData || {};
-	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
-	      var thisSubraceData = utilities.getObjectByName(thisRaceData.subraces, subraceName);
 	      var proficiencies = {};
 	      var id = -1;
 
@@ -20938,10 +20773,6 @@
 
 	      if (thisCharData.proficiencies && thisCharData.proficiencies[type]) {
 	        proficiencies[type] = proficiencies[type].concat(thisCharData.proficiencies[type]);
-	      }
-
-	      if (thisSubraceData.proficiencies && thisSubraceData.proficiencies[type]) {
-	        proficiencies[type] = proficiencies[type].concat(thisSubraceData.proficiencies[type]);
 	      }
 
 	      if (proficiencies[type]) {
@@ -20960,158 +20791,6 @@
 	    }
 
 	    /**
-	     * getRacialFeats - gets list of features of selected race and subrace
-	     *
-	     * @param  {string} raceName name of chosen race
-	     * @return {react object}          view for list of racial features
-	     */
-
-	  }, {
-	    key: 'getRacialFeats',
-	    value: function getRacialFeats(raceName) {
-	      var thisRace = utilities.getObjectByName(_races2.default, raceName);
-	      var feats = [];
-	      var allFeats = [];
-	      var uniqueFeats = [];
-	      var subrace = {};
-	      var i = 0;
-	      var j = -1;
-
-	      if (thisRace.feats && thisRace.feats.length) {
-	        feats = thisRace.feats;
-	      }
-
-	      if (this.props.charData.select_subrace) {
-	        subrace = utilities.getObjectByName(thisRace.subraces, this.props.charData.select_subrace);
-
-	        if (subrace && subrace.feats) {
-	          allFeats = feats.concat(subrace.feats) || feats;
-	          feats = allFeats;
-	        }
-	      }
-
-	      if (this.props.charData.feats) {
-	        allFeats = feats.concat(this.props.charData.feats) || allFeats;
-	        feats = allFeats;
-	      }
-
-	      if (feats) {
-	        for (i in feats) {
-	          if (uniqueFeats.indexOf(feats[i]) === -1) {
-	            if (_feats2.default[feats[i]]) {
-	              uniqueFeats.push(_feats2.default[feats[i]]);
-	            } else {
-	              uniqueFeats.push({
-	                "name": feats[i],
-	                "description": "feat not defined"
-	              });
-	            }
-	          }
-	        }
-	      }
-
-	      if (uniqueFeats) {
-	        return uniqueFeats.map(function (obj) {
-	          j += 1;
-	          return _react2.default.createElement(
-	            'li',
-	            { key: j },
-	            _react2.default.createElement(
-	              'h4',
-	              null,
-	              obj.name
-	            ),
-	            _react2.default.createElement(
-	              'p',
-	              null,
-	              obj.description
-	            )
-	          );
-	        });
-	      }
-	    }
-
-	    /**
-	     * getClassFeats - gets list of features of selected class
-	     *
-	     * @param  {string} heroClass name of chosen class
-	     * @return {react object}          view for list of class features
-	     */
-
-	  }, {
-	    key: 'getClassFeats',
-	    value: function getClassFeats(heroClass) {
-	      var thisClass = utilities.getObjectByName(_characterClasses2.default, heroClass);
-	      var feats = thisClass.feats || [];
-	      var uniqueFeats = [];
-	      var specialty = {};
-	      var allFeats = [];
-	      var i = 0;
-	      var j = -1;
-
-	      if (this.props.charData.select_specialty) {
-	        specialty = utilities.getObjectByName(thisClass.specialties, this.props.charData.select_specialty);
-	        allFeats = feats.concat(specialty.feats) || feats;
-
-	        for (i in allFeats) {
-	          if (uniqueFeats.indexOf(allFeats[i]) === -1) {
-	            uniqueFeats.push(allFeats[i]);
-	          }
-	        }
-	      } else {
-	        for (i in feats) {
-	          if (uniqueFeats.indexOf(feats[i]) === -1) {
-	            uniqueFeats.push(feats[i]);
-	          }
-	        }
-	      }
-
-	      return uniqueFeats.map(function (obj) {
-	        j += 1;
-	        return _react2.default.createElement(
-	          'li',
-	          { key: j },
-	          obj
-	        );
-	      });
-	    }
-
-	    /**
-	     * getBackgroundFeats - gets list of features of selected background
-	     *
-	     * @param  {string} background name of chosen background
-	     * @return {react object}          view for list of background features
-	     */
-
-	  }, {
-	    key: 'getBackgroundFeats',
-	    value: function getBackgroundFeats(background) {
-	      var thisBackground = utilities.getObjectByName(_backgrounds2.default, background);
-	      var feats = thisBackground.feats || [];
-	      var allFeats = [];
-	      var uniqueFeats = [];
-	      var i = 0;
-	      var j = -1;
-
-	      for (i in feats) {
-	        if (uniqueFeats.indexOf(feats[i]) === -1) {
-	          uniqueFeats.push(feats[i]);
-	        }
-	      }
-
-	      if (uniqueFeats) {
-	        return uniqueFeats.map(function (obj) {
-	          j += 1;
-	          return _react2.default.createElement(
-	            'li',
-	            { key: j },
-	            obj
-	          );
-	        });
-	      }
-	    }
-
-	    /**
 	     * render - renders content to the DOM
 	     *
 	     * @return {type}  view for CharacterSheet
@@ -21122,19 +20801,7 @@
 	    value: function render() {
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'character-sheet' },
-	        _react2.default.createElement(
-	          'h1',
-	          null,
-	          'Character Sheet'
-	        ),
-	        this.getProfileInfo(),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Ability Scores'
-	        ),
-	        this.getAbilityScores(),
+	        { className: 'proficiency-sheet' },
 	        _react2.default.createElement(
 	          'h2',
 	          null,
@@ -21189,46 +20856,16 @@
 	          'ul',
 	          null,
 	          this.getProficiencies('languages')
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Racial Features'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getRacialFeats(this.props.charData.select_race)
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Class Features'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getClassFeats(this.props.charData.select_class)
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Background Features'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getBackgroundFeats(this.props.charData.select_background)
 	        )
 	      );
 	    }
 	  }]);
 
-	  return CharacterSheet;
+	  return ProficiencySheet;
 	}(_react2.default.Component);
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -21240,14 +20877,7 @@
 				"str"
 			],
 			"hit_dice": "d12",
-			"base_stats": {
-				"hp": "12",
-				"ac": "10",
-				"ac_mods": [
-					"dex",
-					"con"
-				]
-			},
+			"hp": "12",
 			"proficiencies": {
 				"armor": [
 					"light",
@@ -21266,7 +20896,7 @@
 					"choice",
 					"choice"
 				],
-				"skill_choices": [
+				"skills_choice": [
 					"animal_handling",
 					"athletics",
 					"intimidation",
@@ -21290,11 +20920,7 @@
 					"explorers_pack",
 					"javelins"
 				]
-			},
-			"feats": [
-				"rage",
-				"unarmored_defense"
-			]
+			}
 		},
 		{
 			"name": "Bard",
@@ -21509,7 +21135,7 @@
 	];
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -21561,7 +21187,7 @@
 	];
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -21788,7 +21414,698 @@
 	};
 
 /***/ },
-/* 165 */
+/* 166 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.FeaturesSheet = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _races = __webpack_require__(160);
+
+	var _races2 = _interopRequireDefault(_races);
+
+	var _characterClasses = __webpack_require__(163);
+
+	var _characterClasses2 = _interopRequireDefault(_characterClasses);
+
+	var _backgrounds = __webpack_require__(164);
+
+	var _backgrounds2 = _interopRequireDefault(_backgrounds);
+
+	var _feats = __webpack_require__(165);
+
+	var _feats2 = _interopRequireDefault(_feats);
+
+	var _utilities = __webpack_require__(159);
+
+	var utilities = _interopRequireWildcard(_utilities);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * CharacterSheet
+	 *
+	 * Represents the output for the character builder form
+	 */
+
+	var FeaturesSheet = exports.FeaturesSheet = function (_React$Component) {
+	  _inherits(FeaturesSheet, _React$Component);
+
+	  function FeaturesSheet(props) {
+	    _classCallCheck(this, FeaturesSheet);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(FeaturesSheet).call(this, props));
+	  }
+
+	  _createClass(FeaturesSheet, [{
+	    key: 'getRacialFeats',
+
+
+	    /**
+	     * getRacialFeats - gets list of features of selected race and subrace
+	     *
+	     * @param  {string} raceName name of chosen race
+	     * @return {react object}          view for list of racial features
+	     */
+	    value: function getRacialFeats(raceName) {
+	      var thisRace = utilities.getObjectByName(_races2.default, raceName);
+	      var feats = [];
+	      var allFeats = [];
+	      var uniqueFeats = [];
+	      var subrace = {};
+	      var i = 0;
+	      var j = -1;
+
+	      if (thisRace.feats && thisRace.feats.length) {
+	        feats = thisRace.feats;
+	      }
+
+	      if (this.props.charData.select_subrace) {
+	        subrace = utilities.getObjectByName(thisRace.subraces, this.props.charData.select_subrace);
+
+	        if (subrace && subrace.feats) {
+	          allFeats = feats.concat(subrace.feats) || feats;
+	          feats = allFeats;
+	        }
+	      }
+
+	      if (this.props.charData.feats) {
+	        allFeats = feats.concat(this.props.charData.feats) || allFeats;
+	        feats = allFeats;
+	      }
+
+	      if (feats) {
+	        for (i in feats) {
+	          if (uniqueFeats.indexOf(feats[i]) === -1) {
+	            if (_feats2.default[feats[i]]) {
+	              uniqueFeats.push(_feats2.default[feats[i]]);
+	            } else {
+	              uniqueFeats.push({
+	                "name": feats[i],
+	                "description": "feat not defined"
+	              });
+	            }
+	          }
+	        }
+	      }
+
+	      if (uniqueFeats) {
+	        return uniqueFeats.map(function (obj) {
+	          j += 1;
+	          return _react2.default.createElement(
+	            'li',
+	            { key: j },
+	            _react2.default.createElement(
+	              'h4',
+	              null,
+	              obj.name
+	            ),
+	            _react2.default.createElement(
+	              'p',
+	              null,
+	              obj.description
+	            )
+	          );
+	        });
+	      }
+	    }
+
+	    /**
+	     * getClassFeats - gets list of features of selected class
+	     *
+	     * @param  {string} heroClass name of chosen class
+	     * @return {react object}          view for list of class features
+	     */
+
+	  }, {
+	    key: 'getClassFeats',
+	    value: function getClassFeats(heroClass) {
+	      var thisClass = utilities.getObjectByName(_characterClasses2.default, heroClass);
+	      var feats = thisClass.feats || [];
+	      var uniqueFeats = [];
+	      var specialty = {};
+	      var allFeats = [];
+	      var i = 0;
+	      var j = -1;
+
+	      if (this.props.charData.select_specialty) {
+	        specialty = utilities.getObjectByName(thisClass.specialties, this.props.charData.select_specialty);
+	        allFeats = feats.concat(specialty.feats) || feats;
+
+	        for (i in allFeats) {
+	          if (uniqueFeats.indexOf(allFeats[i]) === -1) {
+	            uniqueFeats.push(allFeats[i]);
+	          }
+	        }
+	      } else {
+	        for (i in feats) {
+	          if (uniqueFeats.indexOf(feats[i]) === -1) {
+	            uniqueFeats.push(feats[i]);
+	          }
+	        }
+	      }
+
+	      return uniqueFeats.map(function (obj) {
+	        j += 1;
+	        return _react2.default.createElement(
+	          'li',
+	          { key: j },
+	          obj
+	        );
+	      });
+	    }
+
+	    /**
+	     * getBackgroundFeats - gets list of features of selected background
+	     *
+	     * @param  {string} background name of chosen background
+	     * @return {react object}          view for list of background features
+	     */
+
+	  }, {
+	    key: 'getBackgroundFeats',
+	    value: function getBackgroundFeats(background) {
+	      var thisBackground = utilities.getObjectByName(_backgrounds2.default, background);
+	      var feats = thisBackground.feats || [];
+	      var allFeats = [];
+	      var uniqueFeats = [];
+	      var i = 0;
+	      var j = -1;
+
+	      for (i in feats) {
+	        if (uniqueFeats.indexOf(feats[i]) === -1) {
+	          uniqueFeats.push(feats[i]);
+	        }
+	      }
+
+	      if (uniqueFeats) {
+	        return uniqueFeats.map(function (obj) {
+	          j += 1;
+	          return _react2.default.createElement(
+	            'li',
+	            { key: j },
+	            obj
+	          );
+	        });
+	      }
+	    }
+
+	    /**
+	     * render - renders content to the DOM
+	     *
+	     * @return {type}  view for CharacterSheet
+	     */
+
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'features-sheet' },
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Racial Features'
+	        ),
+	        _react2.default.createElement(
+	          'ul',
+	          null,
+	          this.getRacialFeats(this.props.charData.select_race)
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Class Features'
+	        ),
+	        _react2.default.createElement(
+	          'ul',
+	          null,
+	          this.getClassFeats(this.props.charData.select_class)
+	        ),
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Background Features'
+	        ),
+	        _react2.default.createElement(
+	          'ul',
+	          null,
+	          this.getBackgroundFeats(this.props.charData.select_background)
+	        )
+	      );
+	    }
+	  }]);
+
+	  return FeaturesSheet;
+	}(_react2.default.Component);
+
+/***/ },
+/* 167 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.AbilityScoresSheet = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _races = __webpack_require__(160);
+
+	var _races2 = _interopRequireDefault(_races);
+
+	var _characterClasses = __webpack_require__(163);
+
+	var _characterClasses2 = _interopRequireDefault(_characterClasses);
+
+	var _backgrounds = __webpack_require__(164);
+
+	var _backgrounds2 = _interopRequireDefault(_backgrounds);
+
+	var _feats = __webpack_require__(165);
+
+	var _feats2 = _interopRequireDefault(_feats);
+
+	var _utilities = __webpack_require__(159);
+
+	var utilities = _interopRequireWildcard(_utilities);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * CharacterSheet
+	 *
+	 * Represents the output for the character builder form
+	 */
+
+	var AbilityScoresSheet = exports.AbilityScoresSheet = function (_React$Component) {
+	  _inherits(AbilityScoresSheet, _React$Component);
+
+	  function AbilityScoresSheet(props) {
+	    _classCallCheck(this, AbilityScoresSheet);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(AbilityScoresSheet).call(this, props));
+	  }
+
+	  _createClass(AbilityScoresSheet, [{
+	    key: 'getRaceAbilityScoreBonus',
+
+
+	    /**
+	     * getRaceAbilityScoreBonus - description
+	     *
+	     * @param  {string} ability name of the ability score to return
+	     * @param  {string} race    name of the race to check
+	     * @return {number}         ability score bonus for selected race
+	     */
+	    value: function getRaceAbilityScoreBonus(ability, race) {
+	      var thisRaceData = utilities.getObjectByName(_races2.default, race);
+	      var subraceSelect = document.querySelector('[name=select_subrace]');
+	      var bonus = 0;
+	      var subraceName = "";
+	      var thisSubRaceData = {};
+
+	      if (subraceSelect) {
+	        thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subraceSelect.value);
+	      }
+
+	      if (thisRaceData.ability_score_increase && thisRaceData.ability_score_increase[ability]) {
+	        bonus = Number(thisRaceData.ability_score_increase[ability]) || 0;
+	      }
+
+	      if (thisSubRaceData && thisSubRaceData.ability_score_increase && thisSubRaceData.ability_score_increase[ability]) {
+	        bonus += Number(thisSubRaceData.ability_score_increase[ability]) || 0;
+	      }
+
+	      return Number(bonus);
+	    }
+
+	    /**
+	     * getSelectedAbilityScoreBonus - gets ability score bonuses selected by the user
+	     *
+	     * @param  {string} ability name of the ability score to return
+	     * @return {number}         ability score bonus for selected ability
+	     */
+
+	  }, {
+	    key: 'getSelectedAbilityScoreBonus',
+	    value: function getSelectedAbilityScoreBonus(ability) {
+	      var thisRaceData = this.props.charData;
+	      var bonus = 0;
+
+	      if (thisRaceData && thisRaceData.ability_score_increase && thisRaceData.ability_score_increase[ability]) {
+	        bonus = thisRaceData.ability_score_increase[ability] || 0;
+	      }
+
+	      return Number(bonus);
+	    }
+
+	    /**
+	     * getAbilityScore - gets the total ability score for selected ability
+	     *
+	     * @param  {string} name ability score to return
+	     * @return {number}      total ability score for selected ability from all sources
+	     */
+
+	  }, {
+	    key: 'getAbilityScore',
+	    value: function getAbilityScore(name) {
+	      var base = Number(this.props.charData['ability_score_' + name]) || 0;
+	      var raceBonus = Number(this.getRaceAbilityScoreBonus(name, this.props.charData.select_race)) || 0;
+	      var selectedBonus = Number(this.getSelectedAbilityScoreBonus(name)) || 0;
+
+	      return Number(base + raceBonus + selectedBonus) || 0;
+	    }
+
+	    /**
+	     * getAbilityModifier - gets the ability modifier for an ability score
+	     *
+	     * @param  {string} ability name of the ability modifier to return
+	     * @return {number}         total modifier for the ability score
+	     */
+
+	  }, {
+	    key: 'getAbilityModifier',
+	    value: function getAbilityModifier(ability) {
+	      if (this.props.charData['ability_score_' + ability]) {
+	        if (utilities.getModifier(this.getAbilityScore(ability)) && this.getAbilityScore(ability) > 0) {
+	          return _react2.default.createElement(
+	            'span',
+	            null,
+	            '[Modifier: ',
+	            utilities.getModifier(this.getAbilityScore(ability)),
+	            ']'
+	          );
+	        }
+	      }
+	    }
+
+	    /**
+	     * getAbilityScores - gets the markup for ability scores
+	     *
+	     * @return {react object}  view for the ability scores block
+	     */
+
+	  }, {
+	    key: 'getAbilityScores',
+	    value: function getAbilityScores() {
+	      var selected_race = this.props.charData.select_subrace || this.props.charData.select_race || "";
+	      var score_names = ['str', 'con', 'dex', 'wis', 'int', 'cha'];
+	      var i = 0;
+	      var ability_scores = {};
+	      var race_bonus = {};
+	      var selected_bonus = {};
+	      var base_score = {};
+	      var score_breakdown = "";
+
+	      for (i in score_names) {
+	        base_score[score_names[i]] = this.props.charData['ability_score_' + score_names[i]] || 0;
+	        race_bonus[score_names[i]] = this.getRaceAbilityScoreBonus(score_names[i], this.props.charData.select_race) ? " + " + this.getRaceAbilityScoreBonus(score_names[i], this.props.charData.select_race) : "";
+	        selected_bonus[score_names[i]] = this.getSelectedAbilityScoreBonus(score_names[i]) ? " + " + this.getSelectedAbilityScoreBonus(score_names[i]) : "";
+	        score_breakdown = this.getAbilityScore(score_names[i]) === base_score[score_names[i]] ? "" : " (" + base_score[score_names[i]] + "" + race_bonus[score_names[i]] + "" + selected_bonus[score_names[i]] + ")";
+	        ability_scores[score_names[i]] = this.getAbilityScore(score_names[i]) + score_breakdown;
+	      }
+
+	      return _react2.default.createElement(
+	        'ul',
+	        null,
+	        _react2.default.createElement(
+	          'li',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'as-label' },
+	            'Strength:'
+	          ),
+	          ' ',
+	          ability_scores.str,
+	          ' ',
+	          this.getAbilityModifier('str')
+	        ),
+	        _react2.default.createElement(
+	          'li',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'as-label' },
+	            'Constitution:'
+	          ),
+	          ' ',
+	          ability_scores.con,
+	          ' ',
+	          this.getAbilityModifier('con')
+	        ),
+	        _react2.default.createElement(
+	          'li',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'as-label' },
+	            'Dexterity:'
+	          ),
+	          ' ',
+	          ability_scores.dex,
+	          ' ',
+	          this.getAbilityModifier('dex')
+	        ),
+	        _react2.default.createElement(
+	          'li',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'as-label' },
+	            'Wisdom:'
+	          ),
+	          ' ',
+	          ability_scores.wis,
+	          ' ',
+	          this.getAbilityModifier('wis')
+	        ),
+	        _react2.default.createElement(
+	          'li',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'as-label' },
+	            'Intelligence:'
+	          ),
+	          ' ',
+	          ability_scores.int,
+	          ' ',
+	          this.getAbilityModifier('int')
+	        ),
+	        _react2.default.createElement(
+	          'li',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { className: 'as-label' },
+	            'Charisma:'
+	          ),
+	          ' ',
+	          ability_scores.cha,
+	          ' ',
+	          this.getAbilityModifier('cha')
+	        )
+	      );
+	    }
+
+	    /**
+	     * render - renders content to the DOM
+	     *
+	     * @return {type}  view for CharacterSheet
+	     */
+
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'ability-scores-sheet' },
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Ability Scores'
+	        ),
+	        this.getAbilityScores()
+	      );
+	    }
+	  }]);
+
+	  return AbilityScoresSheet;
+	}(_react2.default.Component);
+
+/***/ },
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.ProfileSheet = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _races = __webpack_require__(160);
+
+	var _races2 = _interopRequireDefault(_races);
+
+	var _characterClasses = __webpack_require__(163);
+
+	var _characterClasses2 = _interopRequireDefault(_characterClasses);
+
+	var _backgrounds = __webpack_require__(164);
+
+	var _backgrounds2 = _interopRequireDefault(_backgrounds);
+
+	var _feats = __webpack_require__(165);
+
+	var _feats2 = _interopRequireDefault(_feats);
+
+	var _utilities = __webpack_require__(159);
+
+	var utilities = _interopRequireWildcard(_utilities);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * CharacterSheet
+	 *
+	 * Represents the output for the character builder form
+	 */
+
+	var ProfileSheet = exports.ProfileSheet = function (_React$Component) {
+	  _inherits(ProfileSheet, _React$Component);
+
+	  function ProfileSheet(props) {
+	    _classCallCheck(this, ProfileSheet);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ProfileSheet).call(this, props));
+	  }
+
+	  _createClass(ProfileSheet, [{
+	    key: 'getProfileInfo',
+
+	    /**
+	     * getProfileInfo - gets the markup for profile information
+	     *
+	     * @return {react object} view for the profile information block
+	     */
+	    value: function getProfileInfo() {
+	      var selected_race = this.props.charData.select_subrace || this.props.charData.select_race || "";
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          'Player Name: ',
+	          this.props.charData.player_name
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          'Character Name: ',
+	          this.props.charData.character_name
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          'Race: ',
+	          selected_race
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          'Class: ',
+	          this.props.charData.select_class
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          'Background: ',
+	          this.props.charData.select_background
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          'Alignment: ',
+	          this.props.charData.alignment_lawful,
+	          ' ',
+	          this.props.charData.alignment_moral
+	        )
+	      );
+	    }
+
+	    /**
+	     * render - renders content to the DOM
+	     *
+	     * @return {type}  view for CharacterSheet
+	     */
+
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'profile-sheet' },
+	        this.getProfileInfo()
+	      );
+	    }
+	  }]);
+
+	  return ProfileSheet;
+	}(_react2.default.Component);
+
+/***/ },
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21877,7 +22194,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 166 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21951,7 +22268,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 167 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21999,7 +22316,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 168 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22023,13 +22340,15 @@
 
 	var utilities = _interopRequireWildcard(_utilities);
 
-	var _dropDown = __webpack_require__(165);
+	var _dropDown = __webpack_require__(169);
 
-	var _textInput = __webpack_require__(166);
+	var _textInput = __webpack_require__(170);
 
-	var _checkboxGroup = __webpack_require__(169);
+	var _checkboxGroup = __webpack_require__(173);
 
-	var _submitButton = __webpack_require__(167);
+	var _submitButton = __webpack_require__(171);
+
+	var _skillsForm = __webpack_require__(174);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -22052,8 +22371,8 @@
 	    _this.state = {};
 	    _this.onChange = _this.onChange.bind(_this);
 	    _this.setLanguageChoice = _this.setLanguageChoice.bind(_this);
-	    _this.setProficiencyChoices = _this.setProficiencyChoices.bind(_this);
 	    _this.setDraconicAncestry = _this.setDraconicAncestry.bind(_this);
+	    _this.skillsForm = new _skillsForm.SkillsForm(props);
 	    return _this;
 	  }
 
@@ -22064,9 +22383,9 @@
 	        race: document.querySelector('[name=select_race]').value
 	      });
 
-	      this.resetRaceData();
+	      //this.resetRaceData();
+	      this.skillsForm.setSkillChoices(e);
 	      this.props.onUpdate(e);
-	      this.setProficiencyChoices(e);
 	    }
 	  }, {
 	    key: 'setLanguageChoice',
@@ -22124,89 +22443,6 @@
 	      return raceNames;
 	    }
 	  }, {
-	    key: 'setProficiencyChoices',
-	    value: function setProficiencyChoices(e) {
-	      var type = e.target.getAttribute("name");
-	      var proficiency = e.target.value;
-	      var thisRaceData = this.getThisRaceData();
-	      var subRaceName = this.props.charData.select_subrace || "";
-	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);
-	      var subraceProficiencies = thisSubRaceData.proficiencies || {};
-
-	      if (e.target.getAttribute("name") === "select_subrace") {
-	        thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, e.target.value);
-	      } else {
-	        thisSubRaceData = {};
-	      }
-
-	      if (e.target.getAttribute("name") === "select_race") {
-	        thisRaceData = utilities.getObjectByName(_races2.default, e.target.value);
-	        thisSubRaceData = {};
-	      }
-
-	      if (e.target.getAttribute('type') === "checkbox") {
-	        if (e.target.checked) {
-	          this.props.charData.proficiencies[type].push(e.target.value);
-	        } else {
-	          if (this.props.charData.proficiencies[type].indexOf(e.target.value) > -1) {
-	            this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
-	          }
-	        }
-	      }
-
-	      this.props.charData.proficiencies = Object.assign(this.props.charData.proficiencies, thisRaceData.proficiencies, thisSubRaceData.proficiencies);
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'getProficiencyChoiceForm',
-	    value: function getProficiencyChoiceForm(thisRaceData) {
-	      var proficiencyChoiceForm = "";
-	      var proficiencyChoices = [];
-	      var optionsLimit = 0;
-	      var choiceName = "";
-	      var choice = "";
-	      var item = "";
-	      var i = 0;
-	      var j = 0;
-	      var l = 0;
-
-	      if (thisRaceData.proficiencies) {
-	        for (item in thisRaceData.proficiencies) {
-	          if (thisRaceData.proficiencies[item].indexOf('choice') > -1) {
-	            choiceName = item + "_choice";
-
-	            if (item !== "languages") {
-	              if (thisRaceData.proficiencies[choiceName]) {
-	                l = thisRaceData.proficiencies[choiceName].length;
-
-	                for (j = 0; j < l; j += 1) {
-	                  choice = thisRaceData.proficiencies[choiceName][j];
-
-	                  proficiencyChoices.push({
-	                    "name": item,
-	                    "label": utilities.titleCase(choice) + " " + utilities.titleCase(item),
-	                    "value": choice,
-	                    "id": choice
-	                  });
-	                }
-	                proficiencyChoiceForm = _react2.default.createElement(_checkboxGroup.CheckBoxGroup, {
-	                  name: 'proficiency_choice_form',
-	                  label: 'Select Proficiencies',
-	                  choices: proficiencyChoices,
-	                  groupLabel: 'Select Skill Proficiencies',
-	                  groupName: 'proficieny_choices',
-	                  optionsLimit: utilities.countItemInArray(thisRaceData.proficiencies[item], "choice"),
-	                  onUpdate: this.setProficiencyChoices
-	                });
-	              }
-	            }
-	          }
-	        }
-	      }
-
-	      return proficiencyChoiceForm;
-	    }
-	  }, {
 	    key: 'setDraconicAncestry',
 	    value: function setDraconicAncestry(e) {
 	      var i = 0;
@@ -22253,7 +22489,7 @@
 	    key: 'getAbilityScoreChoiceForm',
 	    value: function getAbilityScoreChoiceForm(thisRaceData) {
 	      var raceName = this.props.charData.select_race;
-	      var abilityScores = [{ label: "Strength", name: "ability_score_increase_str", value: 1, id: "str" }, { label: "Constitution", name: "ability_score_increase_con", value: 1, id: "con" }, { label: "Dexterity", name: "ability_score_increase_dex", value: 1, id: "dex" }, { label: "Wisdom", name: "ability_score_increase_wis", value: 1, id: "wis" }, { label: "Intelligence", name: "ability_score_increase_int", value: 1, id: "int" }, { label: "Charisma", name: "ability_score_increase_cha", value: 1, id: "cha" }];
+	      var abilityScores = [{ label: "Strength", name: "ability_score_increase_str", value: 1, id: "str" }, { label: "Constitution", name: "ability_score_increase_con", value: 1, id: "con" }, { label: "Dexterity", name: "ability_score_increase_dex", value: 1, id: "dex" }, { label: "Wisdom", name: "ability_score_increase_wis", value: 1, id: "wis" }, { label: "Intelligence", name: "ability_score_increase_int", value: 1, id: "int" }];
 
 	      if (raceName === "Half-Elf") {
 	        return _react2.default.createElement(_checkboxGroup.CheckBoxGroup, { name: 'half_elf_abilities', label: 'Select Abilities', choices: abilityScores, groupLabel: 'Select Two Abilities', groupName: 'halfelf_ability_score', optionsLimit: thisRaceData.ability_score_choices, onUpdate: this.props.onUpdate });
@@ -22352,7 +22588,6 @@
 	        this.getSubraceForm(thisRaceData),
 	        this.getLanguageChoiceForm(thisRaceData),
 	        this.getAbilityScoreChoiceForm(thisRaceData),
-	        this.getProficiencyChoiceForm(thisRaceData),
 	        this.getDraconicAncestryForm(thisRaceData)
 	      );
 	    }
@@ -22362,7 +22597,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 169 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22440,6 +22675,13 @@
 	          null,
 	          this.props.groupLabel
 	        ),
+	        _react2.default.createElement(
+	          'p',
+	          { className: 'info' },
+	          '(choose ',
+	          this.props.optionsLimit,
+	          ')'
+	        ),
 	        this.props.choices.map(function (choice) {
 	          return _react2.default.createElement(
 	            'div',
@@ -22469,7 +22711,221 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 170 */
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.SkillsForm = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _utilities = __webpack_require__(159);
+
+	var utilities = _interopRequireWildcard(_utilities);
+
+	var _races = __webpack_require__(160);
+
+	var _races2 = _interopRequireDefault(_races);
+
+	var _characterClasses = __webpack_require__(163);
+
+	var _characterClasses2 = _interopRequireDefault(_characterClasses);
+
+	var _backgrounds = __webpack_require__(164);
+
+	var _backgrounds2 = _interopRequireDefault(_backgrounds);
+
+	var _checkboxGroup = __webpack_require__(173);
+
+	var _dropDown = __webpack_require__(169);
+
+	var _textInput = __webpack_require__(170);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var SkillsForm = exports.SkillsForm = function (_React$Component) {
+	  _inherits(SkillsForm, _React$Component);
+
+	  function SkillsForm(props) {
+	    _classCallCheck(this, SkillsForm);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(SkillsForm).call(this, props));
+
+	    _this.state = {};
+
+	    _this.onChange = _this.onChange.bind(_this);
+	    _this.setSkillChoices = _this.setSkillChoices.bind(_this);
+	    return _this;
+	  }
+
+	  _createClass(SkillsForm, [{
+	    key: 'onChange',
+	    value: function onChange(e) {
+	      this.props.onUpdate(e);
+	    }
+	  }, {
+	    key: 'setSkillChoices',
+	    value: function setSkillChoices(e) {
+	      var type = e.target.getAttribute("name");
+	      var proficiency = e.target.value;
+	      var raceName = this.props.charData.select_race || {};
+	      var className = this.props.charData.select_class || {};
+	      var backgroundName = this.props.charData.select_background || {};
+	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
+	      var thisClassData = utilities.getObjectByName(_characterClasses2.default, className);
+	      var thisBackgroundData = utilities.getObjectByName(_backgrounds2.default, backgroundName);
+	      var subRaceName = this.props.charData.select_subrace || "";
+	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);
+	      var subraceProficiencies = thisSubRaceData.proficiencies || {};
+	      console.log(this.props.charData);
+	      this.props.charData.proficiencies = this.props.charData.proficiencies || {};
+	      this.props.charData.proficiencies[type] = this.props.charData.proficiencies[type] || [];
+
+	      if (e.target.getAttribute("name") === "select_subrace") {
+	        thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, e.target.value);
+	      } else {
+	        thisSubRaceData = {};
+	      }
+
+	      if (e.target.getAttribute("name") === "select_race") {
+	        thisRaceData = utilities.getObjectByName(_races2.default, e.target.value);
+	        thisSubRaceData = {};
+	      }
+
+	      if (e.target.getAttribute("name") === "select_class") {
+	        thisClassData = utilities.getObjectByName(_characterClasses2.default, e.target.value);
+	      }
+
+	      if (e.target.getAttribute('type') === "checkbox") {
+	        if (e.target.checked) {
+	          this.props.charData.proficiencies[type].push(e.target.value);
+	        } else {
+	          if (this.props.charData.proficiencies[type].indexOf(e.target.value) > -1) {
+	            this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
+	          }
+	        }
+	      }
+
+	      this.props.charData.proficiencies = Object.assign(this.props.charData.proficiencies, thisRaceData.proficiencies, thisSubRaceData.proficiencies, thisClassData.proficiencies);
+	      this.props.onUpdate(e);
+	    }
+	  }, {
+	    key: 'getSkillChoiceForm',
+	    value: function getSkillChoiceForm() {
+	      var raceName = this.props.charData.select_race || {};
+	      var className = this.props.charData.select_class || {};
+	      var backgroundName = this.props.charData.select_background || {};
+	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
+	      var thisClassData = utilities.getObjectByName(_characterClasses2.default, className);
+	      var thisBackgroundData = utilities.getObjectByName(_backgrounds2.default, backgroundName);
+	      var groupName = "select_skills_" + this.props.source;
+	      var skillChoiceForm = _react2.default.createElement('span', null);
+	      var skillChoices = [];
+	      var optionsLimit = 0;
+	      var choiceName = "";
+	      var choice = "";
+	      var item = "";
+	      var thisData = {};
+	      var i = 0;
+	      var j = 0;
+	      var l = 0;
+
+	      thisData.proficiencies = thisData.proficiencies || {};
+	      thisData.proficiencies.skills = thisData.proficiencies.skills || [];
+	      thisData.proficiencies.skills_choice = thisData.proficiencies.skills_choice || [];
+
+	      if (thisRaceData && thisRaceData.proficiencies && thisRaceData.proficiencies.skills) {
+	        thisData.proficiencies.skills = thisData.proficiencies.skills.concat(thisRaceData.proficiencies.skills);
+
+	        if (thisRaceData.proficiencies.skills_choice) {
+	          thisData.proficiencies.skills_choice = thisData.proficiencies.skills_choice.concat(thisRaceData.proficiencies.skills_choice);
+	        }
+	      }
+
+	      if (thisClassData && thisClassData.proficiencies && thisClassData.proficiencies.skills) {
+	        thisData.proficiencies.skills = thisData.proficiencies.skills.concat(thisClassData.proficiencies.skills);
+
+	        if (thisClassData.proficiencies.skills_choice) {
+	          thisData.proficiencies.skills_choice = thisData.proficiencies.skills_choice.concat(thisClassData.proficiencies.skills_choice);
+	        }
+	      }
+
+	      if (thisBackgroundData && thisBackgroundData.proficiencies && thisBackgroundData.proficiencies.skills) {
+	        thisData.proficiencies.skills = thisData.proficiencies.skills.concat(thisBackgroundData.proficiencies.skills);
+
+	        if (thisBackgroundData.proficiencies.skills_choice) {
+	          thisData.proficiencies.skills_choice = thisData.proficiencies.skills_choice.concat(thisBackgroundData.proficiencies.skills_choice);
+	        }
+	      }
+
+	      if (thisData.proficiencies) {
+	        for (item in thisData.proficiencies) {
+	          if (thisData.proficiencies[item].indexOf('choice') > -1) {
+	            choiceName = item + "_choice";
+
+	            if (item !== "languages") {
+	              if (thisData.proficiencies[choiceName]) {
+	                l = thisData.proficiencies[choiceName].length;
+
+	                for (j = 0; j < l; j += 1) {
+	                  choice = thisData.proficiencies[choiceName][j];
+
+	                  skillChoices.push({
+	                    "name": item,
+	                    "label": utilities.titleCase(choice) + " " + utilities.titleCase(item),
+	                    "value": choice,
+	                    "id": choice
+	                  });
+	                }
+	                skillChoiceForm = _react2.default.createElement(_checkboxGroup.CheckBoxGroup, {
+	                  name: 'skill_choice_form',
+	                  label: 'Select Skills',
+	                  choices: skillChoices,
+	                  groupLabel: 'Select Skills',
+	                  groupName: groupName,
+	                  optionsLimit: utilities.countItemInArray(thisData.proficiencies[item], "choice"),
+	                  onUpdate: this.setSkillChoices
+	                });
+	              }
+	            }
+	          }
+	        }
+	      }
+
+	      return skillChoiceForm;
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        this.getSkillChoiceForm()
+	      );
+	    }
+	  }]);
+
+	  return SkillsForm;
+	}(_react2.default.Component);
+
+/***/ },
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22485,11 +22941,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _characterClasses = __webpack_require__(162);
+	var _characterClasses = __webpack_require__(163);
 
 	var _characterClasses2 = _interopRequireDefault(_characterClasses);
 
-	var _dropDown = __webpack_require__(165);
+	var _utilities = __webpack_require__(159);
+
+	var utilities = _interopRequireWildcard(_utilities);
+
+	var _dropDown = __webpack_require__(169);
+
+	var _checkboxGroup = __webpack_require__(173);
+
+	var _skillsForm = __webpack_require__(174);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22511,16 +22977,31 @@
 	      character_class: ''
 	    };
 	    _this.onChange = _this.onChange.bind(_this);
+	    _this.skillsForm = new _skillsForm.SkillsForm(props);
 	    return _this;
 	  }
 
 	  _createClass(ClassForm, [{
 	    key: 'onChange',
 	    value: function onChange(e) {
+
 	      this.setState({
 	        character_class: document.querySelector('[name=select_class]').value
 	      });
+
+	      //this.resetClassData();
+	      this.skillsForm.setSkillChoices(e);
 	      this.props.onUpdate(e);
+	    }
+	  }, {
+	    key: 'resetClassData',
+	    value: function resetClassData(e) {
+	      this.props.charData.proficiencies = {};
+	      this.props.charData.selected_languages = [];
+	      this.props.charData.feats = [];
+	      if (e && e.target && e.target.getAttribute('name') === "select_race") {
+	        this.props.charData.ability_score_increase = {};
+	      }
 	    }
 	  }, {
 	    key: 'getChoices',
@@ -22558,8 +23039,17 @@
 	      }
 	    }
 	  }, {
+	    key: 'getThisClassData',
+	    value: function getThisClassData() {
+	      var className = this.props.charData.select_class;
+	      var thisClassData = utilities.getObjectByName(_characterClasses2.default, className);
+
+	      return thisClassData;
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var thisClassData = this.getThisClassData();
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'form-field character_class-form' },
@@ -22582,7 +23072,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 171 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22598,11 +23088,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _backgrounds = __webpack_require__(163);
+	var _backgrounds = __webpack_require__(164);
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
-	var _dropDown = __webpack_require__(165);
+	var _dropDown = __webpack_require__(169);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22667,7 +23157,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 172 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22683,11 +23173,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _backgrounds = __webpack_require__(163);
+	var _backgrounds = __webpack_require__(164);
 
 	var _backgrounds2 = _interopRequireDefault(_backgrounds);
 
-	var _dropDown = __webpack_require__(165);
+	var _dropDown = __webpack_require__(169);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22786,7 +23276,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 173 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22802,9 +23292,9 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _dropDown = __webpack_require__(165);
+	var _dropDown = __webpack_require__(169);
 
-	var _textInput = __webpack_require__(166);
+	var _textInput = __webpack_require__(170);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22878,7 +23368,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 174 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22894,7 +23384,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _characterClasses = __webpack_require__(162);
+	var _characterClasses = __webpack_require__(163);
 
 	var _characterClasses2 = _interopRequireDefault(_characterClasses);
 
@@ -22906,9 +23396,9 @@
 
 	var utilities = _interopRequireWildcard(_utilities);
 
-	var _radioGroup = __webpack_require__(175);
+	var _radioGroup = __webpack_require__(180);
 
-	var _textInput = __webpack_require__(166);
+	var _textInput = __webpack_require__(170);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -23000,7 +23490,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 175 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

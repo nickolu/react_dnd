@@ -5,6 +5,7 @@ import { DropDown } from '../form-fields/drop-down.js';
 import { TextInput } from '../form-fields/text-input.js';
 import { CheckBoxGroup } from '../form-fields/checkbox-group.js';
 import { SubmitButton } from '../form-fields/submit-button.js';
+import { SkillsForm } from './skills-form.js';
 
 export class RaceForm extends React.Component {
   constructor(props) {
@@ -13,8 +14,8 @@ export class RaceForm extends React.Component {
     this.state = {};
     this.onChange = this.onChange.bind(this);
     this.setLanguageChoice = this.setLanguageChoice.bind(this);
-    this.setProficiencyChoices = this.setProficiencyChoices.bind(this);
     this.setDraconicAncestry = this.setDraconicAncestry.bind(this);
+    this.skillsForm = new SkillsForm(props);
   };
 
   onChange(e) {
@@ -22,9 +23,9 @@ export class RaceForm extends React.Component {
       race : document.querySelector('[name=select_race]').value,
     });
 
-    this.resetRaceData();
+    //this.resetRaceData();
+    this.skillsForm.setSkillChoices(e);
     this.props.onUpdate(e);
-    this.setProficiencyChoices(e);
   }
 
   setLanguageChoice(e) {
@@ -79,87 +80,6 @@ export class RaceForm extends React.Component {
     return raceNames;
   }
 
-  setProficiencyChoices(e) {
-    let type = e.target.getAttribute("name");
-    let proficiency = e.target.value;
-    let thisRaceData = this.getThisRaceData();
-    let subRaceName = this.props.charData.select_subrace || "";
-    let thisSubRaceData =  utilities.getObjectByName(thisRaceData.subraces,subRaceName);
-    let subraceProficiencies = thisSubRaceData.proficiencies || {};
-
-    if (e.target.getAttribute("name") === "select_subrace") {
-      thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, e.target.value);
-    } else {
-      thisSubRaceData = {};
-    }
-
-    if (e.target.getAttribute("name") === "select_race") {
-      thisRaceData = utilities.getObjectByName(raceData, e.target.value);
-      thisSubRaceData = {};
-    }
-
-    if (e.target.getAttribute('type') === "checkbox") {
-      if (e.target.checked) {
-        this.props.charData.proficiencies[type].push(e.target.value);
-      } else {
-        if (this.props.charData.proficiencies[type].indexOf(e.target.value) > -1) {
-          this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
-        }
-      }
-    }
-
-    this.props.charData.proficiencies = Object.assign(this.props.charData.proficiencies,thisRaceData.proficiencies,thisSubRaceData.proficiencies);
-    this.props.onUpdate(e);
-  }
-
-  getProficiencyChoiceForm(thisRaceData) {
-    let proficiencyChoiceForm = "";
-    let proficiencyChoices = [];
-    let optionsLimit = 0;
-    let choiceName = "";
-    let choice = "";
-    let item = "";
-    let i = 0;
-    let j = 0;
-    let l = 0;
-
-    if (thisRaceData.proficiencies) {
-      for (item in thisRaceData.proficiencies) {
-        if (thisRaceData.proficiencies[item].indexOf('choice') > -1) {
-          choiceName = item+"_choice";
-
-          if (item !== "languages") {
-            if (thisRaceData.proficiencies[choiceName]) {
-                l = thisRaceData.proficiencies[choiceName].length;
-
-                for (j = 0; j < l; j += 1) {
-                  choice = thisRaceData.proficiencies[choiceName][j]
-
-                  proficiencyChoices.push({
-                    "name" : item,
-                    "label" : utilities.titleCase(choice)+" "+utilities.titleCase(item),
-                    "value" : choice,
-                    "id" : choice
-                  })
-                }
-                proficiencyChoiceForm = <CheckBoxGroup
-                                          name="proficiency_choice_form"
-                                          label="Select Proficiencies"
-                                          choices={proficiencyChoices}
-                                          groupLabel="Select Skill Proficiencies"
-                                          groupName="proficieny_choices"
-                                          optionsLimit={utilities.countItemInArray(thisRaceData.proficiencies[item],"choice")}
-                                          onUpdate={this.setProficiencyChoices}
-                                        />
-            }
-          }
-        }
-      }
-    }
-
-    return proficiencyChoiceForm;
-  }
-
   setDraconicAncestry(e) {
     let i = 0;
     let l = 0;
@@ -208,8 +128,7 @@ export class RaceForm extends React.Component {
       {label : "Constitution", name : "ability_score_increase_con", value : 1, id : "con"},
       {label : "Dexterity", name : "ability_score_increase_dex", value : 1, id : "dex"},
       {label : "Wisdom", name : "ability_score_increase_wis", value : 1, id : "wis"},
-      {label : "Intelligence", name : "ability_score_increase_int", value : 1, id : "int"},
-      {label : "Charisma", name : "ability_score_increase_cha", value : 1, id : "cha"}
+      {label : "Intelligence", name : "ability_score_increase_int", value : 1, id : "int"}
     ];
 
     if (raceName === "Half-Elf") {
@@ -280,7 +199,6 @@ export class RaceForm extends React.Component {
               {this.getSubraceForm(thisRaceData)}
               {this.getLanguageChoiceForm(thisRaceData)}
               {this.getAbilityScoreChoiceForm(thisRaceData)}
-              {this.getProficiencyChoiceForm(thisRaceData)}
               {this.getDraconicAncestryForm(thisRaceData)}
             </div>
   }

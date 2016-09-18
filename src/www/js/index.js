@@ -12,6 +12,8 @@ import { BiographyForm } from './forms/character-biography-form.js';
 import { BackgroundForm } from './forms/background-form.js';
 import { AbilityScoresForm } from './forms/ability-scores-form.js';
 import { CharacterDetailsForm } from './forms/character-details-form.js';
+import { SkillsForm } from './forms/skills-form.js';
+
 
 class DndForm extends React.Component {
   constructor(props) {
@@ -122,14 +124,21 @@ class DndForm extends React.Component {
                 <TextInput type="text" label="Your Name (Not your Character's Name)" name="player_name" onChange={this.update}/>
                 <TextInput type="text" label="Your Character's Name" name="character_name" onChange={this.update}/>
                 <RaceForm onUpdate={this.update} charData={this.state.charData}/>
-                <ClassForm onUpdate={this.update} />
-                <BackgroundForm onUpdate={this.update} />
+                <ClassForm onUpdate={this.update} charData={this.state.charData}/>
+                <BackgroundForm onUpdate={this.update} charData={this.state.charData}/>
                 <CharacterDetailsForm onUpdate={this.update} charData={this.state.charData} formDescription={this.getRaceDescription}/>
-                <AbilityScoresForm onUpdate={this.update} />
+                <AbilityScoresForm onUpdate={this.update} charData={this.state.charData}/>
+                <SkillsForm charData={this.state.charData} onUpdate={this.update} />
 
               </div>
               <div className="col-sm-6 output-column">
                 <CharacterSheet charData={this.state.charData}/>
+              </div>
+            </div>
+            <hr />
+            <div className="row">
+              <div className="col-sm-12">
+                <h2>Spells</h2>
               </div>
             </div>
 
