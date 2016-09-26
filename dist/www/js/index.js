@@ -19879,13 +19879,20 @@
 	  return false;
 	};
 
-	var getObjectsByProp = exports.getObjectsByProp = function getObjectsByProp(arr, prop, name) {
+	/**
+	 * gets an object from an array of objects with a matching property name and value
+	 * @param  {[type]} arr  [description]
+	 * @param  {[type]} prop [description]
+	 * @param  {[type]} val  [description]
+	 * @return {[type]}      [description]
+	 */
+	var getObjectsByProp = exports.getObjectsByProp = function getObjectsByProp(arr, propName, val) {
 	  var i = 0;
 	  var objects = [];
 
 	  for (i in arr) {
-	    if (prop in arr[i]) {
-	      if (arr[i][prop] === name) {
+	    if (propName in arr[i]) {
+	      if (arr[i][propName] === val) {
 	        objects.push(arr[i]);
 	      }
 	    }
@@ -19931,6 +19938,52 @@
 	    operator = "-";
 	  }
 	  return operator + "" + Math.abs(modifier);
+	};
+
+	/**
+	 * removes spaces and convertsa string to lowercase for easier matching
+	 * @param  {string} str [string to shrink]
+	 * @return {string}     [shrunken string]
+	 */
+	var shrink = exports.shrink = function shrink(str) {
+	  var myStr = str;
+	  return myStr.replace(/\s/g, '').toLowerCase();
+	};
+
+	/**
+	   * gets a list with the specified object removed
+	   * @param  {array} arr  [array to remove an item from]
+	   * @param  {object} obj [specific object to remove]
+	   * @return {array}      [new array without the specified object]
+	   */
+	var removeObject = exports.removeObject = function removeObject(arr, obj) {
+	  var i;
+	  var l = arr.length;
+	  var prop;
+
+	  for (i = 0; i < l; i += 1) {
+	    if (arr[i] && arr[i].value === obj.value && arr[i].key === obj.key) {
+	      arr.splice(i, 1);
+	    }
+	  }
+
+	  return arr;
+	};
+
+	/**
+	 * removes duplicates from an array and returns the new array
+	 * @param  {array} array [array to remove duplicates from]
+	 * @return {array}       [array with duplicates removed]
+	 */
+	var arrayUnique = exports.arrayUnique = function arrayUnique(arr) {
+	  var a = arr.concat();
+	  for (var i = 0; i < a.length; ++i) {
+	    for (var j = i + 1; j < a.length; ++j) {
+	      if (a[i] === a[j]) a.splice(j--, 1);
+	    }
+	  }
+
+	  return a;
 	};
 
 /***/ },
@@ -22271,7 +22324,7 @@
 /* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -22302,11 +22355,13 @@
 	  }
 
 	  _createClass(SubmitButton, [{
-	    key: 'render',
+	    key: "render",
 	    value: function render() {
+	      var cssClass = this.props.cssClass || "btn";
+
 	      return _react2.default.createElement(
-	        'button',
-	        { onClick: this.props.onUpdate },
+	        "div",
+	        { className: cssClass, onClick: this.props.onUpdate },
 	        this.props.label
 	      );
 	    }
