@@ -43,19 +43,18 @@ export class ButtonGroup extends React.Component {
   }
 
   renderButton(choice) {
-    var choiceString = typeof choice === "object" ? choice.val : choice
-    var id = choiceString;
-    var label = choiceString;
+    var choiceString = typeof choice === "object" ? choice.val : choice;
+    var label = typeof choice === "object" ? choice.label : choice;
     var cssClass = utilities.shrink(this.props.groupLabel)+" "+utilities.shrink(choiceString)+" btn";
     var _this = this;
 
     function onChange(e) {
-      
-      _this.props.onUpdate(e,choice,e.target.className.indexOf("active") > -1);
+      var isActive = e.target.className.indexOf("active") > -1;
+      _this.props.onUpdate(e,choice,isActive);
       _this.setActiveButton(e);
     }
 
-    return <SubmitButton key={choiceString} cssClass={cssClass} label={choiceString} onUpdate={onChange} />
+    return <SubmitButton key={choiceString} cssClass={cssClass} value={choiceString} label={label} onUpdate={onChange} />
   }
 
   render() {

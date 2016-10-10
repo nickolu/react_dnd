@@ -5,10 +5,14 @@ export class SubmitButton extends React.Component {
     super(props);
   };
 
-
   render() {
-  	var cssClass = this.props.cssClass || "btn";
+  	var cssClass = "btn ";
 
-    return  <div className={cssClass} onClick={this.props.onUpdate}>{this.props.label}</div>
+  	if (this.props.cssClass) {
+  		cssClass += this.props.cssClass;	
+  	}
+  	
+
+    return  <div className={cssClass} data-key={this.props.value} onClick={this.props.onUpdate}>{this.props.label}</div>
   }
 }

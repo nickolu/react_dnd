@@ -34,15 +34,22 @@ export class CheckBoxGroup extends React.Component {
 
   render() {
     var key = 0;
-    return  <div>
-              <h3>{this.props.groupLabel}</h3>
-              <p className="info">(choose {this.props.optionsLimit})</p>
+    var chooseText = "";
+
+    if (this.props.optionsLimit > 0) {
+      chooseText = "(choose "+this.props.optionsLimit+")";
+    }
+
+    return  <div className={this.props.cssClass}>
+              <h5>{this.props.groupLabel}</h5>
+              <p className="info">{chooseText}</p>
               {this.props.choices.map(choice => <div key={choice.id}>
                     <label>
                        <input
                          type="checkbox"
                          disabled={this.limitOptions(this.props.optionsLimit, choice.id)}
                          className={this.props.groupName}
+                         defaultChecked={choice.checked}
                          name={choice.name}
                          value={choice.value}
                          data-id={choice.id}
