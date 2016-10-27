@@ -37,10 +37,14 @@ class Generator extends React.Component {
       parents : "[parents]",
       children : "[children]",
       siblings : "[siblings]",
-      extended_family : "[extended_family]",
+      cousins : "[cousins]",
+      aunts : "[aunts]",
+      uncles : "[uncles]",
       family_relationship : "[family_relationship]",
-      maritial_status : "[maritial_status]"
+      maritial_status : "[maritial_status]",
+      ages : "[age]"
     };
+
     this.updateAll = this.updateAll.bind(this);
     this.updateState = this.updateState.bind(this);
     this.renderInput = this.renderInput.bind(this);
@@ -51,7 +55,6 @@ class Generator extends React.Component {
    * updates all values
    * each input which is not locked will be updated with a new random value
    */
-  
   updateAll() {
     let inputEls = document.querySelectorAll('input');
     let _this = this;
@@ -96,8 +99,12 @@ class Generator extends React.Component {
    * @return {string}  
    */
   getRandom(arr) {
-    let randomIndex = Math.round(Math.random() * (arr.length - 1));
+    let randomIndex = 0;
     let item = "";
+
+    if (Array.isArray(arr)) {
+      randomIndex = Math.round(Math.random() * (arr.length - 1));
+    }
 
     return arr[randomIndex];
   }
@@ -126,30 +133,32 @@ class Generator extends React.Component {
     let shouldNotEqual = "";
     let traitsArr = npcTraits.traits[inputName];
 
-    if (npcTraits.options[inputName]) {
-      shouldNotEqual = npcTraits.options[inputName].shouldNotEqual || "";
-      
-      if (npcTraits.options[inputName].dependencies) {
-        dependency = this.getRandom(npcTraits.options[inputName].dependencies) || [];  
-      }
-      
-      if (dependency) { 
-        dependencyVal = this.state[dependency].toLowerCase();
-        traitsArr = npcTraits.traits[inputName][dependencyVal];
+    if (!utilities.contains(this.state.lockedInputs, inputName)) {
+      if (npcTraits.options[inputName]) {
+        shouldNotEqual = npcTraits.options[inputName].shouldNotEqual || "";
+        
+        if (npcTraits.options[inputName].dependencies) {
+          dependency = this.getRandom(npcTraits.options[inputName].dependencies) || [];  // choose random dependency
+          dependencyVal = this.state[dependency].toLowerCase();
+          traitsArr = npcTraits.traits[inputName][dependencyVal];
+        }
+
+        if (npcTraits.options[inputName].isRange) {
+          randomVal = Math.round(Math.random() * (traitsArr[1] - traitsArr[0]) + traitsArr[0]);
+        } else {
+          randomVal = this.getRandom(traitsArr);  
+        }
+        
+        while (randomVal === this.state[shouldNotEqual]) {
+          randomVal = this.getRandom(traitsArr);
+        }
+
+      } else if (Array.isArray(npcTraits.traits[inputName])) {
+        randomVal = this.getRandom(npcTraits.traits[inputName]);
       }
 
-      randomVal = this.getRandom(traitsArr);
-      
-      while (randomVal === this.state[shouldNotEqual]) {
-        console.log('should not equal!');
-        randomVal = this.getRandom(traitsArr);
-      }
-
-    } else if (Array.isArray(npcTraits.traits[inputName])) {
-      randomVal = this.getRandom(npcTraits.traits[inputName]);
+      this.replaceInput(inputName,randomVal);
     }
-
-    this.replaceInput(inputName,randomVal);
   }
 
   /**
@@ -254,9 +263,9 @@ class Generator extends React.Component {
               </div>
               <div className="row">
                 <div className="col-sm-6">
-                  This {renderDescription("gender")} {renderDescription("race")} has a {renderDescription("alignment_lawful")}-{renderDescription("alignment_moral")} alignment and {renderDescription("distinguishing_marks")}. You can see {renderDescription("emotion")} in {genderPronounPossessive.toLowerCase()} {renderDescription("eye_color")}, {renderDescription("eye_shape")} eyes. {genderPronounPersonal} is {renderDescription("high_ability")} yet {renderDescription("low_ability")}. Impressively, {genderPronounPersonal.toLowerCase()} is {renderDescription("talents")}. {genderPronounPersonal} often {renderDescription("mannerisms")} and has a {renderDescription("interaction_traits")} way of speaking. {genderPronounPersonal} is {renderDescription("bonds")} and believes in {renderDescription("ideals")}, but is troubled by {genderPronounPossessive.toLowerCase()} {renderDescription("flaws")}. <br/><br/>
+                  This {renderDescription("ages")} year-old {renderDescription("gender")} {renderDescription("race")} has a {renderDescription("alignment_lawful")}-{renderDescription("alignment_moral")} alignment and {renderDescription("distinguishing_marks")}. You can see {renderDescription("emotion")} in {genderPronounPossessive.toLowerCase()} {renderDescription("eye_color")}, {renderDescription("eye_shape")} eyes. {genderPronounPersonal} is {renderDescription("high_ability")} yet {renderDescription("low_ability")}. Impressively, {genderPronounPersonal.toLowerCase()} is {renderDescription("talents")}. {genderPronounPersonal} often {renderDescription("mannerisms")} and has a {renderDescription("interaction_traits")} way of speaking. {genderPronounPersonal} is {renderDescription("bonds")} and believes in {renderDescription("ideals")}, but is troubled by {genderPronounPossessive.toLowerCase()} {renderDescription("flaws")}. <br/><br/>
 
-                  {genderPronounPersonal} is {renderDescription("maritial_status")} with {renderDescription("children")}. The rest of {genderPronounPossessive.toLowerCase()} family consists of {renderDescription("siblings")}, {renderDescription("extended_family")}, and {renderDescription("parents")}. {genderPronounPersonal} has a {renderDescription("family_relationship")} relationship with most of them.
+                  {genderPronounPersonal} has a {renderDescription("family_relationship")} relationship with {genderPronounPossessive.toLowerCase()} family. {genderPronounPersonal} is {renderDescription("maritial_status")} with {renderDescription("children")}. The rest of {genderPronounPossessive.toLowerCase()} family consists of {renderDescription("siblings")}, {renderDescription("cousins")}, {renderDescription("aunts")}, {renderDescription("uncles")}, and {renderDescription("parents")}.
                 </div>
                 <div className="col-sm-6">
                   <SubmitButton 
@@ -286,12 +295,15 @@ class Generator extends React.Component {
                   {this.renderInput("eye_color","Eye color")}
                   {this.renderInput("eye_shape","Eye shape")}
                   {this.renderInput("hair_color","Hair color")}
+                  {this.renderInput("ages","Age")}
 
                   <p>Family</p>
 
                   {this.renderInput("parents","Parents")}
-                  {this.renderInput("siblings","siblings")}
-                  {this.renderInput("extended_family","Extended_family")}
+                  {this.renderInput("siblings","Siblings")}
+                  {this.renderInput("cousins","Cousins")}
+                  {this.renderInput("aunts","Aunts")}
+                  {this.renderInput("uncles","Uncles")}
                   {this.renderInput("children","Children")}
                   {this.renderInput("family_relationship","Family relationship")}
                   {this.renderInput("maritial_status","Maritial Status")}

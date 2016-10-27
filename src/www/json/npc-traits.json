@@ -30,6 +30,10 @@
         },
         "ideals" : {
             "dependencies" : ["alignment_moral","alignment_lawful"]
+        },
+        "ages" : {
+            "dependencies" : ["race"],
+            "isRange" : "true"
         }
     },
     "traits" : {
@@ -40,7 +44,7 @@
             "High Elf",
             "Drow",
             "Mountain Dwarf",
-            "Stone Dwarf",
+            "Hill Dwarf",
             "Half Orc",
             "Half Orc",
             "Half-elf",
@@ -544,7 +548,8 @@
             "Out for revenge"
         ],
         "flaws" : [
-            "Forbidden love or susceptible to romance",
+            "Forbidden love",
+            "Susceptibility to romance",
             "Enjoyment for decadent pleasures",
             "High level of arrogance",
             "Envy for another creature's possessions or station",
@@ -572,11 +577,29 @@
             "chaotic" : ["Change","Creativity","Freedom","Independence","No limits","Whimsy"],
             "other" : ["Aspiration","Discovery","Glory","Nation","Redemption","Self-knowledge"]
         },
+        "ages" : {
+            "human" : [16,100],
+            "wood elf" : [100,750],
+            "high elf" : [100,750],
+            "drow" : [100,750],
+            "mountain dwarf" : [50,350],
+            "hill dwarf" : [50,350],
+            "half orc" : [18,75],
+            "half-elf" : [18,200],
+            "stout halfling" : [20,250],
+            "lightfoot halfling" : [20,250],
+            "tiefling" : [16,150],
+            "dragonborn" : [3,80],
+            "rock gnome" : [18,500],
+            "forest gnome" : [18,500]
+        },
         "maritial_status" : ["Married","Single","Divorced","Separated","Widowed"],
         "children" : ["Multiple children", "No children", "No children", "No children", "No children", "A dead child or children"],
         "parents" : ["A living mother", "A living father", "No living parents", "Two living parents"],
         "siblings" : ["Multiple brothers and/or sisters", "No siblings", "One brother", "One sister", "One twin brother", "One twin sister"],
-        "extended_family" : ["Few cousins, aunts, or uncles", "Many cousins, aunts, and uncles", "Some cousins, aunts, or uncles", "No cousins, aunts or uncles"],
+        "cousins" : ["a few cousins", "one cousin", "no cousins", "many cousins"],
+        "aunts" : ["a few aunts", "no aunts", "one aunt", "many aunts"],
+        "uncles" : ["a few uncles", "one uncle", "no uncles", "many uncles"],
         "family_relationship" : ["Close","Distant","Hostile"],
         "emotion" : ["Anger","Sadness","Joy","Fear","Disgust"],
         "hair_color" : ["Black","Brown","Red","Blonde","Grey","White","Blue","Maroon","Dark Brown","Rainbow"],

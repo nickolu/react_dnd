@@ -117,10 +117,14 @@
 	      parents: "[parents]",
 	      children: "[children]",
 	      siblings: "[siblings]",
-	      extended_family: "[extended_family]",
+	      cousins: "[cousins]",
+	      aunts: "[aunts]",
+	      uncles: "[uncles]",
 	      family_relationship: "[family_relationship]",
-	      maritial_status: "[maritial_status]"
+	      maritial_status: "[maritial_status]",
+	      ages: "[age]"
 	    };
+
 	    _this2.updateAll = _this2.updateAll.bind(_this2);
 	    _this2.updateState = _this2.updateState.bind(_this2);
 	    _this2.renderInput = _this2.renderInput.bind(_this2);
@@ -132,6 +136,7 @@
 	   * updates all values
 	   * each input which is not locked will be updated with a new random value
 	   */
+
 
 	  _createClass(Generator, [{
 	    key: 'updateAll',
@@ -182,8 +187,12 @@
 	  }, {
 	    key: 'getRandom',
 	    value: function getRandom(arr) {
-	      var randomIndex = Math.round(Math.random() * (arr.length - 1));
+	      var randomIndex = 0;
 	      var item = "";
+
+	      if (Array.isArray(arr)) {
+	        randomIndex = Math.round(Math.random() * (arr.length - 1));
+	      }
 
 	      return arr[randomIndex];
 	    }
@@ -217,29 +226,31 @@
 	      var shouldNotEqual = "";
 	      var traitsArr = _npcTraits2.default.traits[inputName];
 
-	      if (_npcTraits2.default.options[inputName]) {
-	        shouldNotEqual = _npcTraits2.default.options[inputName].shouldNotEqual || "";
+	      if (!utilities.contains(this.state.lockedInputs, inputName)) {
+	        if (_npcTraits2.default.options[inputName]) {
+	          shouldNotEqual = _npcTraits2.default.options[inputName].shouldNotEqual || "";
 
-	        if (_npcTraits2.default.options[inputName].dependencies) {
-	          dependency = this.getRandom(_npcTraits2.default.options[inputName].dependencies) || [];
+	          if (_npcTraits2.default.options[inputName].dependencies) {
+	            dependency = this.getRandom(_npcTraits2.default.options[inputName].dependencies) || []; // choose random dependency
+	            dependencyVal = this.state[dependency].toLowerCase();
+	            traitsArr = _npcTraits2.default.traits[inputName][dependencyVal];
+	          }
+
+	          if (_npcTraits2.default.options[inputName].isRange) {
+	            randomVal = Math.round(Math.random() * (traitsArr[1] - traitsArr[0]) + traitsArr[0]);
+	          } else {
+	            randomVal = this.getRandom(traitsArr);
+	          }
+
+	          while (randomVal === this.state[shouldNotEqual]) {
+	            randomVal = this.getRandom(traitsArr);
+	          }
+	        } else if (Array.isArray(_npcTraits2.default.traits[inputName])) {
+	          randomVal = this.getRandom(_npcTraits2.default.traits[inputName]);
 	        }
 
-	        if (dependency) {
-	          dependencyVal = this.state[dependency].toLowerCase();
-	          traitsArr = _npcTraits2.default.traits[inputName][dependencyVal];
-	        }
-
-	        randomVal = this.getRandom(traitsArr);
-
-	        while (randomVal === this.state[shouldNotEqual]) {
-	          console.log('should not equal!');
-	          randomVal = this.getRandom(traitsArr);
-	        }
-	      } else if (Array.isArray(_npcTraits2.default.traits[inputName])) {
-	        randomVal = this.getRandom(_npcTraits2.default.traits[inputName]);
+	        this.replaceInput(inputName, randomVal);
 	      }
-
-	      this.replaceInput(inputName, randomVal);
 	    }
 
 	    /**
@@ -373,6 +384,8 @@
 	            'div',
 	            { className: 'col-sm-6' },
 	            'This ',
+	            renderDescription("ages"),
+	            ' year-old ',
 	            renderDescription("gender"),
 	            ' ',
 	            renderDescription("race"),
@@ -420,6 +433,12 @@
 	            _react2.default.createElement('br', null),
 	            _react2.default.createElement('br', null),
 	            genderPronounPersonal,
+	            ' has a ',
+	            renderDescription("family_relationship"),
+	            ' relationship with ',
+	            genderPronounPossessive.toLowerCase(),
+	            ' family. ',
+	            genderPronounPersonal,
 	            ' is ',
 	            renderDescription("maritial_status"),
 	            ' with ',
@@ -429,14 +448,14 @@
 	            ' family consists of ',
 	            renderDescription("siblings"),
 	            ', ',
-	            renderDescription("extended_family"),
+	            renderDescription("cousins"),
+	            ', ',
+	            renderDescription("aunts"),
+	            ', ',
+	            renderDescription("uncles"),
 	            ', and ',
 	            renderDescription("parents"),
-	            '. ',
-	            genderPronounPersonal,
-	            ' has a ',
-	            renderDescription("family_relationship"),
-	            ' relationship with most of them.'
+	            '.'
 	          ),
 	          _react2.default.createElement(
 	            'div',
@@ -469,14 +488,17 @@
 	            this.renderInput("eye_color", "Eye color"),
 	            this.renderInput("eye_shape", "Eye shape"),
 	            this.renderInput("hair_color", "Hair color"),
+	            this.renderInput("ages", "Age"),
 	            _react2.default.createElement(
 	              'p',
 	              null,
 	              'Family'
 	            ),
 	            this.renderInput("parents", "Parents"),
-	            this.renderInput("siblings", "siblings"),
-	            this.renderInput("extended_family", "Extended_family"),
+	            this.renderInput("siblings", "Siblings"),
+	            this.renderInput("cousins", "Cousins"),
+	            this.renderInput("aunts", "Aunts"),
+	            this.renderInput("uncles", "Uncles"),
 	            this.renderInput("children", "Children"),
 	            this.renderInput("family_relationship", "Family relationship"),
 	            this.renderInput("maritial_status", "Maritial Status")
@@ -20342,6 +20364,12 @@
 					"alignment_moral",
 					"alignment_lawful"
 				]
+			},
+			"ages": {
+				"dependencies": [
+					"race"
+				],
+				"isRange": "true"
 			}
 		},
 		"traits": {
@@ -20352,7 +20380,7 @@
 				"High Elf",
 				"Drow",
 				"Mountain Dwarf",
-				"Stone Dwarf",
+				"Hill Dwarf",
 				"Half Orc",
 				"Half Orc",
 				"Half-elf",
@@ -20876,7 +20904,8 @@
 				"Out for revenge"
 			],
 			"flaws": [
-				"Forbidden love or susceptible to romance",
+				"Forbidden love",
+				"Susceptibility to romance",
 				"Enjoyment for decadent pleasures",
 				"High level of arrogance",
 				"Envy for another creature's possessions or station",
@@ -20945,6 +20974,64 @@
 					"Self-knowledge"
 				]
 			},
+			"ages": {
+				"human": [
+					16,
+					100
+				],
+				"wood elf": [
+					100,
+					750
+				],
+				"high elf": [
+					100,
+					750
+				],
+				"drow": [
+					100,
+					750
+				],
+				"mountain dwarf": [
+					50,
+					350
+				],
+				"hill dwarf": [
+					50,
+					350
+				],
+				"half orc": [
+					18,
+					75
+				],
+				"half-elf": [
+					18,
+					200
+				],
+				"stout halfling": [
+					20,
+					250
+				],
+				"lightfoot halfling": [
+					20,
+					250
+				],
+				"tiefling": [
+					16,
+					150
+				],
+				"dragonborn": [
+					3,
+					80
+				],
+				"rock gnome": [
+					18,
+					500
+				],
+				"forest gnome": [
+					18,
+					500
+				]
+			},
 			"maritial_status": [
 				"Married",
 				"Single",
@@ -20974,11 +21061,23 @@
 				"One twin brother",
 				"One twin sister"
 			],
-			"extended_family": [
-				"Few cousins, aunts, or uncles",
-				"Many cousins, aunts, and uncles",
-				"Some cousins, aunts, or uncles",
-				"No cousins, aunts or uncles"
+			"cousins": [
+				"a few cousins",
+				"one cousin",
+				"no cousins",
+				"many cousins"
+			],
+			"aunts": [
+				"a few aunts",
+				"no aunts",
+				"one aunt",
+				"many aunts"
+			],
+			"uncles": [
+				"a few uncles",
+				"one uncle",
+				"no uncles",
+				"many uncles"
 			],
 			"family_relationship": [
 				"Close",
