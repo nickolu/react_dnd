@@ -20,7 +20,7 @@ const defaultTasks = [
 	'process-web-app-less'
 ];
 
-const entryPoints = [ './src/www/js/index.js','./src/www/js/spells.js','./src/www/js/monsters.js' ];
+const entryPoints = [ './src/www/js/index.js','./src/www/js/spells.js','./src/www/js/monsters.js','./src/www/js/generator.js'  ];
 
 gulp.task('process-server-app', () =>
 	gulp.src(serverAppFiles)
