@@ -267,7 +267,10 @@ class Generator extends React.Component {
 
                   {genderPronounPersonal} has a {renderDescription("family_relationship")} relationship with {genderPronounPossessive.toLowerCase()} family. {genderPronounPersonal} is {renderDescription("maritial_status")} with {renderDescription("children")}. The rest of {genderPronounPossessive.toLowerCase()} family consists of {renderDescription("siblings")}, {renderDescription("cousins")}, {renderDescription("aunts")}, {renderDescription("uncles")}, and {renderDescription("parents")}.
                 </div>
+              </div>
+              <div className="row">
                 <div className="col-sm-6">
+                  <br />
                   <SubmitButton 
                    type="text" 
                    label="Randomize All" 
@@ -290,14 +293,17 @@ class Generator extends React.Component {
                   {this.renderInput("ideals", "Ideal")}
                   {this.renderInput("emotion", "Emotion")}
 
-                  <p>Physical</p>
+                </div>
+                <div className="col-sm-6">
+
+                  <h3>Physical</h3>
 
                   {this.renderInput("eye_color","Eye color")}
                   {this.renderInput("eye_shape","Eye shape")}
                   {this.renderInput("hair_color","Hair color")}
                   {this.renderInput("ages","Age")}
 
-                  <p>Family</p>
+                  <h3>Family</h3>
 
                   {this.renderInput("parents","Parents")}
                   {this.renderInput("siblings","Siblings")}
@@ -308,8 +314,6 @@ class Generator extends React.Component {
                   {this.renderInput("family_relationship","Family relationship")}
                   {this.renderInput("maritial_status","Maritial Status")}
                 </div>
-
-                
               </div>
             </div>;
 	}

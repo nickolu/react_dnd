@@ -456,10 +456,15 @@
 	            ', and ',
 	            renderDescription("parents"),
 	            '.'
-	          ),
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'row' },
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'col-sm-6' },
+	            _react2.default.createElement('br', null),
 	            _react2.default.createElement(_submitButton.SubmitButton, {
 	              type: 'text',
 	              label: 'Randomize All',
@@ -479,9 +484,13 @@
 	            this.renderInput("bonds", "Bond"),
 	            this.renderInput("flaws", "Flaw"),
 	            this.renderInput("ideals", "Ideal"),
-	            this.renderInput("emotion", "Emotion"),
+	            this.renderInput("emotion", "Emotion")
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col-sm-6' },
 	            _react2.default.createElement(
-	              'p',
+	              'h3',
 	              null,
 	              'Physical'
 	            ),
@@ -490,7 +499,7 @@
 	            this.renderInput("hair_color", "Hair color"),
 	            this.renderInput("ages", "Age"),
 	            _react2.default.createElement(
-	              'p',
+	              'h3',
 	              null,
 	              'Family'
 	            ),
