@@ -20,6 +20,27 @@
         }
     },
     "options" : {
+        "race" : {
+            "conditionals" : {
+                "elf" : [
+                    "Wood elf",
+                    "High elf",
+                    "Drow"
+                ],
+                "dwarf" : [
+                    "Mountain dwarf",
+                    "Hill dwarf"
+                ],
+                "halfling" : [
+                    "Stout halfling",
+                    "Lightfoot halfling"
+                ],
+                "gnome" : [
+                    "Forest gnome",
+                    "Rock gnome"
+                ]
+            }
+        },
         "high_ability" : {
             "shouldNotEqual" : "low_ability",
             "dependencies" : ["race"]
@@ -34,27 +55,33 @@
         "ages" : {
             "dependencies" : ["race"],
             "isRange" : "true"
+        },
+        "flaws" : {
+            "conditionals" : {
+                "specific phobia" : [
+                    "Fear of spiders",
+                    "Fear of bugs",
+                    "Fear of death",
+                    "Fear of failure",
+                    "Fear of loneliness",
+                    "Fear of getting old",
+                    "Fear of open or crowded spaces",
+                    "Fear of water"
+                ]
+            }
         }
     },
     "traits" : {
         "race" : [
             "Human",
-            "Human",
-            "Wood Elf",
-            "High Elf",
-            "Drow",
-            "Mountain Dwarf",
-            "Hill Dwarf",
-            "Half Orc",
+            "Elf",
+            "Dwarf",
             "Half Orc",
             "Half-elf",
-            "Half-elf",
-            "Stout Halfling",
-            "Lightfoot Halfling",
+            "Halfling",
             "Tiefling",
             "Dragonborn",
-            "Rock Gnome",
-            "Forest Gnome"
+            "Gnome"
         ],
         "alignment_moral" : ["Good","Neutral","Evil"],
         "alignment_lawful" : ["Lawful","Neutral","Chaotic"],
@@ -82,7 +109,39 @@
             "Long hair",
             "A plain, unadorned dress style"
         ],
-        "gender" : ["Male","Male","Male","Male","Male","Female","Female","Female","Female","Female","Gender-neutral"],
+        "gender" : [
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Male",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Female",
+            "Gender-neutral"
+        ],
         "high_ability" : {
             "human" : [
                 "strength",
@@ -97,8 +156,13 @@
                 "dexterity",
                 "dexterity",
                 "dexterity",
+                "dexterity",
+                "dexterity",
+                "dexterity",
                 "constitution",
                 "intelligence",
+                "wisdom",
+                "wisdom",
                 "wisdom",
                 "wisdom",
                 "charisma"
@@ -108,7 +172,12 @@
                 "dexterity",
                 "dexterity",
                 "dexterity",
+                "dexterity",
+                "dexterity",
+                "dexterity",
                 "constitution",
+                "intelligence",
+                "intelligence",
                 "intelligence",
                 "intelligence",
                 "wisdom",
@@ -119,9 +188,14 @@
                 "dexterity",
                 "dexterity",
                 "dexterity",
+                "dexterity",
+                "dexterity",
+                "dexterity",
                 "constitution",
                 "intelligence",
                 "wisdom",
+                "charisma",
+                "charisma",
                 "charisma",
                 "charisma"
             ],
@@ -129,7 +203,13 @@
                 "strength",
                 "strength",
                 "strength",
+                "strength",
+                "strength",
+                "strength",
                 "dexterity",
+                "constitution",
+                "constitution",
+                "constitution",
                 "constitution",
                 "constitution",
                 "constitution",
@@ -143,6 +223,9 @@
                 "constitution",
                 "constitution",
                 "constitution",
+                "constitution",
+                "constitution",
+                "constitution",
                 "intelligence",
                 "wisdom",
                 "wisdom",
@@ -152,7 +235,12 @@
                 "strength",
                 "strength",
                 "strength",
+                "strength",
+                "strength",
+                "strength",
                 "dexterity",
+                "constitution",
+                "constitution",
                 "constitution",
                 "constitution",
                 "intelligence",
@@ -167,6 +255,9 @@
                 "wisdom",
                 "charisma",
                 "charisma",
+                "charisma",
+                "charisma",
+                "charisma",
                 "charisma"
             ],
             "stout halfling" : [
@@ -174,6 +265,11 @@
                 "dexterity",
                 "dexterity",
                 "dexterity",
+                "dexterity",
+                "dexterity",
+                "dexterity",
+                "constitution",
+                "constitution",
                 "constitution",
                 "constitution",
                 "intelligence",
@@ -185,9 +281,14 @@
                 "dexterity",
                 "dexterity",
                 "dexterity",
+                "dexterity",
+                "dexterity",
+                "dexterity",
                 "constitution",
                 "intelligence",
                 "wisdom",
+                "charisma",
+                "charisma",
                 "charisma",
                 "charisma"
             ],
@@ -197,7 +298,12 @@
                 "constitution",
                 "intelligence",
                 "intelligence",
+                "intelligence",
+                "intelligence",
                 "wisdom",
+                "charisma",
+                "charisma",
+                "charisma",
                 "charisma",
                 "charisma",
                 "charisma"
@@ -206,10 +312,15 @@
                 "strength",
                 "strength",
                 "strength",
+                "strength",
+                "strength",
+                "strength",
                 "dexterity",
                 "constitution",
                 "intelligence",
                 "wisdom",
+                "charisma",
+                "charisma",
                 "charisma",
                 "charisma"
             ],
@@ -218,6 +329,11 @@
                 "dexterity",
                 "constitution",
                 "constitution",
+                "constitution",
+                "constitution",
+                "intelligence",
+                "intelligence",
+                "intelligence",
                 "intelligence",
                 "intelligence",
                 "intelligence",
@@ -228,7 +344,12 @@
                 "strength",
                 "dexterity",
                 "dexterity",
+                "dexterity",
+                "dexterity",
                 "constitution",
+                "intelligence",
+                "intelligence",
+                "intelligence",
                 "intelligence",
                 "intelligence",
                 "intelligence",
@@ -596,7 +717,7 @@
         "maritial_status" : ["Married","Single","Divorced","Separated","Widowed"],
         "children" : ["Multiple children", "No children", "No children", "No children", "No children", "A dead child or children"],
         "parents" : ["A living mother", "A living father", "No living parents", "Two living parents"],
-        "siblings" : ["Multiple brothers and/or sisters", "No siblings", "One brother", "One sister", "One twin brother", "One twin sister"],
+        "siblings" : ["Multiple brothers and/or sisters", "No siblings", "One brother", "One sister"],
         "cousins" : ["a few cousins", "one cousin", "no cousins", "many cousins"],
         "aunts" : ["a few aunts", "no aunts", "one aunt", "many aunts"],
         "uncles" : ["a few uncles", "one uncle", "no uncles", "many uncles"],

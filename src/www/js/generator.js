@@ -15,7 +15,6 @@ class Generator extends React.Component {
 
     this.state = {
       lockedInputs : [],
-      dependency : "",
       name : "[character name]",
       race : "[race]",
       alignment_lawful : "[lawfulness]",
@@ -61,11 +60,9 @@ class Generator extends React.Component {
 
     inputEls.forEach((obj) => {
       let objName = obj.getAttribute("name");
-      let dependency = "";
-      let dependencyVal = "";
 
       _this.replaceInputWithRandom(objName)
-
+      console.log('hello')
     });
   }
 
@@ -127,38 +124,67 @@ class Generator extends React.Component {
    * @param  {string} inputName - name of input/property
    */
   replaceInputWithRandom(inputName) {
+    let traitsArr = npcTraits.traits[inputName];
+
+    if (!utilities.contains(this.state.lockedInputs, inputName)) {
+      this.replaceInput(inputName,this.getRandomTrait(inputName));
+    }
+  }
+
+
+  getRandomTrait(traitName) {
     let randomVal = "";
     let dependency = "";
     let dependencyVal = "";
     let shouldNotEqual = "";
-    let traitsArr = npcTraits.traits[inputName];
+    let propsArray = [];
+    let traitsArr = npcTraits.traits[traitName];
+    let _this = this;
+    let i = 0;
 
-    if (!utilities.contains(this.state.lockedInputs, inputName)) {
-      if (npcTraits.options[inputName]) {
-        shouldNotEqual = npcTraits.options[inputName].shouldNotEqual || "";
+    if (npcTraits.options[traitName]) {
+        shouldNotEqual = npcTraits.options[traitName].shouldNotEqual || "";
         
-        if (npcTraits.options[inputName].dependencies) {
-          dependency = this.getRandom(npcTraits.options[inputName].dependencies) || [];  // choose random dependency
-          dependencyVal = this.state[dependency].toLowerCase();
-          traitsArr = npcTraits.traits[inputName][dependencyVal];
+        if (npcTraits.options[traitName].dependencies) {
+          dependency = this.getRandom(npcTraits.options[traitName].dependencies) || [];  // choose random dependency
+          if (this.state[dependency]) {
+            dependencyVal = this.state[dependency].toLowerCase();
+            traitsArr = npcTraits.traits[traitName][dependencyVal];  
+          } else {
+            for (let prop in npcTraits.traits[traitName]) {
+              propsArray.push(prop);
+            }
+            dependencyVal = this.getRandom(propsArray) || "other";
+            traitsArr = npcTraits.traits[traitName][dependencyVal];  
+          }
         }
 
-        if (npcTraits.options[inputName].isRange) {
+        if (npcTraits.options[traitName].isRange) {
           randomVal = Math.round(Math.random() * (traitsArr[1] - traitsArr[0]) + traitsArr[0]);
         } else {
           randomVal = this.getRandom(traitsArr);  
         }
-        
+
         while (randomVal === this.state[shouldNotEqual]) {
           randomVal = this.getRandom(traitsArr);
+          if (i++ > 100) {
+            break;
+          }
         }
 
-      } else if (Array.isArray(npcTraits.traits[inputName])) {
-        randomVal = this.getRandom(npcTraits.traits[inputName]);
+        if (npcTraits.options[traitName].conditionals) {
+          for (let condition in npcTraits.options[traitName].conditionals) {
+            if (randomVal.toLowerCase() === condition)  {
+              randomVal = this.getRandom(npcTraits.options[traitName].conditionals[condition]);
+            }
+          }
+        }
+
+      } else if (Array.isArray(npcTraits.traits[traitName])) {
+        randomVal = this.getRandom(npcTraits.traits[traitName]);
       }
 
-      this.replaceInput(inputName,randomVal);
-    }
+      return randomVal;
   }
 
   /**

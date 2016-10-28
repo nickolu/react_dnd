@@ -95,7 +95,6 @@
 
 	    _this2.state = {
 	      lockedInputs: [],
-	      dependency: "",
 	      name: "[character name]",
 	      race: "[race]",
 	      alignment_lawful: "[lawfulness]",
@@ -146,10 +145,9 @@
 
 	      inputEls.forEach(function (obj) {
 	        var objName = obj.getAttribute("name");
-	        var dependency = "";
-	        var dependencyVal = "";
 
 	        _this.replaceInputWithRandom(objName);
+	        console.log('hello');
 	      });
 	    }
 
@@ -220,37 +218,66 @@
 	  }, {
 	    key: 'replaceInputWithRandom',
 	    value: function replaceInputWithRandom(inputName) {
+	      var traitsArr = _npcTraits2.default.traits[inputName];
+
+	      if (!utilities.contains(this.state.lockedInputs, inputName)) {
+	        this.replaceInput(inputName, this.getRandomTrait(inputName));
+	      }
+	    }
+	  }, {
+	    key: 'getRandomTrait',
+	    value: function getRandomTrait(traitName) {
 	      var randomVal = "";
 	      var dependency = "";
 	      var dependencyVal = "";
 	      var shouldNotEqual = "";
-	      var traitsArr = _npcTraits2.default.traits[inputName];
+	      var propsArray = [];
+	      var traitsArr = _npcTraits2.default.traits[traitName];
+	      var _this = this;
+	      var i = 0;
 
-	      if (!utilities.contains(this.state.lockedInputs, inputName)) {
-	        if (_npcTraits2.default.options[inputName]) {
-	          shouldNotEqual = _npcTraits2.default.options[inputName].shouldNotEqual || "";
+	      if (_npcTraits2.default.options[traitName]) {
+	        shouldNotEqual = _npcTraits2.default.options[traitName].shouldNotEqual || "";
 
-	          if (_npcTraits2.default.options[inputName].dependencies) {
-	            dependency = this.getRandom(_npcTraits2.default.options[inputName].dependencies) || []; // choose random dependency
+	        if (_npcTraits2.default.options[traitName].dependencies) {
+	          dependency = this.getRandom(_npcTraits2.default.options[traitName].dependencies) || []; // choose random dependency
+	          if (this.state[dependency]) {
 	            dependencyVal = this.state[dependency].toLowerCase();
-	            traitsArr = _npcTraits2.default.traits[inputName][dependencyVal];
-	          }
-
-	          if (_npcTraits2.default.options[inputName].isRange) {
-	            randomVal = Math.round(Math.random() * (traitsArr[1] - traitsArr[0]) + traitsArr[0]);
+	            traitsArr = _npcTraits2.default.traits[traitName][dependencyVal];
 	          } else {
-	            randomVal = this.getRandom(traitsArr);
+	            for (var prop in _npcTraits2.default.traits[traitName]) {
+	              propsArray.push(prop);
+	            }
+	            dependencyVal = this.getRandom(propsArray) || "other";
+	            traitsArr = _npcTraits2.default.traits[traitName][dependencyVal];
 	          }
-
-	          while (randomVal === this.state[shouldNotEqual]) {
-	            randomVal = this.getRandom(traitsArr);
-	          }
-	        } else if (Array.isArray(_npcTraits2.default.traits[inputName])) {
-	          randomVal = this.getRandom(_npcTraits2.default.traits[inputName]);
 	        }
 
-	        this.replaceInput(inputName, randomVal);
+	        if (_npcTraits2.default.options[traitName].isRange) {
+	          randomVal = Math.round(Math.random() * (traitsArr[1] - traitsArr[0]) + traitsArr[0]);
+	        } else {
+	          randomVal = this.getRandom(traitsArr);
+	        }
+
+	        while (randomVal === this.state[shouldNotEqual]) {
+	          randomVal = this.getRandom(traitsArr);
+	          if (i++ > 100) {
+	            break;
+	          }
+	        }
+
+	        if (_npcTraits2.default.options[traitName].conditionals) {
+	          for (var condition in _npcTraits2.default.options[traitName].conditionals) {
+	            if (randomVal.toLowerCase() === condition) {
+	              randomVal = this.getRandom(_npcTraits2.default.options[traitName].conditionals[condition]);
+	            }
+	          }
+	        }
+	      } else if (Array.isArray(_npcTraits2.default.traits[traitName])) {
+	        randomVal = this.getRandom(_npcTraits2.default.traits[traitName]);
 	      }
+
+	      return randomVal;
 	    }
 
 	    /**
@@ -20356,6 +20383,27 @@
 			}
 		},
 		"options": {
+			"race": {
+				"conditionals": {
+					"elf": [
+						"Wood elf",
+						"High elf",
+						"Drow"
+					],
+					"dwarf": [
+						"Mountain dwarf",
+						"Hill dwarf"
+					],
+					"halfling": [
+						"Stout halfling",
+						"Lightfoot halfling"
+					],
+					"gnome": [
+						"Forest gnome",
+						"Rock gnome"
+					]
+				}
+			},
 			"high_ability": {
 				"shouldNotEqual": "low_ability",
 				"dependencies": [
@@ -20379,27 +20427,33 @@
 					"race"
 				],
 				"isRange": "true"
+			},
+			"flaws": {
+				"conditionals": {
+					"specific phobia": [
+						"Fear of spiders",
+						"Fear of bugs",
+						"Fear of death",
+						"Fear of failure",
+						"Fear of loneliness",
+						"Fear of getting old",
+						"Fear of open or crowded spaces",
+						"Fear of water"
+					]
+				}
 			}
 		},
 		"traits": {
 			"race": [
 				"Human",
-				"Human",
-				"Wood Elf",
-				"High Elf",
-				"Drow",
-				"Mountain Dwarf",
-				"Hill Dwarf",
-				"Half Orc",
+				"Elf",
+				"Dwarf",
 				"Half Orc",
 				"Half-elf",
-				"Half-elf",
-				"Stout Halfling",
-				"Lightfoot Halfling",
+				"Halfling",
 				"Tiefling",
 				"Dragonborn",
-				"Rock Gnome",
-				"Forest Gnome"
+				"Gnome"
 			],
 			"alignment_moral": [
 				"Good",
@@ -20441,6 +20495,26 @@
 				"Male",
 				"Male",
 				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
 				"Female",
 				"Female",
 				"Female",
@@ -20462,8 +20536,13 @@
 					"dexterity",
 					"dexterity",
 					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
 					"constitution",
 					"intelligence",
+					"wisdom",
+					"wisdom",
 					"wisdom",
 					"wisdom",
 					"charisma"
@@ -20473,7 +20552,12 @@
 					"dexterity",
 					"dexterity",
 					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
 					"constitution",
+					"intelligence",
+					"intelligence",
 					"intelligence",
 					"intelligence",
 					"wisdom",
@@ -20484,9 +20568,14 @@
 					"dexterity",
 					"dexterity",
 					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
 					"constitution",
 					"intelligence",
 					"wisdom",
+					"charisma",
+					"charisma",
 					"charisma",
 					"charisma"
 				],
@@ -20494,7 +20583,13 @@
 					"strength",
 					"strength",
 					"strength",
+					"strength",
+					"strength",
+					"strength",
 					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
 					"constitution",
 					"constitution",
 					"constitution",
@@ -20508,6 +20603,9 @@
 					"constitution",
 					"constitution",
 					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
 					"intelligence",
 					"wisdom",
 					"wisdom",
@@ -20517,7 +20615,12 @@
 					"strength",
 					"strength",
 					"strength",
+					"strength",
+					"strength",
+					"strength",
 					"dexterity",
+					"constitution",
+					"constitution",
 					"constitution",
 					"constitution",
 					"intelligence",
@@ -20532,6 +20635,9 @@
 					"wisdom",
 					"charisma",
 					"charisma",
+					"charisma",
+					"charisma",
+					"charisma",
 					"charisma"
 				],
 				"stout halfling": [
@@ -20539,6 +20645,11 @@
 					"dexterity",
 					"dexterity",
 					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"constitution",
 					"constitution",
 					"constitution",
 					"intelligence",
@@ -20550,9 +20661,14 @@
 					"dexterity",
 					"dexterity",
 					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
 					"constitution",
 					"intelligence",
 					"wisdom",
+					"charisma",
+					"charisma",
 					"charisma",
 					"charisma"
 				],
@@ -20562,7 +20678,12 @@
 					"constitution",
 					"intelligence",
 					"intelligence",
+					"intelligence",
+					"intelligence",
 					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma",
 					"charisma",
 					"charisma",
 					"charisma"
@@ -20571,10 +20692,15 @@
 					"strength",
 					"strength",
 					"strength",
+					"strength",
+					"strength",
+					"strength",
 					"dexterity",
 					"constitution",
 					"intelligence",
 					"wisdom",
+					"charisma",
+					"charisma",
 					"charisma",
 					"charisma"
 				],
@@ -20583,6 +20709,11 @@
 					"dexterity",
 					"constitution",
 					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
 					"intelligence",
 					"intelligence",
 					"intelligence",
@@ -20593,7 +20724,12 @@
 					"strength",
 					"dexterity",
 					"dexterity",
+					"dexterity",
+					"dexterity",
 					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
 					"intelligence",
 					"intelligence",
 					"intelligence",
@@ -21066,9 +21202,7 @@
 				"Multiple brothers and/or sisters",
 				"No siblings",
 				"One brother",
-				"One sister",
-				"One twin brother",
-				"One twin sister"
+				"One sister"
 			],
 			"cousins": [
 				"a few cousins",
