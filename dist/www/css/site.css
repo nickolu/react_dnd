@@ -217,8 +217,10 @@ html body {
 GENERATOR
 ****/
 .generator .form-field {
-  display: inline-block;
+  float: left;
   margin-right: 4px;
+  position: relative;
+  top: 1px;
 }
 .generator .form-control {
   width: auto;
@@ -232,8 +234,9 @@ GENERATOR
   width: 32px;
   padding: 5px 0px;
   position: relative;
-  top: 0px;
+  top: 1px;
   margin-right: 2px;
+  float: left;
 }
 .generator .btn-refresh {
   height: 34px;
@@ -241,6 +244,9 @@ GENERATOR
   left: -3px;
   position: relative;
   top: 0px;
+}
+.generator .description-container {
+  min-height: 270px;
 }
 .generator .trait-label {
   display: block;
@@ -253,5 +259,11 @@ GENERATOR
   border: 1px solid #0F0;
 }
 .generator .keyword {
-  color: #6688FF;
+  color: #999999;
+}
+.generator .trait-table td {
+  border: 1px solid;
+  padding: 2px 6px;
+  text-transform: capitalize;
+  font-size: 11px;
 }

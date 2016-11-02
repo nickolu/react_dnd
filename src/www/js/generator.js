@@ -12,10 +12,15 @@ class Generator extends React.Component {
    */
   constructor(props) {
     super(props);
+    let traits = {};
 
     this.state = {
       lockedInputs : [],
+      conditionals : {},
+      rootValues : {},
+      traits : {},
       name : "[character name]",
+      surname : "[character surname]",
       race : "[race]",
       alignment_lawful : "[lawfulness]",
       alignment_moral : "[morality]",
@@ -41,13 +46,31 @@ class Generator extends React.Component {
       uncles : "[uncles]",
       family_relationship : "[family_relationship]",
       maritial_status : "[maritial_status]",
-      ages : "[age]"
+      age_group : "[age_group]",
+      social_class : "[social_class]",
+      occupation : "[occupation]",
+      physique : "[physique]",
+      height : "[height]"
     };
 
+    Object.keys(npcTraits.traits).forEach((keyname) => {
+      traits[keyname] = '['+keyname+']';
+    });
+
+    // this.setState({
+    //   traits : Object.assign(this.state.traits,traits);
+    // }));
+  
+    // console.log(this.state);
+    
     this.updateAll = this.updateAll.bind(this);
     this.updateState = this.updateState.bind(this);
     this.renderInput = this.renderInput.bind(this);
     this.replaceInput = this.replaceInput.bind(this);
+
+    String.prototype.toProperCase = function() {
+      return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}).replace("Of ", "of ");
+    }
   }
 
   /**
@@ -55,15 +78,16 @@ class Generator extends React.Component {
    * each input which is not locked will be updated with a new random value
    */
   updateAll() {
-    let inputEls = document.querySelectorAll('input');
+    let inputEls = document.querySelectorAll('input.form-control');
+    let objName = "";
     let _this = this;
 
-    inputEls.forEach((obj) => {
-      let objName = obj.getAttribute("name");
-
-      _this.replaceInputWithRandom(objName)
-      console.log('hello')
-    });
+    for (let obj in inputEls) {
+      if (inputEls[obj] && typeof inputEls[obj].getAttribute === 'function') {
+        objName = inputEls[obj].getAttribute("name");  
+        _this.replaceInputWithRandom(objName);
+      }
+    }
   }
 
   /**
@@ -124,7 +148,7 @@ class Generator extends React.Component {
    * @param  {string} inputName - name of input/property
    */
   replaceInputWithRandom(inputName) {
-    let traitsArr = npcTraits.traits[inputName];
+    let traitValues = npcTraits.traits[inputName];
 
     if (!utilities.contains(this.state.lockedInputs, inputName)) {
       this.replaceInput(inputName,this.getRandomTrait(inputName));
@@ -133,58 +157,104 @@ class Generator extends React.Component {
 
 
   getRandomTrait(traitName) {
+    let traitValues = npcTraits.traits[traitName];
+    let traitOptions = npcTraits.options[traitName] || false;
     let randomVal = "";
-    let dependency = "";
-    let dependencyVal = "";
-    let shouldNotEqual = "";
-    let propsArray = [];
-    let traitsArr = npcTraits.traits[traitName];
     let _this = this;
-    let i = 0;
 
-    if (npcTraits.options[traitName]) {
-        shouldNotEqual = npcTraits.options[traitName].shouldNotEqual || "";
-        
-        if (npcTraits.options[traitName].dependencies) {
-          dependency = this.getRandom(npcTraits.options[traitName].dependencies) || [];  // choose random dependency
-          if (this.state[dependency]) {
-            dependencyVal = this.state[dependency].toLowerCase();
-            traitsArr = npcTraits.traits[traitName][dependencyVal];  
-          } else {
-            for (let prop in npcTraits.traits[traitName]) {
-              propsArray.push(prop);
-            }
-            dependencyVal = this.getRandom(propsArray) || "other";
-            traitsArr = npcTraits.traits[traitName][dependencyVal];  
-          }
-        }
-
-        if (npcTraits.options[traitName].isRange) {
-          randomVal = Math.round(Math.random() * (traitsArr[1] - traitsArr[0]) + traitsArr[0]);
-        } else {
-          randomVal = this.getRandom(traitsArr);  
-        }
-
-        while (randomVal === this.state[shouldNotEqual]) {
-          randomVal = this.getRandom(traitsArr);
-          if (i++ > 100) {
-            break;
-          }
-        }
-
-        if (npcTraits.options[traitName].conditionals) {
-          for (let condition in npcTraits.options[traitName].conditionals) {
-            if (randomVal.toLowerCase() === condition)  {
-              randomVal = this.getRandom(npcTraits.options[traitName].conditionals[condition]);
-            }
-          }
-        }
-
-      } else if (Array.isArray(npcTraits.traits[traitName])) {
-        randomVal = this.getRandom(npcTraits.traits[traitName]);
-      }
+    if (traitOptions) {
+      resolveOptions();
+    } else if (Array.isArray(npcTraits.traits[traitName])) {
+      randomVal = _this.getRandom(npcTraits.traits[traitName]);
 
       return randomVal;
+    }
+
+    function resolveOptions() {
+      resolveDependencies();
+      resolveRanges();
+      resolveUnwantedMatches();
+      resolveConditionals();
+      makeCombinations();
+    }
+
+    function resolveDependencies() {
+      let dependency = "";
+      let dependencyVal = "";
+      let propsArray = [];
+
+      if (traitOptions.dependencies) {
+        dependency = _this.getRandom(traitOptions.dependencies) || [];  // choose random dependency
+        
+        if (_this.state[dependency]) {
+          dependencyVal = _this.state[dependency].toLowerCase();
+          traitValues = npcTraits.traits[traitName][dependencyVal];  
+
+          if (traitOptions.subdependencies && traitOptions.subdependencies[dependencyVal]) {
+            dependencyVal = traitOptions.subdependencies[dependencyVal];
+            traitValues = traitValues[_this.state[dependencyVal].toLowerCase()];
+          }
+        } else {
+          for (let prop in npcTraits.traits[traitName]) {
+            propsArray.push(prop);
+          }
+          dependencyVal = _this.getRandom(propsArray) || "other";
+          traitValues = npcTraits.traits[traitName][dependencyVal];  
+        }  
+      }
+    }
+
+    function resolveRanges() {
+      if (traitOptions.isRange) {
+        randomVal = Math.round(Math.random() * (traitValues[1] - traitValues[0]) + traitValues[0]);
+      } else {
+        randomVal = _this.getRandom(traitValues);  
+      }
+    }
+
+    function resolveUnwantedMatches() {
+      let shouldNotEqual = traitOptions.shouldNotEqual || "";
+      let i = 0;
+
+      while (randomVal === _this.state[shouldNotEqual]) {
+        randomVal = _this.getRandom(traitValues);
+        if (i++ > 100) {
+          break;
+        }
+      }
+    }
+
+    function resolveConditionals() {
+      if (traitOptions.conditionals) {
+        for (let condition in traitOptions.conditionals) {
+          if (randomVal.toLowerCase() === condition)  {
+            _this.state.conditionals[condition],
+
+            randomVal = _this.getRandom(traitOptions.conditionals[condition]);
+            _this.state.rootValues[randomVal] = condition;
+          }
+        }
+      }
+    }
+
+    function makeCombinations() {
+      let propName = traitName;
+      let propVal = "";
+
+      if (traitOptions.combine) {
+        propVal = _this.state.rootValues[randomVal] || randomVal;
+
+        traitOptions.combine.traits.forEach(function(trait){
+          propName += traitOptions.combine.separator + trait;
+          propVal += traitOptions.combine.separator + _this.state[trait];
+          propVal = propVal.toLowerCase();
+        });
+
+        _this.state[propName] = propVal;
+      }
+    }
+
+    return randomVal;
   }
 
   /**
@@ -270,15 +340,30 @@ class Generator extends React.Component {
       }
     }
 
-    function renderDescription(traitName) {
+    function renderDescription(traitName,useProperCase,prefix) {
       let traitValue = _this.state[traitName].toLowerCase();
       let traitDescription = traitValue;
+      let vowels = ["a","e","i","o","u"];
+
+      prefix = traitDescription && prefix ? prefix : "";
 
       if (npcTraits.descriptions[traitName] && npcTraits.descriptions[traitName][traitValue]) {
         traitDescription = npcTraits.descriptions[traitName][traitValue].toLowerCase();
       }
 
-      return <span className="keyword">{traitDescription}</span>
+      if (prefix === "a ") {
+        vowels.map(function(num){
+          if (traitDescription.split('')[0].toLowerCase() === ""+num)  {
+            prefix = "an ";
+          }
+        });
+      }
+
+      if (useProperCase) {
+        traitDescription = traitDescription.toProperCase()
+      }
+
+      return <span className="keyword">{prefix+traitDescription}</span>
     }
     
     return  <div className="container generator">
@@ -288,10 +373,12 @@ class Generator extends React.Component {
                 </div>
               </div>
               <div className="row">
-                <div className="col-sm-6">
-                  This {renderDescription("ages")} year-old {renderDescription("gender")} {renderDescription("race")} has a {renderDescription("alignment_lawful")}-{renderDescription("alignment_moral")} alignment and {renderDescription("distinguishing_marks")}. You can see {renderDescription("emotion")} in {genderPronounPossessive.toLowerCase()} {renderDescription("eye_color")}, {renderDescription("eye_shape")} eyes. {genderPronounPersonal} is {renderDescription("high_ability")} yet {renderDescription("low_ability")}. Impressively, {genderPronounPersonal.toLowerCase()} is {renderDescription("talents")}. {genderPronounPersonal} often {renderDescription("mannerisms")} and has a {renderDescription("interaction_traits")} way of speaking. {genderPronounPersonal} is {renderDescription("bonds")} and believes in {renderDescription("ideals")}, but is troubled by {genderPronounPossessive.toLowerCase()} {renderDescription("flaws")}. <br/><br/>
+                <div className="col-sm-6 description-container">
+                  <p>You see {renderDescription("physique",false,"a ")} {renderDescription("gender")} {renderDescription("race",true)} with {renderDescription("distinguishing_marks")} wearing the clothes of {renderDescription("occupation",false,"a ")}. {genderPronounPersonal} looks to be in {genderPronounPossessive.toLowerCase()} {renderDescription("age_group")}, has {renderDescription("hair_color")} hair, and is {renderDescription("height")} for a {renderDescription("gender")} {renderDescription("race", true)}. You can see {renderDescription("emotion")} in {genderPronounPossessive.toLowerCase()} {renderDescription("eye_color")}, {renderDescription("eye_shape")} eyes.</p>
 
-                  {genderPronounPersonal} has a {renderDescription("family_relationship")} relationship with {genderPronounPossessive.toLowerCase()} family. {genderPronounPersonal} is {renderDescription("maritial_status")} with {renderDescription("children")}. The rest of {genderPronounPossessive.toLowerCase()} family consists of {renderDescription("siblings")}, {renderDescription("cousins")}, {renderDescription("aunts")}, {renderDescription("uncles")}, and {renderDescription("parents")}.
+                  <p>{renderDescription("name",true)}{renderDescription("surname",true," ")} has a {renderDescription("alignment_lawful")}-{renderDescription("alignment_moral")} alignment and is {renderDescription("high_ability")} yet {renderDescription("low_ability")}. Impressively, {genderPronounPersonal.toLowerCase()} is {renderDescription("talents")}. {renderDescription("name",true)} often {renderDescription("mannerisms")} and has a {renderDescription("interaction_traits")} way of speaking. {genderPronounPersonal} is always {renderDescription("bonds")} and values {renderDescription("ideals")} more than anything, but is troubled by {genderPronounPossessive.toLowerCase()} {renderDescription("flaws")}.</p>
+
+                  <p>{renderDescription("name",true)} has a {renderDescription("family_relationship")} relationship with {genderPronounPossessive.toLowerCase()} family. {genderPronounPersonal} is {renderDescription("maritial_status")} with {renderDescription("children")}. The rest of {genderPronounPossessive.toLowerCase()} family consists of {renderDescription("siblings")}, {renderDescription("cousins")}, {renderDescription("aunts")}, {renderDescription("uncles")}, and {renderDescription("parents")}.</p>
                 </div>
               </div>
               <div className="row">
@@ -304,8 +391,10 @@ class Generator extends React.Component {
                    onUpdate={this.updateAll}
                   />
 
-                  {this.renderInput("race","Race")}
                   {this.renderInput("gender","Gender")}
+                  {this.renderInput("race","Race")}
+                  {this.renderInput("name","Name")}
+                  {this.renderInput("surname","Surame")}
                   {this.renderInput("alignment_lawful","Lawful Alignment")}
                   {this.renderInput("alignment_moral","Moral Alignment")}
                   {this.renderInput("distinguishing_marks", "Distinguishing Mark")}
@@ -318,6 +407,8 @@ class Generator extends React.Component {
                   {this.renderInput("flaws", "Flaw")}
                   {this.renderInput("ideals", "Ideal")}
                   {this.renderInput("emotion", "Emotion")}
+                  {this.renderInput("social_class", "Social Class")}
+                  {this.renderInput("occupation", "Occupation")}
 
                 </div>
                 <div className="col-sm-6">
@@ -327,7 +418,9 @@ class Generator extends React.Component {
                   {this.renderInput("eye_color","Eye color")}
                   {this.renderInput("eye_shape","Eye shape")}
                   {this.renderInput("hair_color","Hair color")}
-                  {this.renderInput("ages","Age")}
+                  {this.renderInput("age_group","Age group")}
+                  {this.renderInput("physique","Physique")}
+                  {this.renderInput("height","Height")}
 
                   <h3>Family</h3>
 

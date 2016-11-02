@@ -8,7 +8,7 @@ const babel = require('gulp-babel');
 const less = require('gulp-less');
 
 const serverAppFiles = ['src/**/*.jsx','!src/www/**'];
-const webAppFiles = ['src/www/**/*.js'];
+const webAppFiles = ['src/www/**/*.js','./src/www/json/**/*.json'];
 const webAppHtmlFiles = ['src/www/**/*.html'];
 const webAppCssFiles = ['src/www/css/**/*.css'];
 const webAppLessFiles = ['./src/www/less/**/*.less'];
