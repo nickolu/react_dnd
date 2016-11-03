@@ -13,56 +13,19 @@ class Generator extends React.Component {
   constructor(props) {
     super(props);
     let traits = {};
+    let allTraits = Object.keys(npcTraits.traits);
+
+    for (let traitName in allTraits) {
+      traits[allTraits[traitName]] = '['+allTraits[traitName]+']';
+    }
 
     this.state = {
       lockedInputs : [],
       conditionals : {},
       rootValues : {},
-      traits : {},
-      name : "[character name]",
-      surname : "[character surname]",
-      race : "[race]",
-      alignment_lawful : "[lawfulness]",
-      alignment_moral : "[morality]",
-      distinguishing_marks : "[distinguishing mark]",
-      gender : "[gender]",
-      high_ability : "[high_ability]",
-      low_ability : "[low_ability]",
-      talents : "[talent]",
-      mannerisms : "[mannerism]",
-      interaction_traits : "[interaction trait]",
-      bonds : "[bond]",
-      flaws : "[flaw]",
-      ideals : "[ideal]",
-      emotion : "[emotion]",
-      eye_color : "[eye color]",
-      eye_shape : "[eye shape]",
-      hair_color : "[hair color]",
-      parents : "[parents]",
-      children : "[children]",
-      siblings : "[siblings]",
-      cousins : "[cousins]",
-      aunts : "[aunts]",
-      uncles : "[uncles]",
-      family_relationship : "[family_relationship]",
-      maritial_status : "[maritial_status]",
-      age_group : "[age_group]",
-      social_class : "[social_class]",
-      occupation : "[occupation]",
-      physique : "[physique]",
-      height : "[height]"
+      traits : traits
     };
 
-    Object.keys(npcTraits.traits).forEach((keyname) => {
-      traits[keyname] = '['+keyname+']';
-    });
-
-    // this.setState({
-    //   traits : Object.assign(this.state.traits,traits);
-    // }));
-  
-    // console.log(this.state);
-    
     this.updateAll = this.updateAll.bind(this);
     this.updateState = this.updateState.bind(this);
     this.renderInput = this.renderInput.bind(this);
@@ -107,11 +70,13 @@ class Generator extends React.Component {
       inputValue = e.target.value;
     }
 
-    newState = Object.assign(this.state,{
+    newState = Object.assign(this.state.traits,{
       [inputName] : inputValue
     })
 
-    this.setState(newState);
+    this.setState({
+      traits : Object.assign({}, this.state.traits, newState)
+    });
   }
 
   /**
@@ -127,7 +92,9 @@ class Generator extends React.Component {
       randomIndex = Math.round(Math.random() * (arr.length - 1));
     }
 
-    return arr[randomIndex];
+    if (arr && arr[randomIndex]) {
+      return arr[randomIndex];  
+    }
   }
 
   
@@ -186,13 +153,14 @@ class Generator extends React.Component {
       if (traitOptions.dependencies) {
         dependency = _this.getRandom(traitOptions.dependencies) || [];  // choose random dependency
         
-        if (_this.state[dependency]) {
-          dependencyVal = _this.state[dependency].toLowerCase();
+        
+        if (_this.state.traits[dependency]) {
+          dependencyVal = _this.state.traits[dependency].toLowerCase();
           traitValues = npcTraits.traits[traitName][dependencyVal];  
-
+          
           if (traitOptions.subdependencies && traitOptions.subdependencies[dependencyVal]) {
             dependencyVal = traitOptions.subdependencies[dependencyVal];
-            traitValues = traitValues[_this.state[dependencyVal].toLowerCase()];
+            traitValues = traitValues[_this.state.traits[dependencyVal].toLowerCase()];
           }
         } else {
           for (let prop in npcTraits.traits[traitName]) {
@@ -216,7 +184,7 @@ class Generator extends React.Component {
       let shouldNotEqual = traitOptions.shouldNotEqual || "";
       let i = 0;
 
-      while (randomVal === _this.state[shouldNotEqual]) {
+      while (randomVal && randomVal === _this.state.traits[shouldNotEqual]) {
         randomVal = _this.getRandom(traitValues);
         if (i++ > 100) {
           break;
@@ -228,9 +196,8 @@ class Generator extends React.Component {
       if (traitOptions.conditionals) {
         for (let condition in traitOptions.conditionals) {
           if (randomVal.toLowerCase() === condition)  {
-            _this.state.conditionals[condition],
-
             randomVal = _this.getRandom(traitOptions.conditionals[condition]);
+            
             _this.state.rootValues[randomVal] = condition;
           }
         }
@@ -246,11 +213,11 @@ class Generator extends React.Component {
 
         traitOptions.combine.traits.forEach(function(trait){
           propName += traitOptions.combine.separator + trait;
-          propVal += traitOptions.combine.separator + _this.state[trait];
+          propVal += traitOptions.combine.separator + _this.state.traits[trait];
           propVal = propVal.toLowerCase();
         });
 
-        _this.state[propName] = propVal;
+        _this.state.traits[propName] = propVal;
       }
     }
 
@@ -295,7 +262,7 @@ class Generator extends React.Component {
       <TextInput 
        type="text" 
        name={traitName}
-       onChange={this.updateState}
+       onChange={_this.updateState}
       />
       <SubmitButton 
        type="text" 
@@ -306,14 +273,37 @@ class Generator extends React.Component {
       />
     </div>
   }
+
+  renderMultipleInputs(options) {
+    options = options || {};
+    let names = options.names || [];
+    let range = options.range || false;
+    let traitName = "";
+
+    if (!names.length) {
+      for (traitName in npcTraits.traits) {
+        names.push(traitName);
+      }
+    }
+
+    if (range && range.length === 2) {
+      let min = range[0];
+      let max = range[1];
+
+      names.splice(0,min);
+      names.splice(max,names.length);
+    }
+
+    return <div>{names.map((trait) => <div key={trait}>{this.renderInput(trait,trait.toProperCase().replace(/\_/g," "))}</div>)}</div>
+  }
   
   /**
    * puts everything in the DOM
    */
 	render() {
     let _this = this;
-    let genderPronounPossessive = getGenderPronoun(this.state.gender).possessive;
-    let genderPronounPersonal = getGenderPronoun(this.state.gender).personal;
+    let genderPronounPossessive = getGenderPronoun(_this.state.traits.gender).possessive;
+    let genderPronounPersonal = getGenderPronoun(_this.state.traits.gender).personal;
 
     function getGenderPronoun(gender) {
       let pronoun = "";
@@ -341,7 +331,7 @@ class Generator extends React.Component {
     }
 
     function renderDescription(traitName,useProperCase,prefix) {
-      let traitValue = _this.state[traitName].toLowerCase();
+      let traitValue = _this.state.traits[traitName].toLowerCase();
       let traitDescription = traitValue;
       let vowels = ["a","e","i","o","u"];
 
@@ -391,47 +381,66 @@ class Generator extends React.Component {
                    onUpdate={this.updateAll}
                   />
 
-                  {this.renderInput("gender","Gender")}
-                  {this.renderInput("race","Race")}
-                  {this.renderInput("name","Name")}
-                  {this.renderInput("surname","Surame")}
-                  {this.renderInput("alignment_lawful","Lawful Alignment")}
-                  {this.renderInput("alignment_moral","Moral Alignment")}
-                  {this.renderInput("distinguishing_marks", "Distinguishing Mark")}
-                  {this.renderInput("high_ability", "High Ability")}
-                  {this.renderInput("low_ability", "Low Ability")}
-                  {this.renderInput("talents", "Talent")}
-                  {this.renderInput("mannerisms", "Mannerism")}
-                  {this.renderInput("interaction_traits", "Interaction Trait")}
-                  {this.renderInput("bonds", "Bond")}
-                  {this.renderInput("flaws", "Flaw")}
-                  {this.renderInput("ideals", "Ideal")}
-                  {this.renderInput("emotion", "Emotion")}
-                  {this.renderInput("social_class", "Social Class")}
-                  {this.renderInput("occupation", "Occupation")}
+                  {this.renderMultipleInputs(
+                    {
+                      names : [
+                        "gender",
+                        "race",
+                        "name",
+                        "surname",
+                        "alignment_lawful",
+                        "alignment_moral",
+                        "distinguishing_marks",
+                        "high_ability",
+                        "low_ability",
+                        "talents",
+                        "mannerisms",
+                        "interaction_traits",
+                        "bonds",
+                        "flaws",
+                        "ideals",
+                        "emotion",
+                        "social_class",
+                        "occupation",
+                        "useful_knowledge"
+                      ]
+                    }
+                  )}
 
                 </div>
                 <div className="col-sm-6">
 
                   <h3>Physical</h3>
-
-                  {this.renderInput("eye_color","Eye color")}
-                  {this.renderInput("eye_shape","Eye shape")}
-                  {this.renderInput("hair_color","Hair color")}
-                  {this.renderInput("age_group","Age group")}
-                  {this.renderInput("physique","Physique")}
-                  {this.renderInput("height","Height")}
+                  {this.renderMultipleInputs(
+                    {
+                      names : [
+                        "eye_color",
+                        "eye_shape",
+                        "hair_color",
+                        "age_group",
+                        "physique",
+                        "height"
+                      ]
+                    }
+                  )}
+                 
 
                   <h3>Family</h3>
-
-                  {this.renderInput("parents","Parents")}
-                  {this.renderInput("siblings","Siblings")}
-                  {this.renderInput("cousins","Cousins")}
-                  {this.renderInput("aunts","Aunts")}
-                  {this.renderInput("uncles","Uncles")}
-                  {this.renderInput("children","Children")}
-                  {this.renderInput("family_relationship","Family relationship")}
-                  {this.renderInput("maritial_status","Maritial Status")}
+                  {this.renderMultipleInputs(
+                    {
+                      names : [
+                        "parents",
+                        "siblings",
+                        "cousins",
+                        "aunts",
+                        "uncles",
+                        "children",
+                        "family_relationship",
+                        "maritial_status"
+                      ]
+                    }
+                  )}
+                  
                 </div>
               </div>
             </div>;

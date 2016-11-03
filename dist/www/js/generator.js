@@ -94,55 +94,18 @@
 	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Generator).call(this, props));
 
 	    var traits = {};
+	    var allTraits = Object.keys(_npcTraits2.default.traits);
+
+	    for (var traitName in allTraits) {
+	      traits[allTraits[traitName]] = '[' + allTraits[traitName] + ']';
+	    }
 
 	    _this2.state = {
 	      lockedInputs: [],
 	      conditionals: {},
 	      rootValues: {},
-	      traits: {},
-	      name: "[character name]",
-	      surname: "[character surname]",
-	      race: "[race]",
-	      alignment_lawful: "[lawfulness]",
-	      alignment_moral: "[morality]",
-	      distinguishing_marks: "[distinguishing mark]",
-	      gender: "[gender]",
-	      high_ability: "[high_ability]",
-	      low_ability: "[low_ability]",
-	      talents: "[talent]",
-	      mannerisms: "[mannerism]",
-	      interaction_traits: "[interaction trait]",
-	      bonds: "[bond]",
-	      flaws: "[flaw]",
-	      ideals: "[ideal]",
-	      emotion: "[emotion]",
-	      eye_color: "[eye color]",
-	      eye_shape: "[eye shape]",
-	      hair_color: "[hair color]",
-	      parents: "[parents]",
-	      children: "[children]",
-	      siblings: "[siblings]",
-	      cousins: "[cousins]",
-	      aunts: "[aunts]",
-	      uncles: "[uncles]",
-	      family_relationship: "[family_relationship]",
-	      maritial_status: "[maritial_status]",
-	      age_group: "[age_group]",
-	      social_class: "[social_class]",
-	      occupation: "[occupation]",
-	      physique: "[physique]",
-	      height: "[height]"
+	      traits: traits
 	    };
-
-	    Object.keys(_npcTraits2.default.traits).forEach(function (keyname) {
-	      traits[keyname] = '[' + keyname + ']';
-	    });
-
-	    // this.setState({
-	    //   traits : Object.assign(this.state.traits,traits);
-	    // }));
-
-	    // console.log(this.state);
 
 	    _this2.updateAll = _this2.updateAll.bind(_this2);
 	    _this2.updateState = _this2.updateState.bind(_this2);
@@ -198,9 +161,11 @@
 	        inputValue = e.target.value;
 	      }
 
-	      newState = Object.assign(this.state, _defineProperty({}, inputName, inputValue));
+	      newState = Object.assign(this.state.traits, _defineProperty({}, inputName, inputValue));
 
-	      this.setState(newState);
+	      this.setState({
+	        traits: Object.assign({}, this.state.traits, newState)
+	      });
 	    }
 
 	    /**
@@ -219,7 +184,9 @@
 	        randomIndex = Math.round(Math.random() * (arr.length - 1));
 	      }
 
-	      return arr[randomIndex];
+	      if (arr && arr[randomIndex]) {
+	        return arr[randomIndex];
+	      }
 	    }
 
 	    /**
@@ -283,13 +250,13 @@
 	        if (traitOptions.dependencies) {
 	          dependency = _this.getRandom(traitOptions.dependencies) || []; // choose random dependency
 
-	          if (_this.state[dependency]) {
-	            dependencyVal = _this.state[dependency].toLowerCase();
+	          if (_this.state.traits[dependency]) {
+	            dependencyVal = _this.state.traits[dependency].toLowerCase();
 	            traitValues = _npcTraits2.default.traits[traitName][dependencyVal];
 
 	            if (traitOptions.subdependencies && traitOptions.subdependencies[dependencyVal]) {
 	              dependencyVal = traitOptions.subdependencies[dependencyVal];
-	              traitValues = traitValues[_this.state[dependencyVal].toLowerCase()];
+	              traitValues = traitValues[_this.state.traits[dependencyVal].toLowerCase()];
 	            }
 	          } else {
 	            for (var prop in _npcTraits2.default.traits[traitName]) {
@@ -313,7 +280,7 @@
 	        var shouldNotEqual = traitOptions.shouldNotEqual || "";
 	        var i = 0;
 
-	        while (randomVal === _this.state[shouldNotEqual]) {
+	        while (randomVal && randomVal === _this.state.traits[shouldNotEqual]) {
 	          randomVal = _this.getRandom(traitValues);
 	          if (i++ > 100) {
 	            break;
@@ -325,7 +292,8 @@
 	        if (traitOptions.conditionals) {
 	          for (var condition in traitOptions.conditionals) {
 	            if (randomVal.toLowerCase() === condition) {
-	              _this.state.conditionals[condition], randomVal = _this.getRandom(traitOptions.conditionals[condition]);
+	              randomVal = _this.getRandom(traitOptions.conditionals[condition]);
+
 	              _this.state.rootValues[randomVal] = condition;
 	            }
 	          }
@@ -341,11 +309,11 @@
 
 	          traitOptions.combine.traits.forEach(function (trait) {
 	            propName += traitOptions.combine.separator + trait;
-	            propVal += traitOptions.combine.separator + _this.state[trait];
+	            propVal += traitOptions.combine.separator + _this.state.traits[trait];
 	            propVal = propVal.toLowerCase();
 	          });
 
-	          _this.state[propName] = propVal;
+	          _this.state.traits[propName] = propVal;
 	        }
 	      }
 
@@ -397,7 +365,7 @@
 	        _react2.default.createElement(_textInput.TextInput, {
 	          type: 'text',
 	          name: traitName,
-	          onChange: this.updateState
+	          onChange: _this.updateState
 	        }),
 	        _react2.default.createElement(_submitButton.SubmitButton, {
 	          type: 'text',
@@ -405,6 +373,42 @@
 	          label: '',
 	          name: 'get_random',
 	          onUpdate: replace
+	        })
+	      );
+	    }
+	  }, {
+	    key: 'renderMultipleInputs',
+	    value: function renderMultipleInputs(options) {
+	      var _this3 = this;
+
+	      options = options || {};
+	      var names = options.names || [];
+	      var range = options.range || false;
+	      var traitName = "";
+
+	      if (!names.length) {
+	        for (traitName in _npcTraits2.default.traits) {
+	          names.push(traitName);
+	        }
+	      }
+
+	      if (range && range.length === 2) {
+	        var min = range[0];
+	        var max = range[1];
+
+	        names.splice(0, min);
+	        names.splice(max, names.length);
+	      }
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        names.map(function (trait) {
+	          return _react2.default.createElement(
+	            'div',
+	            { key: trait },
+	            _this3.renderInput(trait, trait.toProperCase().replace(/\_/g, " "))
+	          );
 	        })
 	      );
 	    }
@@ -417,8 +421,8 @@
 	    key: 'render',
 	    value: function render() {
 	      var _this = this;
-	      var genderPronounPossessive = getGenderPronoun(this.state.gender).possessive;
-	      var genderPronounPersonal = getGenderPronoun(this.state.gender).personal;
+	      var genderPronounPossessive = getGenderPronoun(_this.state.traits.gender).possessive;
+	      var genderPronounPersonal = getGenderPronoun(_this.state.traits.gender).personal;
 
 	      function getGenderPronoun(gender) {
 	        var pronoun = "";
@@ -446,7 +450,7 @@
 	      }
 
 	      function renderDescription(traitName, useProperCase, prefix) {
-	        var traitValue = _this.state[traitName].toLowerCase();
+	        var traitValue = _this.state.traits[traitName].toLowerCase();
 	        var traitDescription = traitValue;
 	        var vowels = ["a", "e", "i", "o", "u"];
 
@@ -612,24 +616,9 @@
 	              name: 'randomize_all',
 	              onUpdate: this.updateAll
 	            }),
-	            this.renderInput("gender", "Gender"),
-	            this.renderInput("race", "Race"),
-	            this.renderInput("name", "Name"),
-	            this.renderInput("surname", "Surame"),
-	            this.renderInput("alignment_lawful", "Lawful Alignment"),
-	            this.renderInput("alignment_moral", "Moral Alignment"),
-	            this.renderInput("distinguishing_marks", "Distinguishing Mark"),
-	            this.renderInput("high_ability", "High Ability"),
-	            this.renderInput("low_ability", "Low Ability"),
-	            this.renderInput("talents", "Talent"),
-	            this.renderInput("mannerisms", "Mannerism"),
-	            this.renderInput("interaction_traits", "Interaction Trait"),
-	            this.renderInput("bonds", "Bond"),
-	            this.renderInput("flaws", "Flaw"),
-	            this.renderInput("ideals", "Ideal"),
-	            this.renderInput("emotion", "Emotion"),
-	            this.renderInput("social_class", "Social Class"),
-	            this.renderInput("occupation", "Occupation")
+	            this.renderMultipleInputs({
+	              names: ["gender", "race", "name", "surname", "alignment_lawful", "alignment_moral", "distinguishing_marks", "high_ability", "low_ability", "talents", "mannerisms", "interaction_traits", "bonds", "flaws", "ideals", "emotion", "social_class", "occupation", "useful_knowledge"]
+	            })
 	          ),
 	          _react2.default.createElement(
 	            'div',
@@ -639,25 +628,17 @@
 	              null,
 	              'Physical'
 	            ),
-	            this.renderInput("eye_color", "Eye color"),
-	            this.renderInput("eye_shape", "Eye shape"),
-	            this.renderInput("hair_color", "Hair color"),
-	            this.renderInput("age_group", "Age group"),
-	            this.renderInput("physique", "Physique"),
-	            this.renderInput("height", "Height"),
+	            this.renderMultipleInputs({
+	              names: ["eye_color", "eye_shape", "hair_color", "age_group", "physique", "height"]
+	            }),
 	            _react2.default.createElement(
 	              'h3',
 	              null,
 	              'Family'
 	            ),
-	            this.renderInput("parents", "Parents"),
-	            this.renderInput("siblings", "Siblings"),
-	            this.renderInput("cousins", "Cousins"),
-	            this.renderInput("aunts", "Aunts"),
-	            this.renderInput("uncles", "Uncles"),
-	            this.renderInput("children", "Children"),
-	            this.renderInput("family_relationship", "Family relationship"),
-	            this.renderInput("maritial_status", "Maritial Status")
+	            this.renderMultipleInputs({
+	              names: ["parents", "siblings", "cousins", "aunts", "uncles", "children", "family_relationship", "maritial_status"]
+	            })
 	          )
 	        )
 	      );
