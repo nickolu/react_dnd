@@ -180,3 +180,9 @@ export const getArrayFromObject = function(data,key,returnString) {
     return items.join(', ');
   }
 }
+
+export const contains = function(obj,val) {
+  if (obj.indexOf) {
+    return obj.indexOf(val) > -1 ? true : false;
+  }
+}

@@ -24,23 +24,27 @@ export class FilterButtonGroup extends React.Component {
   filter(e,choice,isActive) {
       var activeBtns = document.querySelectorAll("."+this.props.prop+".btn.active");
       var val = typeof choice === "string" ? choice : choice.val;
-      var i = 0;
+      var filtersArr = this.props.additiveFilters ? this.props.context.state.additiveFilters : this.props.context.state.subtractiveFilters
       var removeFilter = {};
+      var i = 0;
       var addFilter = {
         "key" : this.props.prop,
         "value" : val,
         "usePartialMatch" : this.props.usePartialMatch || false
       };
 
+      console.log(filtersArr);
+      console.log(this.props.additiveFilters);
+
       if (this.props.type) {
         addFilter.type = this.props.type;
       }
 
       if (isActive) {
-        // the button was active when clicked, so make it unactive and remove its filter
+        // the button was active when clicked, so make it inactive and remove its filter
         this.props.context.setState({
           spells : utilities.sortObjectsByProp(this.props.data, "name"),
-          filter : utilities.removeObject(this.props.context.state.filter,addFilter)
+          [filtersArr] : utilities.removeObject(filtersArr,addFilter)
         });
 
         this.setState({
@@ -52,19 +56,19 @@ export class FilterButtonGroup extends React.Component {
 
         for (i=0; i<activeBtns.length; i++) {
           if (!(activeBtns[i].innerHTML === addFilter.value)) {
-            removeFilter = utilities.getObjectsByProp(this.props.context.state.filter, "value", activeBtns[i].getAttribute("data-key"))[0];
+            removeFilter = utilities.getObjectsByProp(filtersArr, "value", activeBtns[i].getAttribute("data-key"))[0];
           }
         }
 
         this.props.context.setState({
           spells : this.props.context.state.spells,
-          filter : utilities.removeObject(this.props.context.state.filter,removeFilter)
+          [filtersArr] : utilities.removeObject(filtersArr,removeFilter)
         });
 
-        this.props.context.state.filter.push(addFilter);
+        filtersArr.push(addFilter);
       } else {
         // the button was not active and multiSelect is on, so just add the filter for whichever button was clicked
-        this.props.context.state.filter.push(addFilter);
+        filtersArr.push(addFilter);
       }
 
       

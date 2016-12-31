@@ -8,7 +8,7 @@ const babel = require('gulp-babel');
 const less = require('gulp-less');
 
 const serverAppFiles = ['src/**/*.jsx','!src/www/**'];
-const webAppFiles = ['src/www/**/*.js'];
+const webAppFiles = ['src/www/**/*.js','./src/www/json/**/*.json'];
 const webAppHtmlFiles = ['src/www/**/*.html'];
 const webAppCssFiles = ['src/www/css/**/*.css'];
 const webAppLessFiles = ['./src/www/less/**/*.less'];
@@ -20,7 +20,7 @@ const defaultTasks = [
 	'process-web-app-less'
 ];
 
-const entryPoints = [ './src/www/js/index.js','./src/www/js/spells.js','./src/www/js/monsters.js' ];
+const entryPoints = [ './src/www/js/index.js','./src/www/js/spells.js','./src/www/js/monsters.js','./src/www/js/generator.js'  ];
 
 gulp.task('process-server-app', () =>
 	gulp.src(serverAppFiles)

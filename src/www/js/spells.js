@@ -28,14 +28,57 @@ class SpellBook extends React.Component {
 
     this.state = {
       spells : sortedSpellData,
-      sortSpells : "name",
-      descriptionSearch : false,
+      additiveFilters : [],
+      subtractiveFilters : [],
       filter : []
     };
 
-    this.setExclusiveFilters = this.setExclusiveFilters.bind(this);
+    
     this.setInclusiveFilters = this.setInclusiveFilters.bind(this);
+    this.updateFilters = this.updateFilters.bind(this);
   }
+
+
+  updateFilters() {
+    var _this = this;
+    var filteredSpells = spellData;
+
+    if (this.state.additiveFilters.length === 0 && this.state.subtractiveFilters.length === 0) {
+      
+      _this.setState({
+        spells : spellData,
+        additiveFilters : this.state.additiveFilters,
+        subtractiveFilters : this.state.subtractiveFilters
+      });
+
+    } else {
+
+      if (this.state.additiveFilters.length > 0) {
+        filteredSpells = [];
+
+        this.state.additiveFilters.forEach(function(obj) {
+          filteredSpells = filteredSpells.concat(_this.getFilteredSpells(spellData, obj));
+          filteredSpells = utilities.arrayUnique(filteredSpells);
+        });
+        
+      }
+      
+      if (this.state.subtractiveFilters.length > 0) {
+        this.state.subtractiveFilters.forEach(function(obj) {
+          filteredSpells = _this.getFilteredSpells(filteredSpells, obj)
+        });
+      }
+
+      this.setState({
+        spells : filteredSpells,
+        additiveFilters : this.state.additiveFilters,
+        subtractiveFilters : this.state.subtractiveFilters
+      });
+    }
+
+    console.log(this.state);
+  }
+
 
   /**
    * gets the filtered spells using list of filters in state.filters
@@ -66,15 +109,24 @@ class SpellBook extends React.Component {
     var _this = this;
     var filteredSpells = [];
 
-    this.state.filter.forEach(function(obj) {
-      filteredSpells = filteredSpells.concat(_this.getFilteredSpells(spellData, obj));
-      filteredSpells = utilities.arrayUnique(filteredSpells);
-    });
+    if (this.state.filter.length === 0) {
+      _this.setState({
+        spells : utilities.sortObjectsByProp(spellData, "name"),
+        filter : _this.state.filter
+      });
+    } else {
+      this.state.filter.forEach(function(obj) {
+        filteredSpells = filteredSpells.concat(_this.getFilteredSpells(spellData, obj));
+        filteredSpells = utilities.arrayUnique(filteredSpells);
+      });
 
-    _this.setState({
-      spells : utilities.sortObjectsByProp(filteredSpells, "name"),
-      filter : _this.state.filter
-    });
+      _this.setState({
+        spells : utilities.sortObjectsByProp(filteredSpells, "name"),
+        filter : _this.state.filter
+      });
+    }
+
+    
   }
 
   /**
@@ -238,7 +290,8 @@ class SpellBook extends React.Component {
         'multiSelect' : true
       },
       level : {
-        'choices' : ["Cantrip","1st","2nd","3rd","4th","5th","6th","7th","8th","9th"]
+        'choices' : ["Cantrip","1st","2nd","3rd","4th","5th","6th","7th","8th","9th"],
+        'multiSelect' : false
       },
       name : {
         'choices' : ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],
@@ -260,7 +313,7 @@ class SpellBook extends React.Component {
 
                   <div className="card-size-controls">
                     <h4 className="card-size-controls-title">Card Size</h4>
-                    <CardSizeButton onUpdate={this.setExclusiveFilters} />
+                    <CardSizeButton onUpdate={this.updateFilters} />
                   </div>
 
                   <p>Filters: <ShowHideButton target=".filters-wrapper" showText="+" hideText="-" /></p>
@@ -268,7 +321,7 @@ class SpellBook extends React.Component {
                   <div className="row filters-wrapper">
                     <div className="col-xs-12 col-sm-6 col-md-3">
                       <SearchFilter 
-                        onUpdate={this.setInclusiveFilters} 
+                        onUpdate={this.updateFilters} 
                         context={this} 
                         searchForChoices={filterOptions.search.choices}
                       />
@@ -276,7 +329,7 @@ class SpellBook extends React.Component {
                         id="page" 
                         label="Source" 
                         filterOptions={filterOptions.page} 
-                        onUpdate={this.setExclusiveFilters} 
+                        onUpdate={this.updateFilters} 
                         data={spellData} 
                         context={this} 
                       />
@@ -287,7 +340,7 @@ class SpellBook extends React.Component {
                         id="components" 
                         label="components" 
                         filterOptions={filterOptions.components} 
-                        onUpdate={this.setExclusiveFilters} 
+                        onUpdate={this.updateFilters} 
                         data={spellData} 
                         context={this} 
                       />
@@ -299,7 +352,7 @@ class SpellBook extends React.Component {
                           prop="concentration" 
                           val="yes" 
                           label="Concentration" 
-                          onUpdate={this.setExclusiveFilters} 
+                          onUpdate={this.updateFilters} 
                           context={this} 
                           data={spellData} 
                         />
@@ -307,7 +360,7 @@ class SpellBook extends React.Component {
                           prop="ritual" 
                           val="yes" 
                           label="Ritual" 
-                          onUpdate={this.setExclusiveFilters} 
+                          onUpdate={this.updateFilters} 
                           context={this} 
                           data={spellData} 
                         />
@@ -319,7 +372,8 @@ class SpellBook extends React.Component {
                       cssClass="col-xs-12 col-sm-6 col-md-3" 
                       label="Casting Time" 
                       filterOptions={filterOptions.casting_time} 
-                      onUpdate={this.setExclusiveFilters} 
+                      onUpdate={this.updateFilters} 
+                      additiveFilters={false}
                       data={spellData} 
                       context={this} 
                     />
@@ -327,7 +381,8 @@ class SpellBook extends React.Component {
                       cssClass="col-xs-12 col-sm-6 col-md-3" 
                       label="School" 
                       filterOptions={filterOptions.school} 
-                      onUpdate={this.setExclusiveFilters} 
+                      onUpdate={this.updateFilters} 
+                      additiveFilters={false}
                       data={spellData} 
                       context={this}
                     />
@@ -335,7 +390,8 @@ class SpellBook extends React.Component {
                       cssClass="col-xs-12 col-sm-6" 
                       label="Class" 
                       filterOptions={filterOptions.class} 
-                      onUpdate={this.setExclusiveFilters} 
+                      onUpdate={this.updateFilters}
+                      additiveFilters={false}
                       data={spellData} 
                       context={this}
                     />
@@ -343,7 +399,8 @@ class SpellBook extends React.Component {
                       cssClass="col-xs-12 col-sm-6" 
                       label="Level" 
                       filterOptions={filterOptions.level} 
-                      onUpdate={this.setExclusiveFilters} 
+                      onUpdate={this.updateFilters} 
+                      additiveFilters={false}
                       data={spellData} 
                       context={this}
                     />
@@ -351,7 +408,8 @@ class SpellBook extends React.Component {
                       cssClass="col-xs-12" 
                       label="Filter Alphabetically" 
                       filterOptions={filterOptions.name} 
-                      onUpdate={this.setExclusiveFilters} 
+                      onUpdate={this.updateFilters} 
+                      additiveFilters={false}
                       data={spellData} 
                       context={this}
                     />

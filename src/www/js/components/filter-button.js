@@ -29,12 +29,12 @@ export class FilterButton extends React.Component {
 
       this.props.context.setState({
         spells : utilities.sortObjectsByProp(this.props.data, "name"),
-        filter : utilities.removeObject(this.props.context.state.filter,filter)
+        subtractiveFilters : utilities.removeObject(this.props.context.state.subtractiveFilters,filter)
       });
 
     } else {
       e.target.className += " active";
-      this.props.context.state.filter.push(filter);
+      this.props.context.state.subtractiveFilters.push(filter);
     }
 
 

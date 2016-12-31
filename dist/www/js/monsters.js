@@ -20710,6 +20710,12 @@
 	  }
 	};
 
+	var contains = exports.contains = function contains(obj, val) {
+	  if (obj.indexOf) {
+	    return obj.indexOf(val) > -1 ? true : false;
+	  }
+	};
+
 /***/ },
 /* 160 */
 /***/ function(module, exports) {
@@ -38997,6 +39003,26 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	/**
+	 * TextInput();
+	 *
+	 * Params: 
+	 * 
+	 * @param {string} cssClass - type attribute for input element ("text" || "paragraph")
+	 * @param {string || number} value - value to associate with button click (optional)
+	 * @param {string} label - text label for element
+	 * @param {function} onUpdate - function to execute when the button is clicked
+	 *
+	 * Example: 
+	 * 
+	  <SubmitButton 
+	     type="text" 
+	     label="Submit" 
+	     name="submit_data" 
+	     onChange={this.update}
+	   />
+	 */
+
 	var SubmitButton = exports.SubmitButton = function (_React$Component) {
 	  _inherits(SubmitButton, _React$Component);
 
@@ -39053,6 +39079,26 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	/**
+	 * TextInput();
+	 *
+	 * Params: 
+	 * 
+	 * @param {string} type - type attribute for input element ("text" || "paragraph")
+	 * @param {string} name - name attribute for input element 
+	 * @param {string} label - text label for element
+	 * @param {function} onChange - function to execute when the value of the input changes
+	 *
+	 * Example: 
+	 * 
+	  <TextInput 
+	     type="text" 
+	     label="Character Name" 
+	     name="character_name" 
+	     onChange={this.update}
+	   />
+	 */
+
 	var TextInput = exports.TextInput = function (_React$Component) {
 	  _inherits(TextInput, _React$Component);
 
@@ -39082,15 +39128,14 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var label = this.props.label ? this.props.label : "";
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'form-field' },
 	        _react2.default.createElement(
 	          'label',
 	          null,
-	          this.props.label,
-	          ': ',
-	          _react2.default.createElement('br', null),
+	          label,
 	          _react2.default.createElement('input', { type: this.props.type, className: 'form-control', name: this.props.name, onChange: this.props.onChange })
 	        )
 	      );
