@@ -111,24 +111,63 @@
 
 	    _this2.state = {
 	      spells: sortedSpellData,
-	      sortSpells: "name",
-	      descriptionSearch: false,
+	      additiveFilters: [],
+	      subtractiveFilters: [],
 	      filter: []
 	    };
 
-	    _this2.setExclusiveFilters = _this2.setExclusiveFilters.bind(_this2);
 	    _this2.setInclusiveFilters = _this2.setInclusiveFilters.bind(_this2);
+	    _this2.updateFilters = _this2.updateFilters.bind(_this2);
 	    return _this2;
 	  }
 
-	  /**
-	   * gets the filtered spells using list of filters in state.filters
-	   * OVERRIDES the array each time to have ONLY items that match ALL filters
-	   * @param  {object} e [event object passed by event listener]
-	   */
-
-
 	  _createClass(SpellBook, [{
+	    key: 'updateFilters',
+	    value: function updateFilters() {
+	      var _this = this;
+	      var filteredSpells = _spells2.default;
+
+	      if (this.state.additiveFilters.length === 0 && this.state.subtractiveFilters.length === 0) {
+
+	        _this.setState({
+	          spells: _spells2.default,
+	          additiveFilters: this.state.additiveFilters,
+	          subtractiveFilters: this.state.subtractiveFilters
+	        });
+	      } else {
+
+	        if (this.state.additiveFilters.length > 0) {
+	          filteredSpells = [];
+
+	          this.state.additiveFilters.forEach(function (obj) {
+	            filteredSpells = filteredSpells.concat(_this.getFilteredSpells(_spells2.default, obj));
+	            filteredSpells = utilities.arrayUnique(filteredSpells);
+	          });
+	        }
+
+	        if (this.state.subtractiveFilters.length > 0) {
+	          this.state.subtractiveFilters.forEach(function (obj) {
+	            filteredSpells = _this.getFilteredSpells(filteredSpells, obj);
+	          });
+	        }
+
+	        this.setState({
+	          spells: filteredSpells,
+	          additiveFilters: this.state.additiveFilters,
+	          subtractiveFilters: this.state.subtractiveFilters
+	        });
+	      }
+
+	      console.log(this.state);
+	    }
+
+	    /**
+	     * gets the filtered spells using list of filters in state.filters
+	     * OVERRIDES the array each time to have ONLY items that match ALL filters
+	     * @param  {object} e [event object passed by event listener]
+	     */
+
+	  }, {
 	    key: 'setExclusiveFilters',
 	    value: function setExclusiveFilters() {
 	      var _this = this;
@@ -156,15 +195,22 @@
 	      var _this = this;
 	      var filteredSpells = [];
 
-	      this.state.filter.forEach(function (obj) {
-	        filteredSpells = filteredSpells.concat(_this.getFilteredSpells(_spells2.default, obj));
-	        filteredSpells = utilities.arrayUnique(filteredSpells);
-	      });
+	      if (this.state.filter.length === 0) {
+	        _this.setState({
+	          spells: utilities.sortObjectsByProp(_spells2.default, "name"),
+	          filter: _this.state.filter
+	        });
+	      } else {
+	        this.state.filter.forEach(function (obj) {
+	          filteredSpells = filteredSpells.concat(_this.getFilteredSpells(_spells2.default, obj));
+	          filteredSpells = utilities.arrayUnique(filteredSpells);
+	        });
 
-	      _this.setState({
-	        spells: utilities.sortObjectsByProp(filteredSpells, "name"),
-	        filter: _this.state.filter
-	      });
+	        _this.setState({
+	          spells: utilities.sortObjectsByProp(filteredSpells, "name"),
+	          filter: _this.state.filter
+	        });
+	      }
 	    }
 
 	    /**
@@ -462,7 +508,8 @@
 	          'multiSelect': true
 	        },
 	        level: {
-	          'choices': ["Cantrip", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"]
+	          'choices': ["Cantrip", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"],
+	          'multiSelect': false
 	        },
 	        name: {
 	          'choices': ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
@@ -497,7 +544,7 @@
 	                { className: 'card-size-controls-title' },
 	                'Card Size'
 	              ),
-	              _react2.default.createElement(_cardSizeButton.CardSizeButton, { onUpdate: this.setExclusiveFilters })
+	              _react2.default.createElement(_cardSizeButton.CardSizeButton, { onUpdate: this.updateFilters })
 	            ),
 	            _react2.default.createElement(
 	              'p',
@@ -512,7 +559,7 @@
 	                'div',
 	                { className: 'col-xs-12 col-sm-6 col-md-3' },
 	                _react2.default.createElement(_searchFilter.SearchFilter, {
-	                  onUpdate: this.setInclusiveFilters,
+	                  onUpdate: this.updateFilters,
 	                  context: this,
 	                  searchForChoices: filterOptions.search.choices
 	                }),
@@ -520,7 +567,7 @@
 	                  id: 'page',
 	                  label: 'Source',
 	                  filterOptions: filterOptions.page,
-	                  onUpdate: this.setExclusiveFilters,
+	                  onUpdate: this.updateFilters,
 	                  data: _spells2.default,
 	                  context: this
 	                })
@@ -532,7 +579,7 @@
 	                  id: 'components',
 	                  label: 'components',
 	                  filterOptions: filterOptions.components,
-	                  onUpdate: this.setExclusiveFilters,
+	                  onUpdate: this.updateFilters,
 	                  data: _spells2.default,
 	                  context: this
 	                }),
@@ -549,7 +596,7 @@
 	                    prop: 'concentration',
 	                    val: 'yes',
 	                    label: 'Concentration',
-	                    onUpdate: this.setExclusiveFilters,
+	                    onUpdate: this.updateFilters,
 	                    context: this,
 	                    data: _spells2.default
 	                  }),
@@ -557,7 +604,7 @@
 	                    prop: 'ritual',
 	                    val: 'yes',
 	                    label: 'Ritual',
-	                    onUpdate: this.setExclusiveFilters,
+	                    onUpdate: this.updateFilters,
 	                    context: this,
 	                    data: _spells2.default
 	                  })
@@ -567,7 +614,8 @@
 	                cssClass: 'col-xs-12 col-sm-6 col-md-3',
 	                label: 'Casting Time',
 	                filterOptions: filterOptions.casting_time,
-	                onUpdate: this.setExclusiveFilters,
+	                onUpdate: this.updateFilters,
+	                additiveFilters: false,
 	                data: _spells2.default,
 	                context: this
 	              }),
@@ -575,7 +623,8 @@
 	                cssClass: 'col-xs-12 col-sm-6 col-md-3',
 	                label: 'School',
 	                filterOptions: filterOptions.school,
-	                onUpdate: this.setExclusiveFilters,
+	                onUpdate: this.updateFilters,
+	                additiveFilters: false,
 	                data: _spells2.default,
 	                context: this
 	              }),
@@ -583,7 +632,8 @@
 	                cssClass: 'col-xs-12 col-sm-6',
 	                label: 'Class',
 	                filterOptions: filterOptions.class,
-	                onUpdate: this.setExclusiveFilters,
+	                onUpdate: this.updateFilters,
+	                additiveFilters: false,
 	                data: _spells2.default,
 	                context: this
 	              }),
@@ -591,7 +641,8 @@
 	                cssClass: 'col-xs-12 col-sm-6',
 	                label: 'Level',
 	                filterOptions: filterOptions.level,
-	                onUpdate: this.setExclusiveFilters,
+	                onUpdate: this.updateFilters,
+	                additiveFilters: false,
 	                data: _spells2.default,
 	                context: this
 	              }),
@@ -599,7 +650,8 @@
 	                cssClass: 'col-xs-12',
 	                label: 'Filter Alphabetically',
 	                filterOptions: filterOptions.name,
-	                onUpdate: this.setExclusiveFilters,
+	                onUpdate: this.updateFilters,
+	                additiveFilters: false,
 	                data: _spells2.default,
 	                context: this
 	              })
@@ -20418,6 +20470,12 @@
 	  }
 	};
 
+	var contains = exports.contains = function contains(obj, val) {
+	  if (obj.indexOf) {
+	    return obj.indexOf(val) > -1 ? true : false;
+	  }
+	};
+
 /***/ },
 /* 160 */
 /***/ function(module, exports) {
@@ -27675,25 +27733,24 @@
 	  _createClass(SearchFilter, [{
 	    key: 'filter',
 	    value: function filter() {
-	      var name = document.querySelector('[name=search_spells]').value;
-	      var filters = this.props.context.state.filter || [];
-	      var props = this.state.searchFor;
+	      var name = document.querySelector('[name=search]').value;
+	      var filters = this.props.context.state.additiveFilters || [];
+	      var searchFor = this.state.searchFor;
 	      var newFilters = [];
-	      var descriptionSearch = this.props.context.state.descriptionSearch;
 
-	      props.forEach(function (key) {
+	      searchFor.forEach(function (prop) {
 	        var hasFilter = false;
 
-	        filters.forEach(function (obj) {
-	          if (obj.key === key && obj.type === "search") {
+	        filters.forEach(function (filter) {
+	          if (filter.key === prop && filter.type === "search") {
 	            hasFilter = true;
-	            obj.value = name;
+	            filter.value = name;
 	          }
 	        });
 
 	        if (!hasFilter) {
 	          filters.push({
-	            "key": key,
+	            "key": prop,
 	            "type": "search",
 	            "value": name,
 	            "usePartialMatch": true
@@ -27703,8 +27760,7 @@
 
 	      this.props.context.setState({
 	        spells: this.props.context.state.spells,
-	        filter: filters,
-	        descriptionSearch: descriptionSearch
+	        additiveFilters: filters
 	      });
 
 	      this.props.onUpdate();
@@ -27713,8 +27769,8 @@
 	    key: 'setPropertySearch',
 	    value: function setPropertySearch(e) {
 	      var isChecked = false;
-	      var searchFor = this.state.searchFor;
-	      var filters = this.props.context.state.filter || [];
+	      var searchFor = this.state.searchFor; // array
+	      var filters = this.props.context.state.additiveFilters || [];
 	      var key = e.target.getAttribute('data-id');
 	      var i = 0;
 
@@ -27733,8 +27789,9 @@
 	      this.setState({
 	        searchFor: searchFor
 	      });
-	      console.log(this.state);
+
 	      this.filter();
+	      this.props.onUpdate();
 	    }
 	  }, {
 	    key: 'render',
@@ -27743,7 +27800,7 @@
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Search', name: 'search_spells', onChange: this.filter }),
+	        _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Search', name: 'search', onChange: this.filter }),
 	        _react2.default.createElement(_showHideButton.ShowHideButton, { target: ".advanced-search", showText: '+', hideText: '-', startClosed: 'true' }),
 	        _react2.default.createElement(
 	          'span',
@@ -27785,6 +27842,26 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	/**
+	 * TextInput();
+	 *
+	 * Params: 
+	 * 
+	 * @param {string} type - type attribute for input element ("text" || "paragraph")
+	 * @param {string} name - name attribute for input element 
+	 * @param {string} label - text label for element
+	 * @param {function} onChange - function to execute when the value of the input changes
+	 *
+	 * Example: 
+	 * 
+	  <TextInput 
+	     type="text" 
+	     label="Character Name" 
+	     name="character_name" 
+	     onChange={this.update}
+	   />
+	 */
+
 	var TextInput = exports.TextInput = function (_React$Component) {
 	  _inherits(TextInput, _React$Component);
 
@@ -27814,15 +27891,14 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var label = this.props.label ? this.props.label : "";
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'form-field' },
 	        _react2.default.createElement(
 	          'label',
 	          null,
-	          this.props.label,
-	          ': ',
-	          _react2.default.createElement('br', null),
+	          label,
 	          _react2.default.createElement('input', { type: this.props.type, className: 'form-control', name: this.props.name, onChange: this.props.onChange })
 	        )
 	      );
@@ -28058,6 +28134,26 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	/**
+	 * TextInput();
+	 *
+	 * Params: 
+	 * 
+	 * @param {string} cssClass - type attribute for input element ("text" || "paragraph")
+	 * @param {string || number} value - value to associate with button click (optional)
+	 * @param {string} label - text label for element
+	 * @param {function} onUpdate - function to execute when the button is clicked
+	 *
+	 * Example: 
+	 * 
+	  <SubmitButton 
+	     type="text" 
+	     label="Submit" 
+	     name="submit_data" 
+	     onChange={this.update}
+	   />
+	 */
+
 	var SubmitButton = exports.SubmitButton = function (_React$Component) {
 	  _inherits(SubmitButton, _React$Component);
 
@@ -28155,11 +28251,11 @@
 
 	        this.props.context.setState({
 	          spells: utilities.sortObjectsByProp(this.props.data, "name"),
-	          filter: utilities.removeObject(this.props.context.state.filter, filter)
+	          subtractiveFilters: utilities.removeObject(this.props.context.state.subtractiveFilters, filter)
 	        });
 	      } else {
 	        e.target.className += " active";
-	        this.props.context.state.filter.push(filter);
+	        this.props.context.state.subtractiveFilters.push(filter);
 	      }
 
 	      this.props.onUpdate(e);
@@ -28203,6 +28299,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -28238,24 +28336,27 @@
 	    value: function filter(e, choice, isActive) {
 	      var activeBtns = document.querySelectorAll("." + this.props.prop + ".btn.active");
 	      var val = typeof choice === "string" ? choice : choice.val;
-	      var i = 0;
+	      var filtersArr = this.props.additiveFilters ? this.props.context.state.additiveFilters : this.props.context.state.subtractiveFilters;
 	      var removeFilter = {};
+	      var i = 0;
 	      var addFilter = {
 	        "key": this.props.prop,
 	        "value": val,
 	        "usePartialMatch": this.props.usePartialMatch || false
 	      };
 
+	      console.log(filtersArr);
+	      console.log(this.props.additiveFilters);
+
 	      if (this.props.type) {
 	        addFilter.type = this.props.type;
 	      }
 
 	      if (isActive) {
-	        // the button was active when clicked, so make it unactive and remove its filter
-	        this.props.context.setState({
-	          spells: utilities.sortObjectsByProp(this.props.data, "name"),
-	          filter: utilities.removeObject(this.props.context.state.filter, addFilter)
-	        });
+	        // the button was active when clicked, so make it inactive and remove its filter
+	        this.props.context.setState(_defineProperty({
+	          spells: utilities.sortObjectsByProp(this.props.data, "name")
+	        }, filtersArr, utilities.removeObject(filtersArr, addFilter)));
 
 	        this.setState({
 	          timesSet: this.state.timesSet - 1
@@ -28265,19 +28366,18 @@
 
 	        for (i = 0; i < activeBtns.length; i++) {
 	          if (!(activeBtns[i].innerHTML === addFilter.value)) {
-	            removeFilter = utilities.getObjectsByProp(this.props.context.state.filter, "value", activeBtns[i].getAttribute("data-key"))[0];
+	            removeFilter = utilities.getObjectsByProp(filtersArr, "value", activeBtns[i].getAttribute("data-key"))[0];
 	          }
 	        }
 
-	        this.props.context.setState({
-	          spells: this.props.context.state.spells,
-	          filter: utilities.removeObject(this.props.context.state.filter, removeFilter)
-	        });
+	        this.props.context.setState(_defineProperty({
+	          spells: this.props.context.state.spells
+	        }, filtersArr, utilities.removeObject(filtersArr, removeFilter)));
 
-	        this.props.context.state.filter.push(addFilter);
+	        filtersArr.push(addFilter);
 	      } else {
 	        // the button was not active and multiSelect is on, so just add the filter for whichever button was clicked
-	        this.props.context.state.filter.push(addFilter);
+	        filtersArr.push(addFilter);
 	      }
 
 	      console.log(this.state);
@@ -28489,6 +28589,7 @@
 	            choices: this.props.filterOptions.choices,
 	            multiSelect: multiSelect,
 	            type: type,
+	            additiveFilters: this.props.additiveFilters,
 	            usePartialMatch: usePartialMatch,
 	            onUpdate: this.props.onUpdate,
 	            data: this.props.data,

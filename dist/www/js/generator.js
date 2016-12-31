@@ -60,31 +60,13 @@
 
 	var utilities = _interopRequireWildcard(_utilities);
 
-	var _races = __webpack_require__(160);
+	var _npcTraits = __webpack_require__(160);
 
-	var _races2 = _interopRequireDefault(_races);
+	var _npcTraits2 = _interopRequireDefault(_npcTraits);
 
-	var _characterSheet = __webpack_require__(161);
+	var _textInput = __webpack_require__(161);
 
-	var _dropDown = __webpack_require__(169);
-
-	var _textInput = __webpack_require__(170);
-
-	var _submitButton = __webpack_require__(171);
-
-	var _raceForm = __webpack_require__(172);
-
-	var _classForm = __webpack_require__(175);
-
-	var _characterBiographyForm = __webpack_require__(176);
-
-	var _backgroundForm = __webpack_require__(177);
-
-	var _abilityScoresForm = __webpack_require__(178);
-
-	var _characterDetailsForm = __webpack_require__(179);
-
-	var _skillsForm = __webpack_require__(174);
+	var _submitButton = __webpack_require__(162);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -98,157 +80,575 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var DndForm = function (_React$Component) {
-	  _inherits(DndForm, _React$Component);
+	var Generator = function (_React$Component) {
+	  _inherits(Generator, _React$Component);
 
-	  function DndForm(props) {
-	    _classCallCheck(this, DndForm);
+	  /**
+	   * constructor for SpellBook
+	   * @param  {object} props [element properties/attributes passed in at initialization]
+	   */
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DndForm).call(this, props));
+	  function Generator(props) {
+	    _classCallCheck(this, Generator);
 
-	    _this.state = {
-	      charData: {}
+	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Generator).call(this, props));
+
+	    var traits = {};
+	    var allTraits = Object.keys(_npcTraits2.default.traits);
+
+	    for (var traitName in allTraits) {
+	      traits[allTraits[traitName]] = '[' + allTraits[traitName] + ']';
+	    }
+
+	    _this2.state = {
+	      lockedInputs: [],
+	      conditionals: {},
+	      rootValues: {},
+	      traits: traits
 	    };
 
-	    _this.update = _this.update.bind(_this);
-	    _this.getRaceDescription = _this.getRaceDescription.bind(_this);
-	    return _this;
+	    _this2.updateAll = _this2.updateAll.bind(_this2);
+	    _this2.updateState = _this2.updateState.bind(_this2);
+	    _this2.renderInput = _this2.renderInput.bind(_this2);
+	    _this2.replaceInput = _this2.replaceInput.bind(_this2);
+
+	    String.prototype.toProperCase = function () {
+	      return this.replace(/\w\S*/g, function (txt) {
+	        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+	      }).replace("Of ", "of ");
+	    };
+	    return _this2;
 	  }
 
-	  _createClass(DndForm, [{
-	    key: 'update',
-	    value: function update(e) {
-	      var newCharData = {};
-	      var raceName = "";
-	      var thisCharData = {};
-	      var thisSubRaceData = {};
+	  /**
+	   * updates all values
+	   * each input which is not locked will be updated with a new random value
+	   */
 
-	      if (e.target.name.indexOf('ability_score_increase') > -1) {
-	        newCharData = this.getAbilityScoreIncrease(e);
+
+	  _createClass(Generator, [{
+	    key: 'updateAll',
+	    value: function updateAll() {
+	      var inputEls = document.querySelectorAll('input.form-control');
+	      var objName = "";
+	      var _this = this;
+
+	      for (var obj in inputEls) {
+	        if (inputEls[obj] && typeof inputEls[obj].getAttribute === 'function') {
+	          objName = inputEls[obj].getAttribute("name");
+	          _this.replaceInputWithRandom(objName);
+	        }
+	      }
+	    }
+
+	    /**
+	     * updates each property in the state with the value from its related input element
+	     * @param  {object || string} e - event object passed from the triggering event or name of property to update
+	     */
+
+	  }, {
+	    key: 'updateState',
+	    value: function updateState(e) {
+	      var inputName = "";
+	      var inputValue = "";
+	      var newState = {};
+
+	      if (typeof e === "string") {
+	        inputName = e;
+	        inputValue = document.querySelector('input[name=' + inputName + ']').value;
 	      } else {
-	        newCharData = Object.assign({}, this.state.charData, _defineProperty({}, e.target.name, e.target.value));
+	        inputName = e.target.getAttribute('name');
+	        inputValue = e.target.value;
 	      }
 
-	      if (document.querySelector('select_race')) {
-	        thisCharData = utilities.getObjectByName(_races2.default, e.target.name) || utilities.getObjectByName(_races2.default, document.querySelector('select_race').value);
-	        newCharData.proficiencies = thisCharData.proficiencies;
-	      }
-
-	      if (document.querySelector('select_subrace')) {
-	        thisSubRaceData = utilities.getObjectByName(_races2.default, e.target.name);
-	        newCharData.proficiencies = thisCharData.proficiencies;
-	      }
+	      newState = Object.assign(this.state.traits, _defineProperty({}, inputName, inputValue));
 
 	      this.setState({
-	        charData: Object.assign({}, this.state.charData, newCharData)
+	        traits: Object.assign({}, this.state.traits, newState)
 	      });
 	    }
-	  }, {
-	    key: 'getThisRaceData',
-	    value: function getThisRaceData() {
-	      var raceName = this.state.charData.select_race;
-	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
 
-	      return thisRaceData;
-	    }
-	  }, {
-	    key: 'getAbilityScoreIncrease',
-	    value: function getAbilityScoreIncrease(e) {
-	      var abilityScoreIncreaseIndex = e.target.name.indexOf('ability_score_increase');
-	      var abilityScoreIncrease = this.state.charData.ability_score_increase;
-	      var abilityScore = "";
-	      var abilityScoreValue = 0;
-	      var newAbilityScoreIncreases = {};
-	      var newCharData = {};
+	    /**
+	     * gets a random item from array
+	     * @param  {array}  arr - array of items to pick from
+	     * @return {string}  
+	     */
 
-	      if (abilityScoreIncreaseIndex > -1) {
-	        if (e.target.checked) {
-	          abilityScoreValue = e.target.value;
-	        }
-	        abilityScore = e.target.name.substring("ability_score_increase_".length, e.target.name.length);
-	        newAbilityScoreIncreases = Object.assign({}, abilityScoreIncrease, _defineProperty({}, abilityScore, abilityScoreValue));
-	        newCharData = Object.assign({}, this.state.charData, { "ability_score_increase": newAbilityScoreIncreases });
+	  }, {
+	    key: 'getRandom',
+	    value: function getRandom(arr) {
+	      var randomIndex = 0;
+	      var item = "";
+
+	      if (Array.isArray(arr)) {
+	        randomIndex = Math.round(Math.random() * (arr.length - 1));
 	      }
 
-	      return newCharData;
+	      if (arr && arr[randomIndex]) {
+	        return arr[randomIndex];
+	      }
+	    }
+
+	    /**
+	     * replaces the value of target input with specified value
+	     * @param  {string} inputName - name of input/property
+	     * @param  {string} val       - value to replace with
+	     */
+
+	  }, {
+	    key: 'replaceInput',
+	    value: function replaceInput(inputName, val) {
+	      var inputEl = document.querySelector('[name=' + inputName + ']');
+
+	      inputEl.value = val;
+	      this.updateState(inputName);
+	    }
+
+	    /**
+	     * replaces the value of target input with a random value
+	     * @param  {string} inputName - name of input/property
+	     */
+
+	  }, {
+	    key: 'replaceInputWithRandom',
+	    value: function replaceInputWithRandom(inputName) {
+	      var traitValues = _npcTraits2.default.traits[inputName];
+
+	      if (!utilities.contains(this.state.lockedInputs, inputName)) {
+	        this.replaceInput(inputName, this.getRandomTrait(inputName));
+	      }
 	    }
 	  }, {
-	    key: 'updateSelectedProficiencies',
-	    value: function updateSelectedProficiencies(e) {
-	      var arrayIndex = 0;
-	      this.state.charData[e.target.name] = this.state.charData[e.target.name] || [];
+	    key: 'getRandomTrait',
+	    value: function getRandomTrait(traitName) {
+	      var traitValues = _npcTraits2.default.traits[traitName];
+	      var traitOptions = _npcTraits2.default.options[traitName] || false;
+	      var randomVal = "";
+	      var _this = this;
 
-	      if (this.state.charData[e.target.name]) {
-	        arrayIndex = this.state.charData[e.target.name].indexOf(e.target.value);
-	        if (e.target.checked) {
-	          this.state.charData[e.target.name].push(e.target.value);
-	        } else {
-	          if (arrayIndex > -1) {
-	            this.state.charData[e.target.name].splice(arrayIndex, 1);
+	      if (traitOptions) {
+	        resolveOptions();
+	      } else if (Array.isArray(_npcTraits2.default.traits[traitName])) {
+	        randomVal = _this.getRandom(_npcTraits2.default.traits[traitName]);
+
+	        return randomVal;
+	      }
+
+	      function resolveOptions() {
+	        resolveDependencies();
+	        resolveRanges();
+	        resolveUnwantedMatches();
+	        resolveConditionals();
+	        makeCombinations();
+	      }
+
+	      function resolveDependencies() {
+	        var dependency = "";
+	        var dependencyVal = "";
+	        var propsArray = [];
+
+	        if (traitOptions.dependencies) {
+	          dependency = _this.getRandom(traitOptions.dependencies) || []; // choose random dependency
+
+	          if (_this.state.traits[dependency]) {
+	            dependencyVal = _this.state.traits[dependency].toLowerCase();
+	            traitValues = _npcTraits2.default.traits[traitName][dependencyVal];
+
+	            if (traitOptions.subdependencies && traitOptions.subdependencies[dependencyVal]) {
+	              dependencyVal = traitOptions.subdependencies[dependencyVal];
+	              traitValues = traitValues[_this.state.traits[dependencyVal].toLowerCase()];
+	            }
+	          } else {
+	            for (var prop in _npcTraits2.default.traits[traitName]) {
+	              propsArray.push(prop);
+	            }
+	            dependencyVal = _this.getRandom(propsArray) || "other";
+	            traitValues = _npcTraits2.default.traits[traitName][dependencyVal];
 	          }
 	        }
 	      }
-	    }
-	  }, {
-	    key: 'getRaceDescription',
-	    value: function getRaceDescription(prop) {
-	      var selectedRace = "";
-	      var thisRaceData = {};
-	      var description = "";
 
-	      if (this.state.charData && this.state.charData.select_race) {
-	        selectedRace = this.state.charData.select_race;
-	        thisRaceData = utilities.getObjectByName(_races2.default, selectedRace);
-
-	        if (thisRaceData[prop]) {
-	          description = thisRaceData[prop];
+	      function resolveRanges() {
+	        if (traitOptions.isRange) {
+	          randomVal = Math.round(Math.random() * (traitValues[1] - traitValues[0]) + traitValues[0]);
 	        } else {
-	          description = "no " + prop + " data for this race";
+	          randomVal = _this.getRandom(traitValues);
 	        }
 	      }
 
-	      return description;
+	      function resolveUnwantedMatches() {
+	        var shouldNotEqual = traitOptions.shouldNotEqual || "";
+	        var i = 0;
+
+	        while (randomVal && randomVal === _this.state.traits[shouldNotEqual]) {
+	          randomVal = _this.getRandom(traitValues);
+	          if (i++ > 100) {
+	            break;
+	          }
+	        }
+	      }
+
+	      function resolveConditionals() {
+	        if (traitOptions.conditionals) {
+	          for (var condition in traitOptions.conditionals) {
+	            if (randomVal.toLowerCase() === condition) {
+	              randomVal = _this.getRandom(traitOptions.conditionals[condition]);
+
+	              _this.state.rootValues[randomVal] = condition;
+	            }
+	          }
+	        }
+	      }
+
+	      function makeCombinations() {
+	        var propName = traitName;
+	        var propVal = "";
+
+	        if (traitOptions.combine) {
+	          propVal = _this.state.rootValues[randomVal] || randomVal;
+
+	          traitOptions.combine.traits.forEach(function (trait) {
+	            propName += traitOptions.combine.separator + trait;
+	            propVal += traitOptions.combine.separator + _this.state.traits[trait];
+	            propVal = propVal.toLowerCase();
+	          });
+
+	          _this.state.traits[propName] = propVal;
+	        }
+	      }
+
+	      return randomVal;
 	    }
+
+	    /**
+	     * renders a trait
+	     * @param  {function} onUpdate - function to run on update
+	     * @return {react} - react element
+	     */
+
+	  }, {
+	    key: 'renderInput',
+	    value: function renderInput(traitName, label) {
+	      var _this = this;
+
+	      function replace() {
+	        _this.replaceInputWithRandom(traitName);
+	      }
+
+	      function toggleLock(e) {
+	        var isLocked = utilities.contains(_this.state.lockedInputs, traitName);
+
+	        if (isLocked) {
+	          e.target.className = e.target.className.replace('locked', 'unlocked');
+	          _this.state.lockedInputs.splice(_this.state.lockedInputs.indexOf(traitName), 1);
+	        } else {
+	          e.target.className = e.target.className.replace('unlocked', 'locked');
+	          _this.state.lockedInputs.push(traitName);
+	        }
+	      }
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'span',
+	          { className: 'trait-label' },
+	          label
+	        ),
+	        _react2.default.createElement(_submitButton.SubmitButton, {
+	          type: 'text',
+	          cssClass: 'btn-lock unlocked glyphicon glyphicon-lock',
+	          label: '',
+	          name: 'lock_input',
+	          onUpdate: toggleLock
+	        }),
+	        _react2.default.createElement(_textInput.TextInput, {
+	          type: 'text',
+	          name: traitName,
+	          onChange: _this.updateState
+	        }),
+	        _react2.default.createElement(_submitButton.SubmitButton, {
+	          type: 'text',
+	          cssClass: 'btn-refresh glyphicon glyphicon-refresh',
+	          label: '',
+	          name: 'get_random',
+	          onUpdate: replace
+	        })
+	      );
+	    }
+	  }, {
+	    key: 'renderMultipleInputs',
+	    value: function renderMultipleInputs(options) {
+	      var _this3 = this;
+
+	      options = options || {};
+	      var names = options.names || [];
+	      var range = options.range || false;
+	      var traitName = "";
+
+	      if (!names.length) {
+	        for (traitName in _npcTraits2.default.traits) {
+	          names.push(traitName);
+	        }
+	      }
+
+	      if (range && range.length === 2) {
+	        var min = range[0];
+	        var max = range[1];
+
+	        names.splice(0, min);
+	        names.splice(max, names.length);
+	      }
+
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        names.map(function (trait) {
+	          return _react2.default.createElement(
+	            'div',
+	            { key: trait },
+	            _this3.renderInput(trait, trait.toProperCase().replace(/\_/g, " "))
+	          );
+	        })
+	      );
+	    }
+
+	    /**
+	     * puts everything in the DOM
+	     */
+
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var _this = this;
+	      var genderPronounPossessive = getGenderPronoun(_this.state.traits.gender).possessive;
+	      var genderPronounPersonal = getGenderPronoun(_this.state.traits.gender).personal;
+
+	      function getGenderPronoun(gender) {
+	        var pronoun = "";
+	        var possessive = "";
+
+	        gender = gender || "";
+
+	        switch (gender.toLowerCase()) {
+	          case "male":
+	            return {
+	              personal: "He",
+	              possessive: "His"
+	            };
+	          case "female":
+	            return {
+	              personal: "She",
+	              possessive: "Her"
+	            };
+	          default:
+	            return {
+	              personal: "This character",
+	              possessive: "Their"
+	            };
+	        }
+	      }
+
+	      function renderDescription(traitName, useProperCase, prefix) {
+	        var traitValue = _this.state.traits[traitName].toLowerCase();
+	        var traitDescription = traitValue;
+	        var vowels = ["a", "e", "i", "o", "u"];
+
+	        prefix = traitDescription && prefix ? prefix : "";
+
+	        if (_npcTraits2.default.descriptions[traitName] && _npcTraits2.default.descriptions[traitName][traitValue]) {
+	          traitDescription = _npcTraits2.default.descriptions[traitName][traitValue].toLowerCase();
+	        }
+
+	        if (prefix === "a ") {
+	          vowels.map(function (num) {
+	            if (traitDescription.split('')[0].toLowerCase() === "" + num) {
+	              prefix = "an ";
+	            }
+	          });
+	        }
+
+	        if (useProperCase) {
+	          traitDescription = traitDescription.toProperCase();
+	        }
+
+	        return _react2.default.createElement(
+	          'span',
+	          { className: 'keyword' },
+	          prefix + traitDescription
+	        );
+	      }
+
 	      return _react2.default.createElement(
 	        'div',
-	        { className: 'container' },
+	        { className: 'container generator' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'row' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col-sm-12' },
+	            _react2.default.createElement(
+	              'h2',
+	              null,
+	              'NPC Generator'
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'row' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'col-sm-6 description-container' },
+	            _react2.default.createElement(
+	              'p',
+	              null,
+	              'You see ',
+	              renderDescription("physique", false, "a "),
+	              ' ',
+	              renderDescription("gender"),
+	              ' ',
+	              renderDescription("race", true),
+	              ' with ',
+	              renderDescription("distinguishing_marks"),
+	              ' wearing the clothes of ',
+	              renderDescription("occupation", false, "a "),
+	              '. ',
+	              genderPronounPersonal,
+	              ' looks to be in ',
+	              genderPronounPossessive.toLowerCase(),
+	              ' ',
+	              renderDescription("age_group"),
+	              ', has ',
+	              renderDescription("hair_color"),
+	              ' hair, and is ',
+	              renderDescription("height"),
+	              ' for a ',
+	              renderDescription("gender"),
+	              ' ',
+	              renderDescription("race", true),
+	              '. You can see ',
+	              renderDescription("emotion"),
+	              ' in ',
+	              genderPronounPossessive.toLowerCase(),
+	              ' ',
+	              renderDescription("eye_color"),
+	              ', ',
+	              renderDescription("eye_shape"),
+	              ' eyes.'
+	            ),
+	            _react2.default.createElement(
+	              'p',
+	              null,
+	              renderDescription("name", true),
+	              renderDescription("surname", true, " "),
+	              ' has a ',
+	              renderDescription("alignment_lawful"),
+	              '-',
+	              renderDescription("alignment_moral"),
+	              ' alignment and is ',
+	              renderDescription("high_ability"),
+	              ' yet ',
+	              renderDescription("low_ability"),
+	              '. Impressively, ',
+	              genderPronounPersonal.toLowerCase(),
+	              ' is ',
+	              renderDescription("talents"),
+	              '. ',
+	              renderDescription("name", true),
+	              ' often ',
+	              renderDescription("mannerisms"),
+	              ' and has a ',
+	              renderDescription("interaction_traits"),
+	              ' way of speaking. ',
+	              genderPronounPersonal,
+	              ' is always ',
+	              renderDescription("bonds"),
+	              ' and values ',
+	              renderDescription("ideals"),
+	              ' more than anything, but is troubled by ',
+	              genderPronounPossessive.toLowerCase(),
+	              ' ',
+	              renderDescription("flaws"),
+	              '.'
+	            ),
+	            _react2.default.createElement(
+	              'p',
+	              null,
+	              renderDescription("name", true),
+	              ' has a ',
+	              renderDescription("family_relationship"),
+	              ' relationship with ',
+	              genderPronounPossessive.toLowerCase(),
+	              ' family. ',
+	              genderPronounPersonal,
+	              ' is ',
+	              renderDescription("maritial_status"),
+	              ' with ',
+	              renderDescription("children"),
+	              '. The rest of ',
+	              genderPronounPossessive.toLowerCase(),
+	              ' family consists of ',
+	              renderDescription("siblings"),
+	              ', ',
+	              renderDescription("cousins"),
+	              ', ',
+	              renderDescription("aunts"),
+	              ', ',
+	              renderDescription("uncles"),
+	              ', and ',
+	              renderDescription("parents"),
+	              '.'
+	            )
+	          )
+	        ),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'row' },
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'col-sm-6' },
-	            _react2.default.createElement(
-	              'h1',
-	              null,
-	              'Character Creation Form'
-	            ),
-	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Name (Not your Character\'s Name)', name: 'player_name', onChange: this.update }),
-	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Character\'s Name', name: 'character_name', onChange: this.update }),
-	            _react2.default.createElement(_raceForm.RaceForm, { onUpdate: this.update, charData: this.state.charData }),
-	            _react2.default.createElement(_classForm.ClassForm, { onUpdate: this.update, charData: this.state.charData }),
-	            _react2.default.createElement(_backgroundForm.BackgroundForm, { onUpdate: this.update, charData: this.state.charData }),
-	            _react2.default.createElement(_characterDetailsForm.CharacterDetailsForm, { onUpdate: this.update, charData: this.state.charData, formDescription: this.getRaceDescription }),
-	            _react2.default.createElement(_abilityScoresForm.AbilityScoresForm, { onUpdate: this.update, charData: this.state.charData }),
-	            _react2.default.createElement(_skillsForm.SkillsForm, { charData: this.state.charData, onUpdate: this.update })
+	            _react2.default.createElement('br', null),
+	            _react2.default.createElement(_submitButton.SubmitButton, {
+	              type: 'text',
+	              label: 'Randomize All',
+	              name: 'randomize_all',
+	              onUpdate: this.updateAll
+	            }),
+	            this.renderMultipleInputs({
+	              names: ["gender", "race", "name", "surname", "alignment_lawful", "alignment_moral", "distinguishing_marks", "high_ability", "low_ability", "talents", "mannerisms", "interaction_traits", "bonds", "flaws", "ideals", "emotion", "social_class", "occupation", "useful_knowledge"]
+	            })
 	          ),
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'col-sm-6 output-column' },
-	            _react2.default.createElement(_characterSheet.CharacterSheet, { charData: this.state.charData })
+	            { className: 'col-sm-6' },
+	            _react2.default.createElement(
+	              'h3',
+	              null,
+	              'Physical'
+	            ),
+	            this.renderMultipleInputs({
+	              names: ["eye_color", "eye_shape", "hair_color", "age_group", "physique", "height"]
+	            }),
+	            _react2.default.createElement(
+	              'h3',
+	              null,
+	              'Family'
+	            ),
+	            this.renderMultipleInputs({
+	              names: ["parents", "siblings", "cousins", "aunts", "uncles", "children", "family_relationship", "maritial_status"]
+	            })
 	          )
 	        )
 	      );
 	    }
 	  }]);
 
-	  return DndForm;
+	  return Generator;
 	}(_react2.default.Component);
 
-	_reactDom2.default.render(_react2.default.createElement(DndForm, null), document.querySelector('main'));
+	_reactDom2.default.render(_react2.default.createElement(Generator, null), document.querySelector('main'));
 
 /***/ },
 /* 1 */
@@ -20062,2264 +20462,2510 @@
 /* 160 */
 /***/ function(module, exports) {
 
-	module.exports = [
-		{
-			"name": "Dragonborn",
-			"id": "dragonborn",
-			"age": "Young dragonborn grow quickly. They walk hours after hatching, attain the size and development of a 10-year-old human child by the age of 3, and reach adulthood by 15. They live to be around 80.",
-			"alignment": "Dragonborn tend to extremes, making a conscious choice for one side or the other in the cosmic war between good and evil (represented by Hahumut and Tiamat, respectively). Most dragonborn are good, but those who side with Tiamat can be terrible villains.",
-			"size": "Dragonborn are taller and heavier than humans, standing well over 6 feet tall and averaging almost 250 pounds. Your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"draconic"
-				]
-			},
-			"ability_score_increase": {
-				"str": "2",
-				"cha": "1"
-			},
-			"feats": [
-				"draconic_ancestry",
-				"breath_weapon",
-				"draconic_damage_resistance"
-			],
-			"draconic_ancestry": [
-				{
-					"name": "Black",
-					"damage_type": "Acid",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Blue",
-					"damage_type": "Lightning",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Brass",
-					"damage_type": "Fire",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Bronze",
-					"damage_type": "Lightning",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Copper",
-					"damage_type": "Acid",
-					"breath_weapon": "5 by 30 ft. line (Dex. save)"
-				},
-				{
-					"name": "Gold",
-					"damage_type": "Fire",
-					"breath_weapon": "15 ft. cone (Dex. save)"
-				},
-				{
-					"name": "Green",
-					"damage_type": "Poison",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				},
-				{
-					"name": "Red",
-					"damage_type": "Fire",
-					"breath_weapon": "15 ft. cone (Dex. save)"
-				},
-				{
-					"name": "Silver",
-					"damage_type": "Cold",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				},
-				{
-					"name": "White",
-					"damage_type": "Cold",
-					"breath_weapon": "15 ft. cone (Con. save)"
-				}
-			]
-		},
-		{
-			"name": "Dwarf",
-			"id": "dwarf",
-			"alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
-			"age": "Dwarves mature at the same rate as humans, but they’re considered young until they reach the age of 50. On average, they live about 350 years.",
-			"size": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
-			"speed": "25",
-			"ability_score_increase": {
-				"con": "2"
-			},
-			"feats": [
-				"darkvision",
-				"stonecunning",
-				"dwarven_resiliance",
-				"armor_speed"
-			],
-			"proficiencies": {
-				"weapons": [
-					"battleaxe",
-					"handaxe",
-					"light hammer",
-					"warhammer"
-				],
-				"tools": [
-					"choice"
-				],
-				"tools_choice": [
-					"mason",
-					"smith",
-					"brewer"
-				],
-				"languages": [
-					"common",
-					"dwarvish"
-				]
-			},
-			"subraces": [
-				{
-					"name": "Hill Dwarf",
-					"id": "hill_dwarf",
-					"ability_score_increase": {
-						"wis": "1"
-					},
-					"stat_bonus": {
-						"hp": "1"
-					},
-					"feats": [
-						"dwarven_toughness"
-					]
-				},
-				{
-					"name": "Mountain Dwarf",
-					"id": "mountain_dwarf",
-					"ability_score_increase": {
-						"str": "2"
-					},
-					"proficiencies": {
-						"armor": [
-							"light, medium"
-						]
-					}
-				}
-			],
-			"notes": {
-				"age": "Dwarves reach adulthood at age 40 and live about 350 years.",
-				"alignment": "Most dwarves are lawful",
-				"weight": "Dwarves average about 150 lbs and are medium sized creatures"
-			}
-		},
-		{
-			"name": "Elf",
-			"speed": "30",
-			"age": "Elves reach adulthood around age 100 and live about 750 years.",
-			"alignment": "Elves love freedom, variety, and self-expression, so they lean strongly toward the gentler aspects of chaos. They value and protect others' freedom as well as their own, and they are more often good than not. The drow are an exception; their exile into the Underdark has made them vicious and dangerous. Drow are more often evil than not.",
-			"size": "Elves are slender, medium sized creatures. Your size is Medium.",
-			"ability_score_increase": {
-				"dex": "2"
-			},
-			"feats": [
-				"darkvision",
-				"fey_ancestry",
-				"trance"
-			],
-			"proficiencies": {
-				"skills": [
-					"perception"
-				],
-				"languages": [
-					"common",
-					"elvish"
-				]
-			},
-			"subraces": [
-				{
-					"name": "High Elf",
-					"id": "high_elf",
-					"ability_score_increase": {
-						"int": "1"
-					},
-					"proficiencies": {
-						"weapons": [
-							"longsword",
-							"shortsword",
-							"shortbow",
-							"longbow"
-						],
-						"languages": [
-							"choice"
-						]
-					},
-					"feats": [
-						"cantrip_wizard",
-						"extra_language"
-					]
-				},
-				{
-					"name": "Wood Elf",
-					"id": "wood_elf",
-					"ability_score_increase": {
-						"wis": "1"
-					},
-					"stat_bonus": {
-						"speed": "5"
-					},
-					"proficiencies": {
-						"weapons": [
-							"longsword",
-							"shortsword",
-							"shortbow",
-							"longbow"
-						]
-					},
-					"feats": [
-						"mask_of_the_wild"
-					]
-				},
-				{
-					"name": "Dark Elf",
-					"id": "dark_elf",
-					"ability_score_increase": {
-						"cha": "1"
-					},
-					"stat_bonus": {
-						"speed": "5"
-					},
-					"proficiencies": {
-						"weapons": [
-							"rapier",
-							"shortsword",
-							"hand_crossbow"
-						]
-					},
-					"feats": [
-						"superior_darkvision",
-						"drow_magic"
-					]
-				}
-			]
-		},
-		{
-			"name": "Gnome",
-			"id": "gnome",
-			"age": "Gnomes mature at the same rate humans do, and most are expected to settle down into an adult life by around age 40. They can live 350 to almost 500 years.",
-			"alignment": "Gnomes are most often good. Those who tend toward law are sages, engineers, researchers, scholars, investigators, or inventors. Those who tend toward chaos are minstrels, tricksters, wanderers, and fanciful jewelers. Gnomes are good-hearted, and even the tricksters among them are more playful than viscous.",
-			"size": "Gnomes are between 3-4 feet tall and average around 40 lbs. Your size is Small.",
-			"speed": "25",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"gnomish"
-				]
-			},
-			"ability_score_increase": {
-				"int": "2"
-			},
-			"feats": [
-				"darkvision",
-				"gnome_cunning"
-			],
-			"subraces": [
-				{
-					"name": "Forest Gnome",
-					"id": "forest_gnome",
-					"ability_score_increase": {
-						"dex": "1"
-					},
-					"feats": [
-						"natural_illusionist",
-						"speak_with_small_beasts"
-					]
-				},
-				{
-					"name": "Rock Gnome",
-					"id": "rock_gnome",
-					"ability_score_increase": {
-						"con": "1"
-					},
-					"feats": [
-						"artificers_lore",
-						"tinker"
-					],
-					"proficiencies": {
-						"tools": [
-							"tinker"
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "Goblin",
-			"id": "goblin",
-			"age": "Goblins mature faster than humans, reaching adulthood at around age 12. They also age noticeably faster than humans, and even the most cautious goblins rarely live longer than 50 years.",
-			"alignment": "Most goblins are wildly chaotic, though they have no particular inclination toward good or evil.",
-			"size": " Goblins average about 3 feet tall and weigh about 40 pounds. Your size is Small",
-			"speed": "25",
-			"ability_score_increase": {
-				"con": "2"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"goblin"
-				]
-			},
-			"feats": [
-				"darkvision",
-				"grit"
-			],
-			"subraces": [
-				{
-					"name": "Grotag Tribe Goblin",
-					"id": "grotag_goblin",
-					"proficiencies": {
-						"skills": [
-							"animal_handling"
-						]
-					}
-				},
-				{
-					"name": "Lavastep Tribe Goblin",
-					"id": "lavastep_goblin",
-					"feats": [
-						"lavastep_grit"
-					]
-				},
-				{
-					"name": "Tuktuk Tribe Goblin",
-					"id": "tuktuk_goblin",
-					"proficiencies": {
-						"tools": [
-							"thief"
-						]
-					}
-				}
-			]
-		},
-		{
-			"name": "Half-Elf",
-			"id": "halfelf",
-			"age": "Half-elves mature at the same rate humans do and reach adulthood around the age of 20. They live much longer than humans, however, often exceeding 180 years.",
-			"alignment": "Half-elves share the chaotic bent of their elven heritage. They value both personal freedom and creative expression, demonstrating neither love of leaders nore desire for followers. They chafe at rules, resent others' demands, and sometimes prove unreliable, or at least unpredictable.",
-			"size": "Half-elves are about the same size as humans, ranging from 5-6 feet tall. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"cha": "2"
-			},
-			"ability_score_choices": "2",
-			"feats": [
-				"darkvision",
-				"fey_ancestry",
-				"skill_versatility"
-			],
-			"proficiencies": {
-				"skills": [
-					"choice",
-					"choice"
-				],
-				"skills_choice": [
-					"acrobatics",
-					"animal_handling",
-					"arcana",
-					"athletics",
-					"deception",
-					"history",
-					"insight",
-					"intimidation",
-					"investigation",
-					"medicine",
-					"nature",
-					"perception",
-					"persuasion",
-					"religion",
-					"sleight_of_hand",
-					"stealth",
-					"survival"
-				],
-				"languages": [
-					"common",
-					"elvish",
-					"choice"
-				]
-			}
-		},
-		{
-			"name": "Half-Orc",
-			"id": "halforc",
-			"age": "Half-orcs mature a little faster than humans, reaching adulthood around age 14. They age noticeably faster and rarely live longer than 75 years.",
-			"alignment": "Half-orcs inherit a tendency toward chaos from their orc parents and are not strongly inclined toward good. Half-orcs raised among orcs are willing to live out their lives among them are usually evil.",
-			"size": "Half-orcs are somewhat larger and bulkier than humans, and they range from 5 to well over 6 feet tall. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"con": "1",
-				"str": "2"
-			},
-			"feats": [
-				"darkvision",
-				"menacing",
-				"relentless_endurance",
-				"savage_attacks"
-			],
-			"proficiencies": {
-				"skills": [
-					"indimidation"
-				],
-				"languages": [
-					"common",
-					"orc"
-				]
-			}
-		},
-		{
-			"name": "Halfling",
-			"id": "halfling",
-			"age": "A halfing reaches adulthood at the age of 20 and generally lives into the middle of his or her second century.",
-			"alignment": "Most halflings are lawful good. As a rule, they are good-hearted and kind, hate to see others in pain, and have no tolerance for oppression. They are also very orderly and traditional, leaning heavily on the support of their community and the comfort of their old ways",
-			"size": "Halflings average around 3 ft. tall and weigh around 40-45 lbs. Your size is small.",
-			"speed": "25",
-			"ability_score_increase": {
-				"dex": "2"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"halfling"
-				]
-			},
-			"feats": [
-				"lucky",
-				"brave",
-				"halfling_nimbleness"
-			],
-			"subraces": [
-				{
-					"name": "Lightfoot Halfling",
-					"id": "lightfoot_halfling",
-					"ability_score_increase": {
-						"cha": "1"
-					},
-					"feats": [
-						"naturally_stealthy"
-					]
-				},
-				{
-					"name": "Stout Halfling",
-					"id": "stout_halfling",
-					"ability_score_increase": {
-						"con": "1"
-					},
-					"feats": [
-						"stout_resiliance"
-					]
-				}
-			]
-		},
-		{
-			"name": "Human",
-			"id": "human",
-			"age": "Humans reach adulthood in their late teens and live less than a century",
-			"alignment": "Humans tend toward no particular alignment. The best and worst are found among them.",
-			"size": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"choice"
-				]
-			},
-			"ability_score_increase": {
-				"con": "1",
-				"str": "1",
-				"dex": "1",
-				"cha": "1",
-				"int": "1",
-				"wis": "1"
-			}
-		},
-		{
-			"name": "Kor",
-			"id": "kor",
-			"age": "Kor mature at the same rate as humans and live about as long.",
-			"alignment": "Most kor are lawful good, with a strong dedication to community and the traditions of their ancestors.",
-			"size": "Kor average nearly 6 feet tall, but are much lighter and more slender than humans. Your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"kor"
-				],
-				"skills": [
-					"athletics",
-					"acrobatics"
-				]
-			},
-			"ability_score_increase": {
-				"dex": "2",
-				"wis": "1"
-			},
-			"feats": [
-				"lucky",
-				"brave",
-				"kor_climbing"
-			]
-		},
-		{
-			"name": "Merfolk",
-			"id": "merfolk",
-			"age": "Merfolk mature at the same rate humans do and reach adulthood around the age of 20. They live considerably longer than humans, though, often reaching well over 100 years.",
-			"alignment": "Most merfolk are neutral, though merfolk of the Emeria and Cosi creeds have chaotic leanings.",
-			"size": "Merfolk are about the same size and build as humans. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"cha": "1"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"merfolk",
-					"choice"
-				]
-			},
-			"feats": [
-				"amphibeous",
-				"merfolk_swim_speed"
-			],
-			"subraces": [
-				{
-					"name": "Emeria (Wind) Merfolk",
-					"id": "emeria_merfolk",
-					"ability_score_increase": {
-						"wis": "2"
-					},
-					"proficiencies": {
-						"skills": [
-							"deception",
-							"persuasion"
-						]
-					},
-					"feats": [
-						"druid_cantrip"
-					]
-				},
-				{
-					"name": "Ula (Water) Merfolk",
-					"id": "ula_merfolk",
-					"ability_score_increase": {
-						"int": "2"
-					},
-					"proficiencies": {
-						"tools": [
-							"navigator"
-						],
-						"skills": [
-							"survival"
-						]
-					},
-					"feats": [
-						"wizard_cantrip"
-					]
-				},
-				{
-					"name": "Cosi (Trickster) Merfolk",
-					"id": "cosi_merfolk",
-					"ability_score_increase": {
-						"cha": "1",
-						"int": "1"
-					},
-					"proficiencies": {
-						"skills": [
-							"sleight_of_hand",
-							"stealth"
-						]
-					},
-					"feats": [
-						"bard_cantrip"
-					]
-				}
-			]
-		},
-		{
-			"name": "Moogle",
-			"id": "moogle",
-			"age": "Moogles reach adulthood within a few months, but can live for hundreds of years.",
-			"alignment": "Moogles tend to be either Neutral or Good. Moogles usually have their own agenda, but they do follow rules of their trade and strive to get things done by their due date. Moogles can be ethier Chaotic or Lawful.",
-			"size": " Moogles average about 3 feet tall and weigh about 40 pounds. Your size is Small",
-			"speed": "25",
-			"ability_score_increase": {
-				"cha": "2",
-				"wis": "1"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"moogle"
-				],
-				"weapons": [
-					"polearms",
-					"spears"
-				],
-				"tools": [
-					"choice"
-				],
-				"tools_choice": [
-					"alchemist",
-					"brewer",
-					"calligrapher",
-					"carpenter",
-					"cartographer",
-					"cobbler",
-					"cook ",
-					"glassblower",
-					"jeweler",
-					"leatherworker",
-					"mason",
-					"painter",
-					"potter",
-					"smith",
-					"tinker",
-					"weaver",
-					"woodcarver"
-				],
-				"armor": [
-					"shields"
-				]
-			},
-			"feats": [
-				"darkvision",
-				"moogle_wings",
-				"snow_camouflage",
-				"mask_of_the_wild",
-				"naturally_stealthy"
-			]
-		},
-		{
-			"name": "Tiefling",
-			"id": "tiefling",
-			"age": "Tieflings mature at the same rate as humans but live a few years longer.",
-			"alignment": "Tieflings might not have an innate tendency toward evil, but many of them end up there. Evil or not, an independent nature inclines many tieflings toward a chaotic alignment.",
-			"size": "Tieflings are about he same size and build as humans. Your size is Medium.",
-			"speed": "30",
-			"proficiencies": {
-				"languages": [
-					"common",
-					"infernal"
-				]
-			},
-			"ability_score_increase": {
-				"cha": "2",
-				"int": "1"
-			},
-			"feats": [
-				"hellish_resistance",
-				"infernal_legacy",
-				"darkvision"
-			]
-		},
-		{
-			"name": "Vampire",
-			"id": "vampire",
-			"age": "Vampires don’t mature and age in the same way that other races do. Every living vampire is either a bloodchief, infected by Ulamog’s influence in the distant reaches of history, or was spawned by a bloodchief from a living human. Most vampires are thus very old, but few have any memory of their earliest years.",
-			"alignment": "Vampires have no innate tendency toward evil, but consuming the life energy of other creatures often pushes them to that end. Regardless of their moral bent, the strict hierarchies of their bloodchiefs inclines them toward a lawful alignment.",
-			"size": "Vampires are about the same size and build as humans. Your size is Medium.",
-			"speed": "30",
-			"ability_score_increase": {
-				"int": "1",
-				"cha": "2"
-			},
-			"proficiencies": {
-				"languages": [
-					"common",
-					"vampire"
-				]
-			},
-			"feats": [
-				"darkvision",
-				"vampiric_resistance",
-				"blood_thirst"
-			]
-		}
-	];
-
-/***/ },
-/* 161 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.CharacterSheet = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _proficiencySheet = __webpack_require__(162);
-
-	var _featuresSheet = __webpack_require__(166);
-
-	var _abilityScoresSheet = __webpack_require__(167);
-
-	var _profileSheet = __webpack_require__(168);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * CharacterSheet
-	 *
-	 * Represents the output for the character builder form
-	 */
-
-	var CharacterSheet = exports.CharacterSheet = function (_React$Component) {
-	  _inherits(CharacterSheet, _React$Component);
-
-	  function CharacterSheet(props) {
-	    _classCallCheck(this, CharacterSheet);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(CharacterSheet).call(this, props));
-	  }
-
-	  _createClass(CharacterSheet, [{
-	    key: 'render',
-
-
-	    /**
-	     * render - renders content to the DOM
-	     *
-	     * @return {type}  view for CharacterSheet
-	     */
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'character-sheet' },
-	        _react2.default.createElement(
-	          'h1',
-	          null,
-	          'Character Sheet'
-	        ),
-	        _react2.default.createElement(_profileSheet.ProfileSheet, { charData: this.props.charData }),
-	        _react2.default.createElement(_abilityScoresSheet.AbilityScoresSheet, { charData: this.props.charData }),
-	        _react2.default.createElement(_proficiencySheet.ProficiencySheet, { charData: this.props.charData }),
-	        _react2.default.createElement(_featuresSheet.FeaturesSheet, { charData: this.props.charData })
-	      );
-	    }
-	  }]);
-
-	  return CharacterSheet;
-	}(_react2.default.Component);
-
-/***/ },
-/* 162 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.ProficiencySheet = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _characterClasses = __webpack_require__(163);
-
-	var _characterClasses2 = _interopRequireDefault(_characterClasses);
-
-	var _backgrounds = __webpack_require__(164);
-
-	var _backgrounds2 = _interopRequireDefault(_backgrounds);
-
-	var _feats = __webpack_require__(165);
-
-	var _feats2 = _interopRequireDefault(_feats);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * CharacterSheet
-	 *
-	 * Represents the output for the character builder form
-	 */
-
-	var ProficiencySheet = exports.ProficiencySheet = function (_React$Component) {
-	  _inherits(ProficiencySheet, _React$Component);
-
-	  function ProficiencySheet(props) {
-	    _classCallCheck(this, ProficiencySheet);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ProficiencySheet).call(this, props));
-	  }
-
-	  _createClass(ProficiencySheet, [{
-	    key: 'getProficiencies',
-
-
-	    /**
-	     * getProficiencies - gets the markup for the list of proficiences from selected type
-	     *
-	     * @param  {string} type type of character proficiencies to get (race, class, background)
-	     * @return {react object}      view for the list of proficiencies
-	     */
-
-	    value: function getProficiencies(type) {
-	      var thisCharData = this.props.charData || {};
-	      var proficiencies = {};
-	      var id = -1;
-
-	      proficiencies[type] = [];
-
-	      if (thisCharData.proficiencies && thisCharData.proficiencies[type]) {
-	        proficiencies[type] = proficiencies[type].concat(thisCharData.proficiencies[type]);
-	      }
-
-	      if (proficiencies[type]) {
-	        return proficiencies[type].map(function (obj) {
-	          id += 1;
-
-	          if (obj !== "choice") {
-	            return _react2.default.createElement(
-	              'li',
-	              { key: id },
-	              obj
-	            );
-	          }
-	        });
-	      }
-	    }
-
-	    /**
-	     * render - renders content to the DOM
-	     *
-	     * @return {type}  view for CharacterSheet
-	     */
-
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'proficiency-sheet' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Proficiencies'
-	        ),
-	        _react2.default.createElement(
-	          'h4',
-	          null,
-	          'Skills'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getProficiencies('skills')
-	        ),
-	        _react2.default.createElement(
-	          'h4',
-	          null,
-	          'Saving Throws'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getProficiencies('saving_throws')
-	        ),
-	        _react2.default.createElement(
-	          'h4',
-	          null,
-	          'Tools'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getProficiencies('tools')
-	        ),
-	        _react2.default.createElement(
-	          'h4',
-	          null,
-	          'Weapons'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getProficiencies('weapons')
-	        ),
-	        _react2.default.createElement(
-	          'h4',
-	          null,
-	          'Languages'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getProficiencies('languages')
-	        )
-	      );
-	    }
-	  }]);
-
-	  return ProficiencySheet;
-	}(_react2.default.Component);
-
-/***/ },
-/* 163 */
-/***/ function(module, exports) {
-
-	module.exports = [
-		{
-			"name": "Barbarian",
-			"id": "barbarian",
-			"description": "A fierce warrior of primitive background who can enter a battle rage.",
-			"primary_abilities": [
-				"str"
-			],
-			"hit_dice": "d12",
-			"hp": "12",
-			"proficiencies": {
-				"armor": [
-					"light",
-					"medium",
-					"shields"
-				],
-				"weapons": [
-					"simple_weapon",
-					"martial_weapon"
-				],
-				"saving_throws": [
-					"str",
-					"con"
-				],
-				"skills": [
-					"choice",
-					"choice"
-				],
-				"skills_choice": [
-					"animal_handling",
-					"athletics",
-					"intimidation",
-					"nature",
-					"perception",
-					"survival"
-				]
-			},
-			"starting_equipment": {
-				"choices": [
-					[
-						"greataxe",
-						"martial_weapon"
-					],
-					[
-						"handaxes",
-						"simple_weapon"
-					]
-				],
-				"given": [
-					"explorers_pack",
-					"javelins"
-				]
-			}
-		},
-		{
-			"name": "Bard",
-			"id": "bard",
-			"description": "An inspiring magician whose power echoes the music of creation.",
-			"primary_abilities": [
-				"cha"
-			],
-			"hit_dice": "d8",
-			"base_stats": {
-				"hp": "8",
-				"ac": "",
-				"ac_mods": []
-			},
-			"proficiencies": {
-				"armor": [
-					"light"
-				],
-				"weapons": [
-					"simple_weapon",
-					"hand_crossbows",
-					"longswords",
-					"rapiers",
-					"shortswords"
-				],
-				"saving_throws": [
-					"dex",
-					"cha"
-				],
-				"skills": [
-					"choice",
-					"choice",
-					"choice"
-				],
-				"skill_choices": [
-					"acrobatics",
-					"animal_handling",
-					"arcana",
-					"athletics",
-					"deception",
-					"history",
-					"insight",
-					"intimidation",
-					"investigation",
-					"medicine",
-					"nature",
-					"perception",
-					"persuasion",
-					"religion",
-					"sleight_of_hand",
-					"stealth",
-					"survival"
-				],
-				"tools": [
-					"any_instrument",
-					"any_instrument",
-					"any_instrument"
-				]
-			},
-			"starting_equipment": {
-				"choices": [
-					[
-						"rapier",
-						"longsword",
-						"simple_weapon"
-					],
-					[
-						"diplomats_pack",
-						"explorers_pack"
-					],
-					[
-						"any_instrument"
-					]
-				],
-				"given": [
-					"leather_armor",
-					"dagger"
-				]
-			},
-			"spells": {
-				"modifier": "cha",
-				"save_dc": 8,
-				"known": {
-					"lvl00": 2,
-					"lvl01": 4
-				}
-			},
-			"feats": [
-				"bardic_inspiration"
-			]
-		},
-		{
-			"name": "Cleric",
-			"id": "cleric",
-			"description": "A priestly champion who wields divine magic in service of a higher power",
-			"primary_abilities": [
-				"wis"
-			],
-			"hit_dice": "d8"
-		},
-		{
-			"name": "Druid",
-			"id": "druid",
-			"description": "A priest of the Old Faith, wielding the powers of nature--moonlight and plant growth, fire and lightning--and adopting animal forms",
-			"primary_abilities": [
-				"wis"
-			],
-			"hit_dice": "d8"
-		},
-		{
-			"name": "Fighter",
-			"id": "fighter",
-			"description": "A master of matrial combat, skilled with a variety of weapons and armor",
-			"primary_abilities": [
-				"str",
-				"dex"
-			],
-			"hit_dice": "d10"
-		},
-		{
-			"name": "Monk",
-			"id": "monk",
-			"description": "A master of martial arts, harnessing the power of the body in pursuid of physical and spiritual perfection",
-			"primary_abilities": [
-				"dex",
-				"wis"
-			],
-			"hit_dice": "d8"
-		},
-		{
-			"name": "Paladin",
-			"id": "paladin",
-			"description": "A holy warrior bound to a sacred oath",
-			"primary_abilities": [
-				"str",
-				"cha"
-			],
-			"hit_dice": "d10"
-		},
-		{
-			"name": "Ranger",
-			"id": "ranger",
-			"description": "A warrior who uses martial prowess and nature magic to combat threats on the edges of civilization",
-			"primary_abilities": [
-				"dex",
-				"wis"
-			],
-			"hit_dice": "d10"
-		},
-		{
-			"name": "Rogue",
-			"id": "rogue",
-			"description": "A scoundrel who uses stealth and trickery to overcome obstacles and enemies",
-			"primary_abilities": [
-				"dex"
-			],
-			"hit_dice": "d8"
-		},
-		{
-			"name": "Sorcerer",
-			"id": "sorcerer",
-			"description": "A spellcaster who draws on inherent magic from a gift of bloodline",
-			"primary_abilities": [
-				"cha"
-			],
-			"hit_dice": "d6"
-		},
-		{
-			"name": "Warlock",
-			"id": "warlock",
-			"description": "A wielder of magic that is derived from a bargain with an extraplanar ally",
-			"primary_abilities": [
-				"cha"
-			],
-			"hit_dice": "d8"
-		},
-		{
-			"name": "Wizard",
-			"id": "wizard",
-			"description": "A scholarly magic-user capable of manipulating the structures of reality",
-			"primary_abilities": [
-				"int"
-			],
-			"hit_dice": "d6"
-		},
-		{
-			"name": "Template",
-			"id": "this_template",
-			"primary_abilities": [],
-			"hit_dice": "",
-			"base_stats": {
-				"hp": "",
-				"ac": "",
-				"ac_mods": []
-			},
-			"proficiencies": {
-				"armor": [],
-				"weapons": [],
-				"saving_throws": [],
-				"skills": [],
-				"skill_choices": []
-			},
-			"starting_equipment": {
-				"choices": [
-					[],
-					[]
-				],
-				"given": []
-			},
-			"feats": []
-		}
-	];
-
-/***/ },
-/* 164 */
-/***/ function(module, exports) {
-
-	module.exports = [
-		{
-			"name": "Acolyte"
-		},
-		{
-			"name": "Criminal",
-			"feats": [
-				"has a criminal contact"
-			]
-		},
-		{
-			"name": "Folk Hero"
-		},
-		{
-			"name": "Soldier"
-		},
-		{
-			"name": "Fisherman"
-		},
-		{
-			"name": "Gambler"
-		},
-		{
-			"name": "Noble"
-		},
-		{
-			"name": "Miner"
-		},
-		{
-			"name": "Jeweler"
-		},
-		{
-			"name": "Beggar"
-		},
-		{
-			"name": "Statesman"
-		},
-		{
-			"name": "Slave"
-		},
-		{
-			"name": "Slaver"
-		},
-		{
-			"name": "Shephard"
-		}
-	];
-
-/***/ },
-/* 165 */
-/***/ function(module, exports) {
-
 	module.exports = {
-		"darkvision": {
-			"name": "Darkvision",
-			"description": "You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light."
+		"descriptions": {
+			"high_ability": {
+				"strength": "Powerful, brawny, and strong as an ox (high Strength)",
+				"dexterity": "Lithe, agile, and graceful (high Dexterity)",
+				"constitution": "Hardy, hale, and healthy (high Constitution)",
+				"intelligence": "Studious, learned, and inquisitive (high Intelligence)",
+				"wisdom": "Perceptive, spiritual, and insightful (high Wisdom)",
+				"charisma": "Persuasive, forceful, and a born leader (high Charisma)",
+				"none": "Not spectactular at anything (no high abilities)"
+			},
+			"low_ability": {
+				"strength": "Feeble and scrawny (low Strength)",
+				"dexterity": "Clumsy and fumbling (low Dexterity)",
+				"constitution": "Sickly and pale (low Constitution)",
+				"intelligence": "Dim-witted and slow (low Intelligence)",
+				"wisdom": "Oblivious and absent minded (low Wisdom)",
+				"charisma": "Dull and boring (low Charisma)",
+				"none": "Well rounded (no low abilities)"
+			}
 		},
-		"fey_ancestry": {
-			"name": "Fey Ancestry",
-			"description": "You have advantage on saving throws against being charmed, and magic can't put you to sleep."
+		"options": {
+			"age": {
+				"dependencies": [
+					"race"
+				],
+				"isRange": "true"
+			},
+			"flaws": {
+				"conditionals": {
+					"specific phobia": [
+						"Fear of spiders",
+						"Fear of bugs",
+						"Fear of death",
+						"Fear of failure",
+						"Fear of loneliness",
+						"Fear of getting old",
+						"Fear of open or crowded spaces",
+						"Fear of water"
+					]
+				}
+			},
+			"high_ability": {
+				"shouldNotEqual": "low_ability",
+				"dependencies": [
+					"race"
+				]
+			},
+			"ideals": {
+				"dependencies": [
+					"alignment_moral",
+					"alignment_lawful"
+				]
+			},
+			"low_ability": {
+				"shouldNotEqual": "high_ability",
+				"dependencies": [
+					"race"
+				]
+			},
+			"name": {
+				"dependencies": [
+					"race_gender"
+				]
+			},
+			"occupation": {
+				"dependencies": [
+					"social_class"
+				],
+				"subdependencies": {
+					"royal": "gender"
+				}
+			},
+			"race": {
+				"conditionals": {
+					"elf": [
+						"Wood elf",
+						"High elf",
+						"Drow"
+					],
+					"dwarf": [
+						"Mountain dwarf",
+						"Hill dwarf"
+					],
+					"halfling": [
+						"Stout halfling",
+						"Lightfoot halfling"
+					],
+					"gnome": [
+						"Forest gnome",
+						"Rock gnome"
+					]
+				},
+				"combine": {
+					"separator": "_",
+					"traits": [
+						"gender"
+					]
+				}
+			},
+			"surname": {
+				"dependencies": [
+					"race_gender"
+				]
+			},
+			"talents": {
+				"conditionals": {
+					"great at one game": [
+						"Great at \"Three Dragon Ante\"",
+						"Great at Chess",
+						"Great at Card games",
+						"Great at Dice games"
+					],
+					"able to play an instrument": [
+						"Able to play the lute beautifully",
+						"Able to play the bagpipes beautifully",
+						"Able to play the drum beautifully",
+						"Able to play the dulcimer beautifully",
+						"Able to play the flute beautifully",
+						"Able to play the lyre beautifully",
+						"Able to play the horn beautifully",
+						"Able to play the pan flute beautifully",
+						"Able to play the shawm beautifully",
+						"Able to play the viol beautifully"
+					]
+				}
+			}
 		},
-		"trance": {
-			"name": "Trance",
-			"description": "You don't need to sleep. Instead, you meditate deeply, remaining semiconscious for 4 hours a day. After resting in this way, you gain the same benefit that a human does from 8 hours of sleep."
-		},
-		"dwarven_resiliance": {
-			"name": "Dwarven Resiliance",
-			"description": "You have advantage on saving throws against poison, and you have resistance against poison damage."
-		},
-		"dwarven_toughness": {
-			"name": "Dwarven Toughness",
-			"description": "Your hit point maximum increases by 1 every time you gain a level (in addition to your usual hp increase)."
-		},
-		"stonecunning": {
-			"name": "Stonecunning",
-			"description": "Whenever you make an Intelligence (History) check related to the origin of stonework, you are considered proficient in the History skill and add double your proficiency bonus to the check, instead of your normal proficiency bonus."
-		},
-		"armor_speed": {
-			"name": "Armor Speed",
-			"description": "Your speed is not reduced by wearing heavy armor."
-		},
-		"cantrip_wizard": {
-			"name": "Wizard Cantrip",
-			"description": "You know one cantrip of your choice from the wizard spell list. Intelligence is your spellcasting ability for it."
-		},
-		"extra_language": {
-			"name": "Extra Language",
-			"description": "You know one extra language of your choice."
-		},
-		"mask_of_the_wild": {
-			"name": "Mask of the Wild",
-			"description": "You can attempt to hide even when you are only lightly obscured by foliage, heavy rain, falling snow, mist, and other natural phenomena."
-		},
-		"superior_darkvision": {
-			"name": "Superior Darkvision",
-			"description": "Your darkvision has a radius of 120 feet."
-		},
-		"sunlight_sensitivity": {
-			"name": "Sunlight Sensitivity",
-			"description": "You have disadvantage on attack rolls and on Wisdom (Perception) checks that rely on sight when you, the target of your attack, or whatever you are trying to perceive is in direct sunlight."
-		},
-		"drow_magic": {
-			"name": "Drow Magic",
-			"description": "You know the dancing lights cantrip. When you reach 3rd level, you can cast the faerie fire spell once with this trait and regain the ability to do so when you finish a long rest. When you reach 5th level, you can cast the darkness spell once with this trait and regain the ability to do so when you finish a long rest. Charisma is your spellcasting ability for these spells."
-		},
-		"lucky": {
-			"name": "Lucky",
-			"description": "When you roll a 1 on the d20 for an attack roll, ability check, or saving throw, you can reroll the die and must use the new roll."
-		},
-		"brave": {
-			"name": "Brave",
-			"description": "You have advantage on saving throws against being frightened."
-		},
-		"halfling_nimbleness": {
-			"name": "Halfling Nimbleness",
-			"description": "You can move through the space of any creature that is of a size larger than yours."
-		},
-		"naturally_stealthy": {
-			"name": "Naturally Stealthy",
-			"description": "You can attempt to hide even when you are obscured only by a creature that is at least one size larger than you."
-		},
-		"stout_resiliance": {
-			"name": "Stout Resiliance",
-			"description": "You have advantage on saving throws against poison, and you have resistance against poison damage."
-		},
-		"breath_weapon": {
-			"name": "Breath Weapon",
-			"description": "You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation. <br> When you use your breath weapon, each creature in the area of the exhalation must make a saving throw, the type of which is is determined by your draconic ancestry. The DC for this saving throw equals 8 + your Constitution modifier + your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level"
-		},
-		"draconic_ancestry": {
-			"name": "Draconic Ancestry",
-			"description": "You choose a draconic ancestry which determines your color, breath weapon damage type, and elemental resistance"
-		},
-		"draconic_ancestry_black": {
-			"name": "Black Draconic Ancestry",
-			"description": "You have Black draconic ancestry. This means your breath weapon does acid damage in a 5 by 30 ft. line (Dex. save). You have resistance to acid damage."
-		},
-		"draconic_ancestry_blue": {
-			"name": "Blue Draconic Ancestry",
-			"description": "You have Blue draconic ancestry. This means your breath weapon does lightning damage in a 5 by 30 ft. line (Dex. save). You have resistance to lightning damage."
-		},
-		"draconic_ancestry_brass": {
-			"name": "Brass Draconic Ancestry",
-			"description": "You have Brass draconic ancestry. This means your breath weapon does fire damage in a 5 by 30 ft. line (Dex. save). You have resistance to fire damage."
-		},
-		"draconic_ancestry_bronze": {
-			"name": "Bronze Draconic Ancestry",
-			"description": "You have Bronze draconic ancestry. This means your breath weapon does lightning damage in a 5 by 30 ft. line (Dex. save). You have resistance to lightning damage."
-		},
-		"draconic_ancestry_copper": {
-			"name": "Copper Draconic Ancestry",
-			"description": "You have Copper draconic ancestry. This means your breath weapon does acid damage in a 5 by 30 ft. line (Dex. save). You have resistance to _element_ damage."
-		},
-		"draconic_ancestry_gold": {
-			"name": "Gold Draconic Ancestry",
-			"description": "You have Gold draconic ancestry. This means your breath weapon does fire damage in a 15 ft. cone (Dex. save). You have resistance to fire damage."
-		},
-		"draconic_ancestry_green": {
-			"name": "Green Draconic Ancestry",
-			"description": "You have Green draconic ancestry. This means your breath weapon does poison damage in a 15 ft. cone (Con. save). You have resistance to poison damage."
-		},
-		"draconic_ancestry_red": {
-			"name": "Red Draconic Ancestry",
-			"description": "You have Red draconic ancestry. This means your breath weapon does fire damage in a 15 ft. cone (Dex. save). You have resistance to fire damage."
-		},
-		"draconic_ancestry_white": {
-			"name": "White Draconic Ancestry",
-			"description": "You have White draconic ancestry. This means your breath weapon does cold damage in a 15 ft. cone (Con. save). You have resistance to cold damage."
-		},
-		"draconic_ancestry_silver": {
-			"name": "Silver Draconic Ancestry",
-			"description": "You have Silver draconic ancestry. This means your breath weapon does cold damage in a 15 ft. cone (Con. save). You have resistance to cold damage."
-		},
-		"draconic_damage_resistance": {
-			"name": "Damage Resistance",
-			"description": "You have resistance to the damage type associated with your draconic ancestry."
-		},
-		"amphibeous": {
-			"name": "Amphibeous",
-			"description": "You can breathe air or water."
-		},
-		"merfolk_swim_speed": {
-			"name": "Merfolk Swim Speed",
-			"description": "You have a swim speed of 30 ft."
-		},
-		"gnome_cunning": {
-			"name": "Gnome Cunning",
-			"description": "You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic."
-		},
-		"skill_versatility": {
-			"name": "Skill Versatility",
-			"description": "You gain proficiency in two skills of your choice."
-		},
-		"natural_illusionist": {
-			"name": "Natural Illusionist",
-			"description": "You know the minor illusion cantrip. Intelligence is your spellcasting ability for it."
-		},
-		"speak_with_small_beasts": {
-			"name": "Speak with Small Beasts",
-			"description": "Through sounds and gestures, you can communicate simple ideas with Small or smaller beasts. Forest gnomes love animals and often keep squirrels, badgers, rabbits, moles, woodpeckers, and other creatures as beloved pets."
-		},
-		"artificers_lore": {
-			"name": "Artificers Lore",
-			"description": "Whenever you make an Intelligence (History) check related to magic items, alchemical objects, or technological devices, you can add twice your proficiency bonus, instead of any proficiency bonus you normally apply."
-		},
-		"tinker": {
-			"name": "Tinker",
-			"description": "You have proficiency with artican's tools (tikder's tools). Using those tools, you can spend 1 hour and 10gp worth of materials to construct a Tiny clockwork device (AC 5, 1 hp). The device ceases to function after 24 hours (unless you spend 1 hour repairing to keep the device functioning), or when you use your action to dismantle it; at that time, you can reclaim the materials used to create it. You can have up to three such devices active at a time."
-		},
-		"moogle_wings": {
-			"name": "Moogle Wings",
-			"description": "Your tiny wings aren't strong enough for flight, but they can help ease your decents. When you fall any distance, you take no falling damage as long as you are not incapacitated, your wings are not obstructed, and you are not wearing heavy armor."
-		},
-		"druid_cantrip": {
-			"name": "Druid Cantrip",
-			"description": "You know one cantrip of your choice from the druid spell list. Wisdom is your spellcasting ability for it."
-		},
-		"wizard_cantrip": {
-			"name": "Wizard Cantrip",
-			"description": "You know one cantrip of your choice from the wizard spell list. Intelligence is your spellcasting ability for it."
-		},
-		"bard_cantrip": {
-			"name": "Bard Cantrip",
-			"description": "You know one cantrip of your choice from the bard spell list. Charisma is your spellcasting ability for it."
-		},
-		"hellish_resistance": {
-			"name": "Hellish Resistance",
-			"description": "You have resistance to fire damage."
-		},
-		"infernal_legacy": {
-			"name": "Infernal Legacy",
-			"description": "You know the thaumaturgy cantrip. Once you reach 3rd level, you can cast the hellish rebuke spell once per day as a 2nd-level spell. Once you reach 5th level, you can also cast the darkness spell once per day. Charisma is your spellcasting ability for these spells."
-		},
-		"vampiric_resistance": {
-			"name": "Vampiric Resistance",
-			"description": "You have resistance to necrotic damage."
-		},
-		"blood_thirst": {
-			"name": "Blood Thirst",
-			"description": "You can drain blood and life energy from a willing creature, or one that is grappled by you, incapacitated, or restrained. Make a melee attack against the target. If you hit, you deal 1 piercing damage and 1d6 necrotic damage. The target’s hit point maximum is reduced by an amount equal to the necrotic damage taken, and you regain hit points equal to that amount. The reduction lasts until the target finishes a long rest. The target dies if this effect reduces its hit point maximum to 0. A humanoid killed in this way becomes a null."
-		},
-		"snow_camouflage": {
-			"name": "Snow Camouflage",
-			"description": "Your white fur and small stature make you hard to spot in snowy conditions. You have advantage on Dexterity (Stealth) checks made to hide in snowy or icy environments."
-		},
-		"kor_climbing": {
-			"name": "Kor Climbing",
-			"description": "You have proficiency in the Athletics and Acrobatics skills. You also have advantage on athletics or acrobatics checks related to climbing"
-		},
-		"grit": {
-			"name": "Grit",
-			"description": "You have resistance to fire damage and psychic damage. In addition, when you are wearing no armor, your AC is equal to 11 + your Dexterity modifier."
-		},
-		"lavastep_grit": {
-			"name": "Lavastep Grit",
-			"description": "You have advantage on Dexterity (Stealth) checks made to hide in rocky or subterranean environments."
-		},
-		"menacing": {
-			"name": "Menacing",
-			"description": "You gain proficiency in the Intimidation skill."
-		},
-		"relentless_endurance": {
-			"name": "Relentless Endurance",
-			"description": "When you are reduced to 0 hit points but not killed outright, you can drop to 1 hit point instead. You can’t use this feature again until you finish a long rest."
-		},
-		"savage_attacks": {
-			"name": "Savage Attacks",
-			"description": "When you score a critical hit with a melee weapon attack, you can roll one of the weapon’s damage dice one additional time and add it to the extra damage of the critical hit."
-		},
-		"template": {
-			"name": "",
-			"description": ""
+		"traits": {
+			"age_group": [
+				"Early adulthood",
+				"Early adulthood",
+				"Early adulthood",
+				"Middle adulthood",
+				"Middle adulthood",
+				"Middle adulthood",
+				"Later adulthood",
+				"Later adulthood",
+				"Eldery years"
+			],
+			"age": {
+				"human": [
+					16,
+					100
+				],
+				"wood elf": [
+					100,
+					750
+				],
+				"high elf": [
+					100,
+					750
+				],
+				"drow": [
+					100,
+					750
+				],
+				"mountain dwarf": [
+					50,
+					350
+				],
+				"hill dwarf": [
+					50,
+					350
+				],
+				"half-orc": [
+					18,
+					75
+				],
+				"half-elf": [
+					18,
+					200
+				],
+				"stout halfling": [
+					20,
+					250
+				],
+				"lightfoot halfling": [
+					20,
+					250
+				],
+				"tiefling": [
+					16,
+					150
+				],
+				"dragonborn": [
+					3,
+					80
+				],
+				"rock gnome": [
+					18,
+					500
+				],
+				"forest gnome": [
+					18,
+					500
+				]
+			},
+			"alignment_lawful": [
+				"Lawful",
+				"Neutral",
+				"Chaotic"
+			],
+			"alignment_moral": [
+				"Good",
+				"Neutral",
+				"Evil"
+			],
+			"alignment_trait": {
+				"lawful_good": [
+					"Has a good moral character (LG)",
+					"Values truth, honor, and the welfare of others (LG)"
+				],
+				"lawful_neutral": [
+					"Acts as law, tradition, or a personal code directs (LN)"
+				],
+				"lawful_evil": [
+					"Cares about tradition, loyalty, and order but not about freedom, dignity, or life (LE)"
+				],
+				"neutral_neutral": [
+					"Does what seems to be a good idea (TN)",
+					"Sees good, evil, law, and chaos as prejudices and dangerous extremes (TN)"
+				],
+				"neutral_evil": [
+					"Is an unscrupulous, self-serving person (NE)",
+					"Will betray friends, family, community, and nation in order to advance (NE)"
+				],
+				"neutral_good": [
+					"Feels that too many laws may unnecessarily restrict the freedom of good beings (NG)",
+					"Believes life and the assurance of other creatures' rights take precedence over all else (NG)"
+				],
+				"chaotic_neutral": [
+					"Values liberty but doesn't strive to protect others' freedom (CN)"
+				],
+				"chaotic_evil": [
+					"Is driven by greed, hatred, and lust for destruction (CE)"
+				],
+				"chaotic_good": [
+					"Believes that freedom is the only means by which each creature can achieve true satisfaction and happiness (CG)"
+				]
+			},
+			"aunts": [
+				"a few aunts",
+				"no aunts",
+				"one aunt",
+				"many aunts"
+			],
+			"bonds": [
+				"Dedicated to fulfilling a personal life goal",
+				"Loyal to a benefactor, patron, or employer",
+				"Captivated by a romantic interest",
+				"Drawn to a special place",
+				"Protective of a sentimental keepsake",
+				"Protective of a valuable possession",
+				"Protective of close family members",
+				"Protective of colleagues or compatriots",
+				"Out for revenge"
+			],
+			"children": [
+				"Multiple children",
+				"No children",
+				"No children",
+				"No children",
+				"No children",
+				"A dead child or children"
+			],
+			"cousins": [
+				"a few cousins",
+				"one cousin",
+				"no cousins",
+				"many cousins"
+			],
+			"distinguishing_marks": [
+				"Distinctive Jewelry",
+				"Piercings",
+				"Missing teeth",
+				"Missing fingers",
+				"An unusual amount of body hair",
+				"A patch over one eye",
+				"Two different eye colors",
+				"Unusual skin color",
+				"A noticeable birthmark",
+				"A noticable mole",
+				"A unique hair color",
+				"A visible scar",
+				"Baldness",
+				"Braided hair",
+				"A nervous eye twitch",
+				"A distinctive nose",
+				"A bent, crooked posture",
+				"An upright, rigid posture",
+				"Exceptional Beauty",
+				"Exceptional Ugliness",
+				"Long hair",
+				"A lot of freckles",
+				"A large hump"
+			],
+			"emotion": [
+				"Anger",
+				"Sadness",
+				"Joy",
+				"Fear",
+				"Disgust",
+				"No expression",
+				"Amusement",
+				"Pity",
+				"Pride",
+				"Shame",
+				"Relaxation",
+				"Envy",
+				"Confusion",
+				"Calmness",
+				"Surprise",
+				"Trust",
+				"Anticipation",
+				"Impatience",
+				"Desire",
+				"Anxiety",
+				"Guilt",
+				"Contempt",
+				"Arousal"
+			],
+			"eye_color": [
+				"Brown",
+				"Dark brown",
+				"Light brown",
+				"Blue",
+				"Bright blue",
+				"Green",
+				"Dark Green",
+				"Hazel",
+				"Red",
+				"Grey",
+				"Black",
+				"Full white",
+				"Unsually colored"
+			],
+			"eye_shape": [
+				"Flat",
+				"Hooded",
+				"Deep-set",
+				"Protruding",
+				"Upturned",
+				"Downturned",
+				"Close-set",
+				"Wide-set"
+			],
+			"family_relationship": [
+				"Close",
+				"Distant",
+				"Hostile"
+			],
+			"flaws": [
+				"Forbidden love",
+				"Susceptibility to romance",
+				"Many debts",
+				"Enjoyment for decadent pleasures",
+				"High level of arrogance",
+				"Envy for another creature's possessions or station",
+				"Overpowering Greed",
+				"Powerful enemy",
+				"Specific phobia",
+				"Cowardly behavior",
+				"Shameful/scandelous history",
+				"Secret crime or misdeed",
+				"Possession of forbidden lore",
+				"Tendency for foolhardy bravery",
+				"Harshe judgement of self and others",
+				"Inflexibility in thinking",
+				"Suspicion of strangers",
+				"Obsession with a goal",
+				"Need to tell meaningless lies",
+				"Competitiveness",
+				"General unreliability",
+				"Desire to be in charge",
+				"Constant intoxication",
+				"Drug addiction",
+				"Missing leg",
+				"Blindness",
+				"Loss of hearing",
+				"Missing eye",
+				"Loss of hair",
+				"Loss of teeth",
+				"Unhappy love life",
+				"Constant appetite"
+			],
+			"gender": [
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Male",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Female",
+				"Gender-neutral"
+			],
+			"hair_color": [
+				"Black",
+				"Black",
+				"Black",
+				"Brown",
+				"Brown",
+				"Brown",
+				"Red",
+				"Red",
+				"Red",
+				"Blonde",
+				"Blonde",
+				"Blonde",
+				"Grey",
+				"Grey",
+				"Grey",
+				"White",
+				"White",
+				"White",
+				"Blue",
+				"Maroon",
+				"Multicolored",
+				"Very little",
+				"No"
+			],
+			"hair_style": [
+				"Long",
+				"Short",
+				"Bald",
+				"Pinned up"
+			],
+			"height": [
+				"Short",
+				"A little short",
+				"Very short",
+				"Extremely short",
+				"Tall",
+				"A little tall",
+				"Very tall",
+				"Extremely tall",
+				"Of an average height",
+				"Of an average height",
+				"Of an average height",
+				"Of an average height",
+				"Of an average height",
+				"Of an average height",
+				"Of an average height",
+				"Of an average height"
+			],
+			"high_ability": {
+				"human": [
+					"strength",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma"
+				],
+				"wood elf": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma"
+				],
+				"high elf": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"charisma"
+				],
+				"drow": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"mountain dwarf": [
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma"
+				],
+				"hill dwarf": [
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"charisma"
+				],
+				"half-orc": [
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma"
+				],
+				"half-elf": [
+					"strength",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"stout halfling": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma"
+				],
+				"lightfoot halfling": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"tiefling": [
+					"strength",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"dragonborn": [
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"rock gnome": [
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"charisma"
+				],
+				"forest gnome": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"charisma"
+				]
+			},
+			"ideals": {
+				"good": [
+					"Beauty",
+					"Charity",
+					"Greater good",
+					"Life",
+					"Respect",
+					"Aspiration",
+					"Discovery",
+					"Glory",
+					"Nation",
+					"Redemption",
+					"Self-knowledge"
+				],
+				"evil": [
+					"Domination",
+					"Greed",
+					"Might",
+					"Pain",
+					"Retribution",
+					"Slaughter",
+					"Aspiration",
+					"Discovery",
+					"Glory",
+					"Nation",
+					"Redemption",
+					"Self-knowledge"
+				],
+				"lawful": [
+					"Community",
+					"Fairness",
+					"Honor",
+					"Logic",
+					"Responsibility",
+					"Tradition",
+					"Power",
+					"Faith",
+					"Aspiration",
+					"Discovery",
+					"Glory",
+					"Nation",
+					"Redemption",
+					"Self-knowledge"
+				],
+				"neutral": [
+					"Balance",
+					"Knowledge",
+					"\"Live and let live\"",
+					"Moderation",
+					"Neutrality",
+					"People",
+					"Aspiration",
+					"Discovery",
+					"Glory",
+					"Nation",
+					"Redemption",
+					"Self-knowledge"
+				],
+				"chaotic": [
+					"Change",
+					"Creativity",
+					"Freedom",
+					"Independence",
+					"No limits",
+					"Whimsy",
+					"Aspiration",
+					"Discovery",
+					"Glory",
+					"Nation",
+					"Redemption",
+					"Self-knowledge"
+				]
+			},
+			"interaction_traits": [
+				"Quarrelsome",
+				"Conceited",
+				"Blustering",
+				"Rude",
+				"Curious",
+				"Friendly",
+				"Truthful",
+				"Direct",
+				"Hot tempered",
+				"Grouchy",
+				"Ponderous",
+				"Quiet",
+				"Suspicious"
+			],
+			"low_ability": {
+				"human": [
+					"strength",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma"
+				],
+				"wood elf": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"high elf": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"drow": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma"
+				],
+				"mountain dwarf": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"hill dwarf": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"half-orc": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"half-elf": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma"
+				],
+				"stout halfling": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"lightfoot halfling": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma"
+				],
+				"tiefling": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma"
+				],
+				"dragonborn": [
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"intelligence",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma"
+				],
+				"rock gnome": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma"
+				],
+				"forest gnome": [
+					"strength",
+					"strength",
+					"strength",
+					"dexterity",
+					"dexterity",
+					"constitution",
+					"constitution",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"wisdom",
+					"wisdom",
+					"charisma",
+					"charisma",
+					"charisma"
+				]
+			},
+			"mannerisms": [
+				"Sings, whistles, or humms quietly",
+				"Talks in rhyme",
+				"Talks in a singing voice",
+				"Brings up religion",
+				"Brings up politics",
+				"Talks about games",
+				"Interrupts other people",
+				"Responds to questions with questions",
+				"Uses a particularly low pitched voice",
+				"Uses a particularly high pitched voice",
+				"Slurs words",
+				"Stutters",
+				"Makes criticisms",
+				"Brags about achievements",
+				"Enunciates overly clearly",
+				"Talks loudly",
+				"Whispers",
+				"Uses flowery speech or long words",
+				"Uses the wrong word",
+				"Uses colorful oaths and exlamations",
+				"Makes jokes or puns",
+				"Is prone to predictions of doom",
+				"Fidgets",
+				"Squints",
+				"Stares into the distance",
+				"Chews something",
+				"Paces",
+				"Taps fingers on nearby objects",
+				"Bites on a fingernail",
+				"Reaches into a pocket"
+			],
+			"maritial_status": [
+				"Married",
+				"Single",
+				"Divorced",
+				"Separated",
+				"Widowed"
+			],
+			"name": {
+				"human_male": [
+					"Bor",
+					"Fodel",
+					"Glar",
+					"Grigor",
+					"Igan",
+					"Ivor",
+					"Kosef",
+					"Mival",
+					"Orel",
+					"Pavel",
+					"Sergor",
+					"Aseir",
+					"Bardeid",
+					"Haseid",
+					"Khemed",
+					"Mehmen",
+					"Sudeiman",
+					"Zasheir",
+					"Darvin",
+					"Dorn",
+					"Evendur",
+					"Gorstag",
+					"Grim",
+					"Helm",
+					"Malark",
+					"Morn",
+					"Randal",
+					"Stedd",
+					"Ander",
+					"Blath",
+					"Bran",
+					"Frath",
+					"Geth",
+					"Lander",
+					"Luth",
+					"Malcer",
+					"Stor",
+					"Taman",
+					"Urth",
+					"Aoth",
+					"Bareris",
+					"Ehput-Ki",
+					"Kethoth",
+					"Mumed",
+					"Ramas",
+					"So-Kehur",
+					"Thazar-De",
+					"Urhur",
+					"Borivik",
+					"Faurgar",
+					"Jandar",
+					"Kanithar",
+					"Madislak",
+					"Ralmevik",
+					"Shaumar",
+					"Vladislak",
+					"An",
+					"Chen",
+					"Chi",
+					"Fai",
+					"Jiang",
+					"Jun",
+					"Lian",
+					"Long",
+					"Meng",
+					"On",
+					"Shan",
+					"Shui",
+					"Wen",
+					"Anton",
+					"Diero",
+					"Marcon",
+					"Pieron",
+					"Rimardo",
+					"Romero",
+					"Salazar",
+					"Umbero"
+				],
+				"human_female": [
+					"Atala",
+					"Ceidil",
+					"Hama",
+					"Jasmal",
+					"Meilil",
+					"Seipora",
+					"Yasheira",
+					"Zasheida",
+					"Alethra",
+					"Kara",
+					"Katernin",
+					"Mara",
+					"Natali",
+					"Olma",
+					"Tana",
+					"Zora",
+					"Arveene",
+					"Esvele",
+					"Jhessail",
+					"Kerri",
+					"Lureene",
+					"Miri",
+					"Rowan",
+					"Shandri",
+					"Tessele",
+					"Amafrey",
+					"Betha",
+					"Cefrey",
+					"Kethra",
+					"Mara",
+					"Olga",
+					"Silifrey",
+					"Westra",
+					"Arizima",
+					"Chathi",
+					"Nephis",
+					"Nulara",
+					"Murithi",
+					"Sefris",
+					"Thola",
+					"Umara",
+					"Zolis",
+					"Fyevarra",
+					"Hulmarra",
+					"Immith",
+					"Imzel",
+					"Navarra",
+					"Shevarra",
+					"Tammith",
+					"Yuldra",
+					"Bai",
+					"Chao",
+					"Jia",
+					"Lei",
+					"Mei",
+					"Qiao",
+					"Shui",
+					"Tai",
+					"Balama",
+					"Dona",
+					"Faila",
+					"Jalana",
+					"Luisa",
+					"Marta",
+					"Quara",
+					"Selise",
+					"Vonda"
+				],
+				"elf_male": [
+					"Adran",
+					"Aelar",
+					"Aramil",
+					"Arannis",
+					"Aust",
+					"Beiro",
+					"Berrian",
+					"Carric",
+					"Enialis",
+					"Erdan",
+					"Erevan",
+					"Galinndan",
+					"Hadarai",
+					"Heian",
+					"Himo",
+					"Immeral",
+					"Ivellios",
+					"Laucian",
+					"Mindartis",
+					"Paelias",
+					"Peren",
+					"Quarion",
+					"Riardon",
+					"Rolen",
+					"Soveliss",
+					"Thamior",
+					"Tharivol",
+					"Theren",
+					"Varis"
+				],
+				"elf_female": [
+					"Adrie",
+					"Althaea",
+					"Anastrianna",
+					"Andraste",
+					"Antinua",
+					"Bethrynna",
+					"Birel",
+					"Caelynn",
+					"Drusilia",
+					"Enna",
+					"Felosial",
+					"Ielenia",
+					"Jelenneth",
+					"Keyleth",
+					"Leshanna",
+					"Lia",
+					"Meriele",
+					"Mialee",
+					"Naivara",
+					"Quelenna",
+					"Quillathe",
+					"Sariel",
+					"Shanairra",
+					"Shava",
+					"Silaqui",
+					"Theirastra",
+					"Thia",
+					"Vadania",
+					"Valanthe",
+					"Xanaphia"
+				],
+				"dwarf_male": [
+					"Adrik",
+					"Alberich",
+					"Baern",
+					"Barendd",
+					"Brottor",
+					"Bruenor",
+					"Dain",
+					"Darrak",
+					"Delg",
+					"Eberk",
+					"Einkil",
+					"Fargrim",
+					"Flint",
+					"Gardain",
+					"Harbek",
+					"Kildrak",
+					"Morgran",
+					"Orsik",
+					"Oskar",
+					"Rangrim",
+					"Rurik",
+					"Taklinn",
+					"Thoradin",
+					"Thorin",
+					"Tordek",
+					"Traubon",
+					"Travok",
+					"Ulfgar",
+					"Veit",
+					"Vondal"
+				],
+				"dwarf_female": [
+					"Amber",
+					"Artin",
+					"Audhild",
+					"Bardryn",
+					"Dagnal",
+					"Diesa",
+					"Eldeth",
+					"Falkrunn",
+					"Finellen",
+					"Gunnloda",
+					"Gurdis",
+					"Helja",
+					"Hlin",
+					"Kathra",
+					"Kristryd",
+					"Ilde",
+					"Liftrasa",
+					"Mardred",
+					"Riswynn",
+					"Sannl",
+					"Torbera",
+					"Torgga",
+					"Vistra"
+				],
+				"half-orc_male": [
+					"Dench",
+					"Feng",
+					"Gell",
+					"Henk",
+					"Holg",
+					"Imsh",
+					"Keth",
+					"Krusk",
+					"Mhurren",
+					"Ront",
+					"Shump",
+					"Thokk"
+				],
+				"half-orc_female": [
+					"Baggi",
+					"Emen",
+					"Engong",
+					"Kansif",
+					"Myev",
+					"Neega",
+					"Ovak",
+					"Ownka",
+					"Shautha",
+					"Sutha",
+					"Vola",
+					"Volen",
+					"Yevelda"
+				],
+				"half-elf_male": [
+					"Bor",
+					"Fodel",
+					"Glar",
+					"Grigor",
+					"Igan",
+					"Ivor",
+					"Kosef",
+					"Mival",
+					"Orel",
+					"Pavel",
+					"Sergor",
+					"Aseir",
+					"Bardeid",
+					"Haseid",
+					"Khemed",
+					"Mehmen",
+					"Sudeiman",
+					"Zasheir",
+					"Darvin",
+					"Dorn",
+					"Evendur",
+					"Gorstag",
+					"Grim",
+					"Helm",
+					"Malark",
+					"Morn",
+					"Randal",
+					"Stedd",
+					"Ander",
+					"Blath",
+					"Bran",
+					"Frath",
+					"Geth",
+					"Lander",
+					"Luth",
+					"Malcer",
+					"Stor",
+					"Taman",
+					"Urth",
+					"Aoth",
+					"Bareris",
+					"Ehput-Ki",
+					"Kethoth",
+					"Mumed",
+					"Ramas",
+					"So-Kehur",
+					"Thazar-De",
+					"Urhur",
+					"Borivik",
+					"Faurgar",
+					"Jandar",
+					"Kanithar",
+					"Madislak",
+					"Ralmevik",
+					"Shaumar",
+					"Vladislak",
+					"An",
+					"Chen",
+					"Chi",
+					"Fai",
+					"Jiang",
+					"Jun",
+					"Lian",
+					"Long",
+					"Meng",
+					"On",
+					"Shan",
+					"Shui",
+					"Wen",
+					"Anton",
+					"Diero",
+					"Marcon",
+					"Pieron",
+					"Rimardo",
+					"Romero",
+					"Salazar",
+					"Umbero",
+					"Adran",
+					"Aelar",
+					"Aramil",
+					"Arannis",
+					"Aust",
+					"Beiro",
+					"Berrian",
+					"Carric",
+					"Enialis",
+					"Erdan",
+					"Erevan",
+					"Galinndan",
+					"Hadarai",
+					"Heian",
+					"Himo",
+					"Immeral",
+					"Ivellios",
+					"Laucian",
+					"Mindartis",
+					"Paelias",
+					"Peren",
+					"Quarion",
+					"Riardon",
+					"Rolen",
+					"Soveliss",
+					"Thamior",
+					"Tharivol",
+					"Theren",
+					"Varis"
+				],
+				"half-elf_female": [
+					"Atala",
+					"Ceidil",
+					"Hama",
+					"Jasmal",
+					"Meilil",
+					"Seipora",
+					"Yasheira",
+					"Zasheida",
+					"Alethra",
+					"Kara",
+					"Katernin",
+					"Mara",
+					"Natali",
+					"Olma",
+					"Tana",
+					"Zora",
+					"Arveene",
+					"Esvele",
+					"Jhessail",
+					"Kerri",
+					"Lureene",
+					"Miri",
+					"Rowan",
+					"Shandri",
+					"Tessele",
+					"Amafrey",
+					"Betha",
+					"Cefrey",
+					"Kethra",
+					"Mara",
+					"Olga",
+					"Silifrey",
+					"Westra",
+					"Arizima",
+					"Chathi",
+					"Nephis",
+					"Nulara",
+					"Murithi",
+					"Sefris",
+					"Thola",
+					"Umara",
+					"Zolis",
+					"Fyevarra",
+					"Hulmarra",
+					"Immith",
+					"Imzel",
+					"Navarra",
+					"Shevarra",
+					"Tammith",
+					"Yuldra",
+					"Bai",
+					"Chao",
+					"Jia",
+					"Lei",
+					"Mei",
+					"Qiao",
+					"Shui",
+					"Tai",
+					"Balama",
+					"Dona",
+					"Faila",
+					"Jalana",
+					"Luisa",
+					"Marta",
+					"Quara",
+					"Selise",
+					"Vonda",
+					"Adrie",
+					"Althaea",
+					"Anastrianna",
+					"Andraste",
+					"Antinua",
+					"Bethrynna",
+					"Birel",
+					"Caelynn",
+					"Drusilia",
+					"Enna",
+					"Felosial",
+					"Ielenia",
+					"Jelenneth",
+					"Keyleth",
+					"Leshanna",
+					"Lia",
+					"Meriele",
+					"Mialee",
+					"Naivara",
+					"Quelenna",
+					"Quillathe",
+					"Sariel",
+					"Shanairra",
+					"Shava",
+					"Silaqui",
+					"Theirastra",
+					"Thia",
+					"Vadania",
+					"Valanthe",
+					"Xanaphia"
+				],
+				"halfling_male": [
+					"Alton",
+					"Ander",
+					"Cade",
+					"Corrin",
+					"Eldon",
+					"Errich",
+					"Finnan",
+					"Garret",
+					"Lindal",
+					"Lyle",
+					"Merric",
+					"Milo",
+					"Osborn",
+					"Perrin",
+					"Reed",
+					"Roscoe",
+					"Wellby"
+				],
+				"halfling_female": [
+					"Andry",
+					"Bree",
+					"Callie",
+					"Cora",
+					"Euphemia",
+					"Jillian",
+					"Kithri",
+					"Lavinia",
+					"Lidda",
+					"Merla",
+					"Nedda",
+					"Paela",
+					"Portia",
+					"Seraphina",
+					"Shaena",
+					"Trym",
+					"Vani",
+					"Verna"
+				],
+				"tiefling_male": [
+					"Akmenos",
+					"Amnon",
+					"Barakas",
+					"Damakos",
+					"Ekemon",
+					"Iados",
+					"Kairon",
+					"Leucis",
+					"Melech",
+					"Mordai",
+					"Morthos",
+					"Pelaios",
+					"Skamos",
+					"Therai",
+					"Art",
+					"Carrion",
+					"Chant",
+					"Creed",
+					"Despair",
+					"Excellence",
+					"Fear",
+					"Glory",
+					"Hope",
+					"Ideal",
+					"Music",
+					"Nowhere",
+					"Open",
+					"Poetry",
+					"Quest",
+					"Random",
+					"Reverence",
+					"Sorrow",
+					"Temerity",
+					"Torment",
+					"Weary"
+				],
+				"tiefling_female": [
+					"Akta",
+					"Anakis",
+					"Bryseis",
+					"Criella",
+					"Damaia",
+					"Ea",
+					"Kallista",
+					"Lerissa",
+					"Makaria",
+					"Nemeia",
+					"Orianna",
+					"Phelaia",
+					"Rieta",
+					"Art",
+					"Carrion",
+					"Chant",
+					"Creed",
+					"Despair",
+					"Excellence",
+					"Fear",
+					"Glory",
+					"Hope",
+					"Ideal",
+					"Music",
+					"Nowhere",
+					"Open",
+					"Poetry",
+					"Quest",
+					"Random",
+					"Reverence",
+					"Sorrow",
+					"Temerity",
+					"Torment",
+					"Weary"
+				],
+				"dragonborn_male": [
+					"Arjhan",
+					"Balasar",
+					"Bharash",
+					"Donaar",
+					"Ghesh",
+					"Heskan",
+					"Kriv",
+					"Medrash",
+					"Mehen",
+					"Nadarr",
+					"Pandjed",
+					"Patrin",
+					"Rhogar",
+					"Shamash",
+					"Shedinn",
+					"Tarhun",
+					"Torinn"
+				],
+				"dragonborn_female": [
+					"Akra",
+					"Biri",
+					"Daar",
+					"Farideh",
+					"Harann",
+					"Flavilar",
+					"Jheri",
+					"Kava",
+					"Korinn",
+					"Mishann",
+					"Nala",
+					"Perra",
+					"Raiann",
+					"Sora",
+					"Surina",
+					"Thava",
+					"Uadjit"
+				],
+				"gnome_male": [
+					"Alston",
+					"Alvyn",
+					"Boddynock",
+					"Brocc",
+					"Burgell",
+					"Dimble",
+					"Eldon",
+					"Erky",
+					"Fonkin",
+					"Frug",
+					"Gerbo",
+					"Gimble",
+					"Glim",
+					"Jebeddo",
+					"Kellen",
+					"Namfoodle",
+					"Orryn",
+					"Roondar",
+					"Seebo",
+					"Sindri",
+					"Warryn",
+					"Wrenn",
+					"Zook",
+					"Aleslosh",
+					"Ashhearth",
+					"Badger",
+					"Cloak",
+					"Doublelock",
+					"Filchbatter",
+					"Fnipper",
+					"Ku",
+					"Nim",
+					"Oneshoe",
+					"Pock",
+					"Sparklegem",
+					"Stumbleduck"
+				],
+				"gnome_female": [
+					"Bimpnottin",
+					"Breena",
+					"Caramip",
+					"Carlin",
+					"Donella",
+					"Duvamil",
+					"Ella",
+					"Ellyjobell",
+					"Ellywick",
+					"Lilli",
+					"Loopmottin",
+					"Lorilla",
+					"Mardnab",
+					"Nissa",
+					"Nyx",
+					"Oda",
+					"Orla",
+					"Roywyn",
+					"Shamil",
+					"Tana",
+					"Waywocket",
+					"Zanna"
+				]
+			},
+			"occupation": {
+				"lower": [
+					"Beggar",
+					"Wanderer",
+					"Prisoner",
+					"Slave",
+					"Criminal",
+					"Urchin",
+					"Drifter",
+					"Outcast",
+					"Scavenger"
+				],
+				"working": [
+					"Alchemist",
+					"Apocathery",
+					"Armorer",
+					"Baker",
+					"Basketweaver",
+					"Blacksmith",
+					"Bookbinder",
+					"Bookseller",
+					"Bowyer",
+					"Brewer",
+					"Butcher",
+					"Card Maker",
+					"Carpenter",
+					"Cartwright",
+					"Clockmaker",
+					"Cobbler",
+					"Constructor",
+					"Cook",
+					"Cooper",
+					"Cutler",
+					"Distiller",
+					"Dyer",
+					"Fletcher",
+					"Gemcutter",
+					"Girdler",
+					"Glassblower",
+					"Glazier",
+					"Glover",
+					"Goldsmith",
+					"Hatmaker",
+					"Horner",
+					"Illuminator",
+					"Knitter",
+					"Locksmith",
+					"Mason",
+					"Miller",
+					"Musical Instrument Maker",
+					"Needlemaker",
+					"Spectacle Maker",
+					"Paper & Ink Maker",
+					"Perfume Maker",
+					"Pewterer",
+					"Pottery Maker",
+					"Rope/Netmaker",
+					"Saddler",
+					"Salt Maker",
+					"Shipwright",
+					"Skinner",
+					"Tailor",
+					"Candler",
+					"Tanner",
+					"Thatcher",
+					"Tiler & Bricklayer",
+					"Tinker",
+					"Tobacconist",
+					"Turner",
+					"Upholder",
+					"Vintner",
+					"Weapon Smith",
+					"Weaver",
+					"Wireworker",
+					"Acrobat",
+					"Adventuerer",
+					"Animal Breeder",
+					"Animal Handler",
+					"Animal Tamer",
+					"Architect",
+					"Artist",
+					"Barber",
+					"Carriage Driver",
+					"Cartographer",
+					"Chimney Sweep",
+					"Clerk",
+					"Councellor",
+					"Dancer",
+					"Dentist",
+					"Drill Instructor",
+					"Entertainer",
+					"Ferrier",
+					"Fisherman",
+					"Forrester",
+					"Fortune Teller",
+					"Fruiterer",
+					"Gambler",
+					"Gardener",
+					"Grain Farmer",
+					"Grave Digger",
+					"Guard",
+					"Guide",
+					"Herald",
+					"Herder",
+					"Hunter",
+					"Innkeeper",
+					"Interpreter",
+					"Jack of all trades",
+					"Juggler",
+					"Landlord",
+					"Launderer",
+					"Logger",
+					"Magician",
+					"Clothier",
+					"Fishmonger",
+					"Fruiterer",
+					"Grocier",
+					"Mercer",
+					"Trader",
+					"Messenger",
+					"Money Lender",
+					"Musician",
+					"Navigator",
+					"Pattenmaker",
+					"Plasterer",
+					"Plumber",
+					"Priest",
+					"Prize fighter",
+					"Rancher",
+					"Rat Catcher",
+					"Sage",
+					"Woodworker",
+					"Scribe",
+					"Server",
+					"Shearer",
+					"Slaver",
+					"Soldier",
+					"Spy",
+					"Stable Hand",
+					"Tavernkeeper",
+					"Teamster",
+					"Trapper",
+					"Tutor",
+					"Gambler",
+					"Veternarian"
+				],
+				"noble": [
+					"Governor",
+					"Courtier",
+					"Noble",
+					"High ranking official",
+					"Wealthy merchant",
+					"Academic",
+					"Steward",
+					"Butler",
+					"Chamberlain",
+					"Chancellor",
+					"Chaplain",
+					"Constable",
+					"Money lender",
+					"Physician",
+					"Sheriff",
+					"Tudor",
+					"Knight"
+				],
+				"royal": {
+					"male": [
+						"King",
+						"Prince",
+						"Duke",
+						"Marquess",
+						"Count",
+						"Viscount",
+						"Baron"
+					],
+					"female": [
+						"Queen",
+						"Princess",
+						"Dutchess",
+						"Marchioness",
+						"Countess",
+						"Viscountess",
+						"Baroness"
+					],
+					"gender-neutral": [
+						"King",
+						"Prince",
+						"Duke",
+						"Marquess",
+						"Count",
+						"Viscount",
+						"Baron"
+					]
+				}
+			},
+			"parents": [
+				"A living mother",
+				"A living father",
+				"No living parents",
+				"Two living parents"
+			],
+			"physique": [
+				"Thin",
+				"Scrawny",
+				"Extremely thin",
+				"Fit",
+				"Muscular",
+				"Very muscular",
+				"Fat",
+				"Extremely fat",
+				"Plump"
+			],
+			"race": [
+				"Human",
+				"Human",
+				"Human",
+				"Human",
+				"Elf",
+				"Elf",
+				"Elf",
+				"Dwarf",
+				"Dwarf",
+				"Dwarf",
+				"Half-elf",
+				"Half-elf",
+				"Half-elf",
+				"Halfling",
+				"Halfling",
+				"Halfling",
+				"Half-Orc",
+				"Half-Orc",
+				"Tiefling",
+				"Dragonborn",
+				"Gnome"
+			],
+			"siblings": [
+				"Multiple brothers and/or sisters",
+				"No siblings",
+				"One brother",
+				"One sister"
+			],
+			"social_class": [
+				"Lower",
+				"Lower",
+				"Lower",
+				"Lower",
+				"Working",
+				"Working",
+				"Working",
+				"Working",
+				"Working",
+				"Working",
+				"Working",
+				"Working",
+				"Noble",
+				"Noble",
+				"Noble",
+				"Royal"
+			],
+			"surname": {
+				"human_male": [
+					"Basha",
+					"Dumein",
+					"Jassan",
+					"Khalid",
+					"Mostana",
+					"Pashar",
+					"Rein",
+					"Amblecrown",
+					"Buckman",
+					"Dundragon",
+					"Evenwood",
+					"Greycastle",
+					"Bersk",
+					"Chernin",
+					"Dotsk",
+					"Kulenov",
+					"Marsk",
+					"Nemetsk",
+					"Shemov",
+					"Starag",
+					"Tallstag",
+					"Brightwood",
+					"Helder",
+					"Hornraven",
+					"Lackman",
+					"Stormwind",
+					"Windrivver",
+					"Ankhalab",
+					"AnskChien",
+					"Huang",
+					"Kao",
+					"Kung",
+					"Lao",
+					"Ling",
+					"Mei",
+					"Pin",
+					"Shin",
+					"Sum",
+					"Tan",
+					"Wanuld",
+					"Fezim",
+					"Hahpet",
+					"Nathandem",
+					"Sepret",
+					"Uuthrakt",
+					"Chergoba",
+					"Dyernina",
+					"Iltazyara",
+					"Murnyethara",
+					"Stayanoga",
+					"Ulmokina",
+					"Agosto",
+					"Astorio",
+					"Calabra",
+					"Domine",
+					"Falone",
+					"Marivaldi",
+					"Pisacar",
+					"Ramondo"
+				],
+				"human_female": [
+					"Basha",
+					"Dumein",
+					"Jassan",
+					"Khalid",
+					"Mostana",
+					"Pashar",
+					"Rein",
+					"Amblecrown",
+					"Buckman",
+					"Dundragon",
+					"Evenwood",
+					"Greycastle",
+					"Bersk",
+					"Chernin",
+					"Dotsk",
+					"Kulenov",
+					"Marsk",
+					"Nemetsk",
+					"Shemov",
+					"Starag",
+					"Tallstag",
+					"Brightwood",
+					"Helder",
+					"Hornraven",
+					"Lackman",
+					"Stormwind",
+					"Windrivver",
+					"Ankhalab",
+					"AnskChien",
+					"Huang",
+					"Kao",
+					"Kung",
+					"Lao",
+					"Ling",
+					"Mei",
+					"Pin",
+					"Shin",
+					"Sum",
+					"Tan",
+					"Wanuld",
+					"Fezim",
+					"Hahpet",
+					"Nathandem",
+					"Sepret",
+					"Uuthrakt",
+					"Chergoba",
+					"Dyernina",
+					"Iltazyara",
+					"Murnyethara",
+					"Stayanoga",
+					"Ulmokina",
+					"Agosto",
+					"Astorio",
+					"Calabra",
+					"Domine",
+					"Falone",
+					"Marivaldi",
+					"Pisacar",
+					"Ramondo"
+				],
+				"elf_male": [
+					"Amakiir (Gemflower)",
+					"Amastacia (Starflower)",
+					"Galanodel (Moonwhisper)",
+					"Holimion (Diamonddew)",
+					"Ilphelkiir (Gemblossom)",
+					"Liadon (Silverfrond)",
+					"Meliamne (Oakenheel)",
+					"Nai'lo (Nightbreeze)",
+					"Siannodel (Moonbrook)",
+					"Xiloscient (Goldpetal)"
+				],
+				"elf_female": [
+					"Amakiir (Gemflower)",
+					"Amastacia (Starflower)",
+					"Galanodel (Moonwhisper)",
+					"Holimion (Diamonddew)",
+					"Ilphelkiir (Gemblossom)",
+					"Liadon (Silverfrond)",
+					"Meliamne (Oakenheel)",
+					"Nai'lo (Nightbreeze)",
+					"Siannodel (Moonbrook)",
+					"Xiloscient (Goldpetal)"
+				],
+				"dwarf_male": [
+					"of Balderk",
+					"of Battlehammer",
+					"of Brawnanvil",
+					"of Dankil",
+					"of Fireforge",
+					"of Frostbeard",
+					"of Gorunn",
+					"of Holderhek",
+					"of Ironfist",
+					"of Loderr",
+					"of Lutgehr",
+					"of Rumnaheim",
+					"of Strakeln",
+					"of Torunn",
+					"of Ungart"
+				],
+				"dwarf_female": [
+					"of Balderk",
+					"of Battlehammer",
+					"of Brawnanvil",
+					"of Dankil",
+					"of Fireforge",
+					"of Frostbeard",
+					"of Gorunn",
+					"of Holderhek",
+					"of Ironfist",
+					"of Loderr",
+					"of Lutgehr",
+					"of Rumnaheim",
+					"of Strakeln",
+					"of Torunn",
+					"of Ungart"
+				],
+				"half-orc_male": [
+					""
+				],
+				"half-orc_female": [
+					""
+				],
+				"half-elf_male": [
+					"Basha",
+					"Dumein",
+					"Jassan",
+					"Khalid",
+					"Mostana",
+					"Pashar",
+					"Rein",
+					"Amblecrown",
+					"Buckman",
+					"Dundragon",
+					"Evenwood",
+					"Greycastle",
+					"Bersk",
+					"Chernin",
+					"Dotsk",
+					"Kulenov",
+					"Marsk",
+					"Nemetsk",
+					"Shemov",
+					"Starag",
+					"Tallstag",
+					"Brightwood",
+					"Helder",
+					"Hornraven",
+					"Lackman",
+					"Stormwind",
+					"Windrivver",
+					"Ankhalab",
+					"AnskChien",
+					"Huang",
+					"Kao",
+					"Kung",
+					"Lao",
+					"Ling",
+					"Mei",
+					"Pin",
+					"Shin",
+					"Sum",
+					"Tan",
+					"Wanuld",
+					"Fezim",
+					"Hahpet",
+					"Nathandem",
+					"Sepret",
+					"Uuthrakt",
+					"Chergoba",
+					"Dyernina",
+					"Iltazyara",
+					"Murnyethara",
+					"Stayanoga",
+					"Ulmokina",
+					"Agosto",
+					"Astorio",
+					"Calabra",
+					"Domine",
+					"Falone",
+					"Marivaldi",
+					"Pisacar",
+					"Ramondo",
+					"Amakiir (Gemflower)",
+					"Amastacia (Starflower)",
+					"Galanodel (Moonwhisper)",
+					"Holimion (Diamonddew)",
+					"Ilphelkiir (Gemblossom)",
+					"Liadon (Silverfrond)",
+					"Meliamne (Oakenheel)",
+					"Nai'lo (Nightbreeze)",
+					"Siannodel (Moonbrook)",
+					"Xiloscient (Goldpetal)"
+				],
+				"half-elf_female": [
+					"Basha",
+					"Dumein",
+					"Jassan",
+					"Khalid",
+					"Mostana",
+					"Pashar",
+					"Rein",
+					"Amblecrown",
+					"Buckman",
+					"Dundragon",
+					"Evenwood",
+					"Greycastle",
+					"Bersk",
+					"Chernin",
+					"Dotsk",
+					"Kulenov",
+					"Marsk",
+					"Nemetsk",
+					"Shemov",
+					"Starag",
+					"Tallstag",
+					"Brightwood",
+					"Helder",
+					"Hornraven",
+					"Lackman",
+					"Stormwind",
+					"Windrivver",
+					"Ankhalab",
+					"AnskChien",
+					"Huang",
+					"Kao",
+					"Kung",
+					"Lao",
+					"Ling",
+					"Mei",
+					"Pin",
+					"Shin",
+					"Sum",
+					"Tan",
+					"Wanuld",
+					"Fezim",
+					"Hahpet",
+					"Nathandem",
+					"Sepret",
+					"Uuthrakt",
+					"Chergoba",
+					"Dyernina",
+					"Iltazyara",
+					"Murnyethara",
+					"Stayanoga",
+					"Ulmokina",
+					"Agosto",
+					"Astorio",
+					"Calabra",
+					"Domine",
+					"Falone",
+					"Marivaldi",
+					"Pisacar",
+					"Ramondo",
+					"Amakiir (Gemflower)",
+					"Amastacia (Starflower)",
+					"Galanodel (Moonwhisper)",
+					"Holimion (Diamonddew)",
+					"Ilphelkiir (Gemblossom)",
+					"Liadon (Silverfrond)",
+					"Meliamne (Oakenheel)",
+					"Nai'lo (Nightbreeze)",
+					"Siannodel (Moonbrook)",
+					"Xiloscient (Goldpetal)"
+				],
+				"halfling_male": [
+					"Brushgather",
+					"Goodbarrel",
+					"Greenbottle",
+					"High-hill",
+					"Hilltopple",
+					"Leagallow",
+					"Tealeaf",
+					"Thorngage",
+					"Tosscobble",
+					"Underbough"
+				],
+				"halfling_female": [
+					"Brushgather",
+					"Goodbarrel",
+					"Greenbottle",
+					"High-hill",
+					"Hilltopple",
+					"Leagallow",
+					"Tealeaf",
+					"Thorngage",
+					"Tosscobble",
+					"Underbough"
+				],
+				"tiefling_male": [
+					""
+				],
+				"tiefling_female": [
+					""
+				],
+				"dragonborn_male": [
+					"of Clethtinthiallor",
+					"of Daardendrian",
+					"of Delmirev",
+					"of Drachedandion",
+					"of Fenkenkabradon",
+					"of Kepeshkmolik",
+					"of Kerrhylon",
+					"of Kimbatuul",
+					"of Linxakasendalor",
+					"of Myastan",
+					"of Nemmonis",
+					"of Norixius",
+					"of Ophinshtalajiir",
+					"of Prexijandilin",
+					"of Shestendeliath",
+					"of Turnuroth",
+					"of Verthisathurgiesh",
+					"of Yarjerit"
+				],
+				"dragonborn_female": [
+					"of Clethtinthiallor",
+					"of Daardendrian",
+					"of Delmirev",
+					"of Drachedandion",
+					"of Fenkenkabradon",
+					"of Kepeshkmolik",
+					"of Kerrhylon",
+					"of Kimbatuul",
+					"of Linxakasendalor",
+					"of Myastan",
+					"of Nemmonis",
+					"of Norixius",
+					"of Ophinshtalajiir",
+					"of Prexijandilin",
+					"of Shestendeliath",
+					"of Turnuroth",
+					"of Verthisathurgiesh",
+					"of Yarjerit"
+				],
+				"gnome_male": [
+					"of Beren",
+					"of Daergel",
+					"of Folkor",
+					"of Garrick",
+					"of Nackle",
+					"of Murnig",
+					"of Ningel",
+					"of Raulnor",
+					"of Scheppen",
+					"of Timbers",
+					"of Turen"
+				],
+				"gnome_female": [
+					"of Beren",
+					"of Daergel",
+					"of Folkor",
+					"of Garrick",
+					"of Nackle",
+					"of Murnig",
+					"of Ningel",
+					"of Raulnor",
+					"of Scheppen",
+					"of Timbers",
+					"of Turen"
+				]
+			},
+			"talents": [
+				"Able to play a musical instrument",
+				"Able to speak several languages fluently",
+				"Able to write beautiful poetry",
+				"Able to draw beautifully",
+				"Able to paint beautifully",
+				"Able to sing beautifully",
+				"Able to drink everyone under the table",
+				"Able to cook very well",
+				"Able to juggle just about anything",
+				"Able to play an instrument",
+				"Able to recognize the tracks of any creature",
+				"Able to win most arguments",
+				"Able to communicate using the thieves' cant",
+				"Able to spot small details at great distances",
+				"Able to accurately appraise wine and spirits by tasting them",
+				"Able to read lips very well",
+				"Blind but has adapted to normal living",
+				"Unbelievably lucky",
+				"The owner of a perfect memory",
+				"The owner of a restaurant",
+				"The owner of a tavern",
+				"Famous for an impressive incident",
+				"Related to a famous hero",
+				"Renowned for stopping a local menace",
+				"Renowned for saved a young child",
+				"Renowned for a craft or product",
+				"Great with animals",
+				"Great with children",
+				"Great at solving puzzles",
+				"Great at one game",
+				"Great at impersonations",
+				"An expert dart thrower and rock skipper",
+				"An expert juggler",
+				"An expert martial artist",
+				"A skilled actor and master of disguise",
+				"A skilled dancer",
+				"A skilled 'sleight of hand' magician",
+				"A skilled pick-pocket",
+				"A skilled story teller"
+			],
+			"uncles": [
+				"a few uncles",
+				"one uncle",
+				"no uncles",
+				"many uncles"
+			],
+			"useful_knowledge": [
+				"Best places in town",
+				"Important quest clue",
+				"Identity of local mystery person",
+				"Insight about their trade or profession",
+				"The latest tavern gossip",
+				"None"
+			]
 		}
 	};
 
 /***/ },
-/* 166 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.FeaturesSheet = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _characterClasses = __webpack_require__(163);
-
-	var _characterClasses2 = _interopRequireDefault(_characterClasses);
-
-	var _backgrounds = __webpack_require__(164);
-
-	var _backgrounds2 = _interopRequireDefault(_backgrounds);
-
-	var _feats = __webpack_require__(165);
-
-	var _feats2 = _interopRequireDefault(_feats);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * CharacterSheet
-	 *
-	 * Represents the output for the character builder form
-	 */
-
-	var FeaturesSheet = exports.FeaturesSheet = function (_React$Component) {
-	  _inherits(FeaturesSheet, _React$Component);
-
-	  function FeaturesSheet(props) {
-	    _classCallCheck(this, FeaturesSheet);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(FeaturesSheet).call(this, props));
-	  }
-
-	  _createClass(FeaturesSheet, [{
-	    key: 'getRacialFeats',
-
-
-	    /**
-	     * getRacialFeats - gets list of features of selected race and subrace
-	     *
-	     * @param  {string} raceName name of chosen race
-	     * @return {react object}          view for list of racial features
-	     */
-	    value: function getRacialFeats(raceName) {
-	      var thisRace = utilities.getObjectByName(_races2.default, raceName);
-	      var feats = [];
-	      var allFeats = [];
-	      var uniqueFeats = [];
-	      var subrace = {};
-	      var i = 0;
-	      var j = -1;
-
-	      if (thisRace.feats && thisRace.feats.length) {
-	        feats = thisRace.feats;
-	      }
-
-	      if (this.props.charData.select_subrace) {
-	        subrace = utilities.getObjectByName(thisRace.subraces, this.props.charData.select_subrace);
-
-	        if (subrace && subrace.feats) {
-	          allFeats = feats.concat(subrace.feats) || feats;
-	          feats = allFeats;
-	        }
-	      }
-
-	      if (this.props.charData.feats) {
-	        allFeats = feats.concat(this.props.charData.feats) || allFeats;
-	        feats = allFeats;
-	      }
-
-	      if (feats) {
-	        for (i in feats) {
-	          if (uniqueFeats.indexOf(feats[i]) === -1) {
-	            if (_feats2.default[feats[i]]) {
-	              uniqueFeats.push(_feats2.default[feats[i]]);
-	            } else {
-	              uniqueFeats.push({
-	                "name": feats[i],
-	                "description": "feat not defined"
-	              });
-	            }
-	          }
-	        }
-	      }
-
-	      if (uniqueFeats) {
-	        return uniqueFeats.map(function (obj) {
-	          j += 1;
-	          return _react2.default.createElement(
-	            'li',
-	            { key: j },
-	            _react2.default.createElement(
-	              'h4',
-	              null,
-	              obj.name
-	            ),
-	            _react2.default.createElement(
-	              'p',
-	              null,
-	              obj.description
-	            )
-	          );
-	        });
-	      }
-	    }
-
-	    /**
-	     * getClassFeats - gets list of features of selected class
-	     *
-	     * @param  {string} heroClass name of chosen class
-	     * @return {react object}          view for list of class features
-	     */
-
-	  }, {
-	    key: 'getClassFeats',
-	    value: function getClassFeats(heroClass) {
-	      var thisClass = utilities.getObjectByName(_characterClasses2.default, heroClass);
-	      var feats = thisClass.feats || [];
-	      var uniqueFeats = [];
-	      var specialty = {};
-	      var allFeats = [];
-	      var i = 0;
-	      var j = -1;
-
-	      if (this.props.charData.select_specialty) {
-	        specialty = utilities.getObjectByName(thisClass.specialties, this.props.charData.select_specialty);
-	        allFeats = feats.concat(specialty.feats) || feats;
-
-	        for (i in allFeats) {
-	          if (uniqueFeats.indexOf(allFeats[i]) === -1) {
-	            uniqueFeats.push(allFeats[i]);
-	          }
-	        }
-	      } else {
-	        for (i in feats) {
-	          if (uniqueFeats.indexOf(feats[i]) === -1) {
-	            uniqueFeats.push(feats[i]);
-	          }
-	        }
-	      }
-
-	      return uniqueFeats.map(function (obj) {
-	        j += 1;
-	        return _react2.default.createElement(
-	          'li',
-	          { key: j },
-	          obj
-	        );
-	      });
-	    }
-
-	    /**
-	     * getBackgroundFeats - gets list of features of selected background
-	     *
-	     * @param  {string} background name of chosen background
-	     * @return {react object}          view for list of background features
-	     */
-
-	  }, {
-	    key: 'getBackgroundFeats',
-	    value: function getBackgroundFeats(background) {
-	      var thisBackground = utilities.getObjectByName(_backgrounds2.default, background);
-	      var feats = thisBackground.feats || [];
-	      var allFeats = [];
-	      var uniqueFeats = [];
-	      var i = 0;
-	      var j = -1;
-
-	      for (i in feats) {
-	        if (uniqueFeats.indexOf(feats[i]) === -1) {
-	          uniqueFeats.push(feats[i]);
-	        }
-	      }
-
-	      if (uniqueFeats) {
-	        return uniqueFeats.map(function (obj) {
-	          j += 1;
-	          return _react2.default.createElement(
-	            'li',
-	            { key: j },
-	            obj
-	          );
-	        });
-	      }
-	    }
-
-	    /**
-	     * render - renders content to the DOM
-	     *
-	     * @return {type}  view for CharacterSheet
-	     */
-
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'features-sheet' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Racial Features'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getRacialFeats(this.props.charData.select_race)
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Class Features'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getClassFeats(this.props.charData.select_class)
-	        ),
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Background Features'
-	        ),
-	        _react2.default.createElement(
-	          'ul',
-	          null,
-	          this.getBackgroundFeats(this.props.charData.select_background)
-	        )
-	      );
-	    }
-	  }]);
-
-	  return FeaturesSheet;
-	}(_react2.default.Component);
-
-/***/ },
-/* 167 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.AbilityScoresSheet = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _characterClasses = __webpack_require__(163);
-
-	var _characterClasses2 = _interopRequireDefault(_characterClasses);
-
-	var _backgrounds = __webpack_require__(164);
-
-	var _backgrounds2 = _interopRequireDefault(_backgrounds);
-
-	var _feats = __webpack_require__(165);
-
-	var _feats2 = _interopRequireDefault(_feats);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * CharacterSheet
-	 *
-	 * Represents the output for the character builder form
-	 */
-
-	var AbilityScoresSheet = exports.AbilityScoresSheet = function (_React$Component) {
-	  _inherits(AbilityScoresSheet, _React$Component);
-
-	  function AbilityScoresSheet(props) {
-	    _classCallCheck(this, AbilityScoresSheet);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(AbilityScoresSheet).call(this, props));
-	  }
-
-	  _createClass(AbilityScoresSheet, [{
-	    key: 'getRaceAbilityScoreBonus',
-
-
-	    /**
-	     * getRaceAbilityScoreBonus - description
-	     *
-	     * @param  {string} ability name of the ability score to return
-	     * @param  {string} race    name of the race to check
-	     * @return {number}         ability score bonus for selected race
-	     */
-	    value: function getRaceAbilityScoreBonus(ability, race) {
-	      var thisRaceData = utilities.getObjectByName(_races2.default, race);
-	      var subraceSelect = document.querySelector('[name=select_subrace]');
-	      var bonus = 0;
-	      var subraceName = "";
-	      var thisSubRaceData = {};
-
-	      if (subraceSelect) {
-	        thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subraceSelect.value);
-	      }
-
-	      if (thisRaceData.ability_score_increase && thisRaceData.ability_score_increase[ability]) {
-	        bonus = Number(thisRaceData.ability_score_increase[ability]) || 0;
-	      }
-
-	      if (thisSubRaceData && thisSubRaceData.ability_score_increase && thisSubRaceData.ability_score_increase[ability]) {
-	        bonus += Number(thisSubRaceData.ability_score_increase[ability]) || 0;
-	      }
-
-	      return Number(bonus);
-	    }
-
-	    /**
-	     * getSelectedAbilityScoreBonus - gets ability score bonuses selected by the user
-	     *
-	     * @param  {string} ability name of the ability score to return
-	     * @return {number}         ability score bonus for selected ability
-	     */
-
-	  }, {
-	    key: 'getSelectedAbilityScoreBonus',
-	    value: function getSelectedAbilityScoreBonus(ability) {
-	      var thisRaceData = this.props.charData;
-	      var bonus = 0;
-
-	      if (thisRaceData && thisRaceData.ability_score_increase && thisRaceData.ability_score_increase[ability]) {
-	        bonus = thisRaceData.ability_score_increase[ability] || 0;
-	      }
-
-	      return Number(bonus);
-	    }
-
-	    /**
-	     * getAbilityScore - gets the total ability score for selected ability
-	     *
-	     * @param  {string} name ability score to return
-	     * @return {number}      total ability score for selected ability from all sources
-	     */
-
-	  }, {
-	    key: 'getAbilityScore',
-	    value: function getAbilityScore(name) {
-	      var base = Number(this.props.charData['ability_score_' + name]) || 0;
-	      var raceBonus = Number(this.getRaceAbilityScoreBonus(name, this.props.charData.select_race)) || 0;
-	      var selectedBonus = Number(this.getSelectedAbilityScoreBonus(name)) || 0;
-
-	      return Number(base + raceBonus + selectedBonus) || 0;
-	    }
-
-	    /**
-	     * getAbilityModifier - gets the ability modifier for an ability score
-	     *
-	     * @param  {string} ability name of the ability modifier to return
-	     * @return {number}         total modifier for the ability score
-	     */
-
-	  }, {
-	    key: 'getAbilityModifier',
-	    value: function getAbilityModifier(ability) {
-	      if (this.props.charData['ability_score_' + ability]) {
-	        if (utilities.getModifier(this.getAbilityScore(ability)) && this.getAbilityScore(ability) > 0) {
-	          return _react2.default.createElement(
-	            'span',
-	            null,
-	            '[Modifier: ',
-	            utilities.getModifier(this.getAbilityScore(ability)),
-	            ']'
-	          );
-	        }
-	      }
-	    }
-
-	    /**
-	     * getAbilityScores - gets the markup for ability scores
-	     *
-	     * @return {react object}  view for the ability scores block
-	     */
-
-	  }, {
-	    key: 'getAbilityScores',
-	    value: function getAbilityScores() {
-	      var selected_race = this.props.charData.select_subrace || this.props.charData.select_race || "";
-	      var score_names = ['str', 'con', 'dex', 'wis', 'int', 'cha'];
-	      var i = 0;
-	      var ability_scores = {};
-	      var race_bonus = {};
-	      var selected_bonus = {};
-	      var base_score = {};
-	      var score_breakdown = "";
-
-	      for (i in score_names) {
-	        base_score[score_names[i]] = this.props.charData['ability_score_' + score_names[i]] || 0;
-	        race_bonus[score_names[i]] = this.getRaceAbilityScoreBonus(score_names[i], this.props.charData.select_race) ? " + " + this.getRaceAbilityScoreBonus(score_names[i], this.props.charData.select_race) : "";
-	        selected_bonus[score_names[i]] = this.getSelectedAbilityScoreBonus(score_names[i]) ? " + " + this.getSelectedAbilityScoreBonus(score_names[i]) : "";
-	        score_breakdown = this.getAbilityScore(score_names[i]) === base_score[score_names[i]] ? "" : " (" + base_score[score_names[i]] + "" + race_bonus[score_names[i]] + "" + selected_bonus[score_names[i]] + ")";
-	        ability_scores[score_names[i]] = this.getAbilityScore(score_names[i]) + score_breakdown;
-	      }
-
-	      return _react2.default.createElement(
-	        'ul',
-	        null,
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Strength:'
-	          ),
-	          ' ',
-	          ability_scores.str,
-	          ' ',
-	          this.getAbilityModifier('str')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Constitution:'
-	          ),
-	          ' ',
-	          ability_scores.con,
-	          ' ',
-	          this.getAbilityModifier('con')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Dexterity:'
-	          ),
-	          ' ',
-	          ability_scores.dex,
-	          ' ',
-	          this.getAbilityModifier('dex')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Wisdom:'
-	          ),
-	          ' ',
-	          ability_scores.wis,
-	          ' ',
-	          this.getAbilityModifier('wis')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Intelligence:'
-	          ),
-	          ' ',
-	          ability_scores.int,
-	          ' ',
-	          this.getAbilityModifier('int')
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { className: 'as-label' },
-	            'Charisma:'
-	          ),
-	          ' ',
-	          ability_scores.cha,
-	          ' ',
-	          this.getAbilityModifier('cha')
-	        )
-	      );
-	    }
-
-	    /**
-	     * render - renders content to the DOM
-	     *
-	     * @return {type}  view for CharacterSheet
-	     */
-
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'ability-scores-sheet' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Ability Scores'
-	        ),
-	        this.getAbilityScores()
-	      );
-	    }
-	  }]);
-
-	  return AbilityScoresSheet;
-	}(_react2.default.Component);
-
-/***/ },
-/* 168 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.ProfileSheet = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _characterClasses = __webpack_require__(163);
-
-	var _characterClasses2 = _interopRequireDefault(_characterClasses);
-
-	var _backgrounds = __webpack_require__(164);
-
-	var _backgrounds2 = _interopRequireDefault(_backgrounds);
-
-	var _feats = __webpack_require__(165);
-
-	var _feats2 = _interopRequireDefault(_feats);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * CharacterSheet
-	 *
-	 * Represents the output for the character builder form
-	 */
-
-	var ProfileSheet = exports.ProfileSheet = function (_React$Component) {
-	  _inherits(ProfileSheet, _React$Component);
-
-	  function ProfileSheet(props) {
-	    _classCallCheck(this, ProfileSheet);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ProfileSheet).call(this, props));
-	  }
-
-	  _createClass(ProfileSheet, [{
-	    key: 'getProfileInfo',
-
-	    /**
-	     * getProfileInfo - gets the markup for profile information
-	     *
-	     * @return {react object} view for the profile information block
-	     */
-	    value: function getProfileInfo() {
-	      var selected_race = this.props.charData.select_subrace || this.props.charData.select_race || "";
-
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Player Name: ',
-	          this.props.charData.player_name
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Character Name: ',
-	          this.props.charData.character_name
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Race: ',
-	          selected_race
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Class: ',
-	          this.props.charData.select_class
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Background: ',
-	          this.props.charData.select_background
-	        ),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          'Alignment: ',
-	          this.props.charData.alignment_lawful,
-	          ' ',
-	          this.props.charData.alignment_moral
-	        )
-	      );
-	    }
-
-	    /**
-	     * render - renders content to the DOM
-	     *
-	     * @return {type}  view for CharacterSheet
-	     */
-
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'profile-sheet' },
-	        this.getProfileInfo()
-	      );
-	    }
-	  }]);
-
-	  return ProfileSheet;
-	}(_react2.default.Component);
-
-/***/ },
-/* 169 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.DropDown = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var DropDown = exports.DropDown = function (_React$Component) {
-	  _inherits(DropDown, _React$Component);
-
-	  function DropDown(props) {
-	    _classCallCheck(this, DropDown);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DropDown).call(this, props));
-
-	    _this.state = {
-	      selection: '',
-	      charData: _this.props.charData
-	    };
-
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(DropDown, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.setState({
-	        selection: e.target.value
-	      });
-
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var concatClasses = this.props.className + " drop-down form-field";
-	      function getChoiceLabel(choices) {
-	        if (choices.label) {
-	          return choices.label;
-	        } else if (choices.name) {
-	          return choices.name;
-	        }
-	        return "";
-	      }
-	      return _react2.default.createElement(
-	        'div',
-	        { className: concatClasses },
-	        _react2.default.createElement(
-	          'select',
-	          { name: this.props.name, value: this.state.selection, onChange: this.onChange },
-	          _react2.default.createElement(
-	            'option',
-	            { value: '', defaultValue: 'selected' },
-	            this.props.label
-	          ),
-	          this.props.choices.map(function (choice) {
-	            return _react2.default.createElement(
-	              'option',
-	              { key: choice.name, 'data-index': choice.id, value: choice.name },
-	              getChoiceLabel(choice)
-	            );
-	          })
-	        )
-	      );
-	    }
-	  }]);
-
-	  return DropDown;
-	}(_react2.default.Component);
-
-/***/ },
-/* 170 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -22412,7 +23058,7 @@
 	}(_react2.default.Component);
 
 /***/ },
-/* 171 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22483,1273 +23129,6 @@
 	  }]);
 
 	  return SubmitButton;
-	}(_react2.default.Component);
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.RaceForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	var _dropDown = __webpack_require__(169);
-
-	var _textInput = __webpack_require__(170);
-
-	var _checkboxGroup = __webpack_require__(173);
-
-	var _submitButton = __webpack_require__(171);
-
-	var _skillsForm = __webpack_require__(174);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var RaceForm = exports.RaceForm = function (_React$Component) {
-	  _inherits(RaceForm, _React$Component);
-
-	  function RaceForm(props) {
-	    _classCallCheck(this, RaceForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RaceForm).call(this, props));
-
-	    _this.state = {};
-	    _this.onChange = _this.onChange.bind(_this);
-	    _this.setLanguageChoice = _this.setLanguageChoice.bind(_this);
-	    _this.setDraconicAncestry = _this.setDraconicAncestry.bind(_this);
-	    _this.skillsForm = new _skillsForm.SkillsForm(props);
-	    return _this;
-	  }
-
-	  _createClass(RaceForm, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.setState({
-	        race: document.querySelector('[name=select_race]').value
-	      });
-
-	      //this.resetRaceData();
-	      this.skillsForm.setSkillChoices(e);
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'setLanguageChoice',
-	    value: function setLanguageChoice(e) {
-	      var languageElems = document.querySelectorAll('[name=select_extra_language]') || [];
-	      var l = languageElems.length;
-	      var index = 0;
-	      var i = 0;
-
-	      this.props.charData.selected_languages = this.props.charData.selected_languages || [];
-	      this.props.charData.proficiencies = this.props.charData.proficiencies || {};
-	      this.props.charData.proficiencies.languages = this.props.charData.proficiencies.languages || [];
-
-	      if (l > 0) {
-	        for (i = 0; i < l; i += 1) {
-	          this.props.charData.selected_languages.push(languageElems[i].value);
-	          this.props.charData.proficiencies.languages.push(languageElems[i].value);
-	        }
-	      } else {
-	        if (this.props.charData.selected_languages) {
-	          l = this.props.charData.selected_languages.length;
-	          for (i = 0; i < l; i += 1) {
-	            index = this.props.charData.proficiencies.languages.indexOf(this.props.charData.selected_languages[i]);
-	            if (index > -1) {
-	              this.props.charData.proficiencies.languages.splice(index, 1);
-	            }
-	            this.props.charData.proficiencies.languages.push('choice');
-	          }
-	        }
-	        this.props.charData.selected_languages = [];
-	      }
-
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'resetRaceData',
-	    value: function resetRaceData(e) {
-	      this.props.charData.proficiencies = {};
-	      this.props.charData.selected_languages = [];
-	      this.props.charData.feats = [];
-	      if (e && e.target && e.target.getAttribute('name') === "select_race") {
-	        this.props.charData.ability_score_increase = {};
-	      }
-	    }
-	  }, {
-	    key: 'getRaceNames',
-	    value: function getRaceNames() {
-	      var raceNames = [];
-	      var race = "";
-
-	      for (race in _races2.default) {
-	        raceNames.push(_races2.default[race]);
-	      }
-
-	      return raceNames;
-	    }
-	  }, {
-	    key: 'setDraconicAncestry',
-	    value: function setDraconicAncestry(e) {
-	      var i = 0;
-	      var l = 0;
-
-	      if (this.props.charData) {
-	        this.props.charData.feats = this.props.charData.feats || [];
-	        l = this.props.charData.feats.length;
-
-	        for (i = 0; i < l; i += 1) {
-	          if (this.props.charData.feats && this.props.charData.feats[i] && this.props.charData.feats[i].indexOf("draconic_ancestry_") > -1) {
-	            this.props.charData.feats.splice(i, 1);
-	          }
-	        }
-
-	        this.props.charData.feats.push("draconic_ancestry_" + e.target.value.toLowerCase());
-	      }
-
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'getDraconicAncestryForm',
-	    value: function getDraconicAncestryForm(thisRaceData) {
-	      var raceName = this.props.charData.select_race;
-	      var draconicAncestryForm = "";
-	      var draconicAncestryChoices = [];
-	      var item = "";
-
-	      if (raceName === "Dragonborn") {
-
-	        for (item in thisRaceData.draconic_ancestry) {
-	          draconicAncestryChoices.push({
-	            id: thisRaceData.draconic_ancestry[item].name,
-	            label: thisRaceData.draconic_ancestry[item].name + " | " + thisRaceData.draconic_ancestry[item].damage_type + " | " + thisRaceData.draconic_ancestry[item].breath_weapon,
-	            name: thisRaceData.draconic_ancestry[item].name
-	          });
-	        }
-	        return _react2.default.createElement(_dropDown.DropDown, { name: 'select_draconic_ancestry', className: 'select-race', label: 'Select Draconic Ancestry', choices: draconicAncestryChoices, onUpdate: this.setDraconicAncestry });
-	      }
-
-	      return false;
-	    }
-	  }, {
-	    key: 'getAbilityScoreChoiceForm',
-	    value: function getAbilityScoreChoiceForm(thisRaceData) {
-	      var raceName = this.props.charData.select_race;
-	      var abilityScores = [{ label: "Strength", name: "ability_score_increase_str", value: 1, id: "str" }, { label: "Constitution", name: "ability_score_increase_con", value: 1, id: "con" }, { label: "Dexterity", name: "ability_score_increase_dex", value: 1, id: "dex" }, { label: "Wisdom", name: "ability_score_increase_wis", value: 1, id: "wis" }, { label: "Intelligence", name: "ability_score_increase_int", value: 1, id: "int" }];
-
-	      if (raceName === "Half-Elf") {
-	        return _react2.default.createElement(_checkboxGroup.CheckBoxGroup, { name: 'half_elf_abilities', label: 'Select Abilities', choices: abilityScores, groupLabel: 'Select Two Abilities', groupName: 'halfelf_ability_score', optionsLimit: thisRaceData.ability_score_choices, onUpdate: this.props.onUpdate });
-	      }
-	    }
-	  }, {
-	    key: 'getLanguageChoiceForm',
-	    value: function getLanguageChoiceForm(thisRaceData) {
-	      var raceName = this.props.charData.select_race;
-	      var subRaceName = this.props.charData.select_subrace;
-	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);;
-	      var languageChoiceForm = "";
-	      var raceIndex = 0;
-	      var subraceIndex = 0;
-
-	      if (thisRaceData) {
-	        raceIndex = thisRaceData.proficiencies.languages.indexOf("choice");
-	        if (thisRaceData.proficiencies.languages && raceIndex > -1) {
-	          languageChoiceForm = _react2.default.createElement(
-	            'div',
-	            null,
-	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language' }),
-	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.setLanguageChoice })
-	          );
-	        } else if (this.props.charData && this.props.charData.proficiences && this.props.charData.proficiences.languages && this.props.charData.proficiences.languages.indexOf('choice') > -1) {
-	          languageChoiceForm = _react2.default.createElement(
-	            'div',
-	            null,
-	            _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language' }),
-	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.setLanguageChoice })
-	          );
-	        }
-
-	        if (thisSubRaceData && thisSubRaceData.proficiencies && thisSubRaceData.proficiencies.languages) {
-	          subraceIndex = thisSubRaceData.proficiencies.languages.indexOf("choice");
-	          if (subraceIndex > -1) {
-	            languageChoiceForm = _react2.default.createElement(
-	              'div',
-	              null,
-	              _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Extra Language', name: 'select_extra_language' }),
-	              _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose', onUpdate: this.setLanguageChoice })
-	            );
-	          }
-	        }
-
-	        if (this.props.charData.selected_languages && this.props.charData.selected_languages.length > 0) {
-	          languageChoiceForm = _react2.default.createElement(
-	            'div',
-	            null,
-	            _react2.default.createElement(_submitButton.SubmitButton, { label: 'Choose a different language', onUpdate: this.setLanguageChoice })
-	          );
-	        }
-	      }
-
-	      return languageChoiceForm;
-	    }
-	  }, {
-	    key: 'getSubraceForm',
-	    value: function getSubraceForm(thisRaceData) {
-	      var raceName = this.props.charData.select_race;
-	      var subRaceName = this.props.charData.select_subrace;
-	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);;
-	      var subraces = thisRaceData.subraces;
-	      var subRaceForm = "";
-
-	      if (thisRaceData) {
-	        if (subraces && subraces.length) {
-	          subRaceForm = _react2.default.createElement(_dropDown.DropDown, { name: 'select_subrace', label: 'Select Subrace', choices: subraces, onUpdate: this.props.onUpdate });
-	        }
-	      }
-
-	      return subRaceForm;
-	    }
-	  }, {
-	    key: 'getThisRaceData',
-	    value: function getThisRaceData() {
-	      var raceName = this.props.charData.select_race;
-	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
-
-	      return thisRaceData;
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var thisRaceData = this.getThisRaceData();
-
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'form-field race-form' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Race'
-	        ),
-	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_race', className: 'select-race', label: 'Select Race', choices: this.getRaceNames(), onUpdate: this.onChange }),
-	        this.getSubraceForm(thisRaceData),
-	        this.getLanguageChoiceForm(thisRaceData),
-	        this.getAbilityScoreChoiceForm(thisRaceData),
-	        this.getDraconicAncestryForm(thisRaceData)
-	      );
-	    }
-	  }]);
-
-	  return RaceForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 173 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.CheckBoxGroup = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var CheckBoxGroup = exports.CheckBoxGroup = function (_React$Component) {
-	  _inherits(CheckBoxGroup, _React$Component);
-
-	  function CheckBoxGroup(props) {
-	    _classCallCheck(this, CheckBoxGroup);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CheckBoxGroup).call(this, props));
-
-	    _this.state = {
-	      selection: ''
-	    };
-
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(CheckBoxGroup, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.setState({
-	        selection: e.target.value
-	      });
-
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'limitOptions',
-	    value: function limitOptions(optionsLimit, id) {
-	      var checkedNumber = document.querySelectorAll('.' + this.props.groupName + ':checked').length || 0;
-	      var thisCheckBox = document.querySelector('.' + this.props.groupName + '[data-id=' + id + ']');
-	      optionsLimit = optionsLimit < 1 ? 1 : optionsLimit;
-
-	      if (thisCheckBox && !thisCheckBox.checked) {
-	        if (checkedNumber >= optionsLimit) {
-	          return "disabled";
-	        }
-	      }
-
-	      return "";
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var _this2 = this;
-
-	      var key = 0;
-	      var chooseText = "";
-
-	      if (this.props.optionsLimit > 0) {
-	        chooseText = "(choose " + this.props.optionsLimit + ")";
-	      }
-
-	      return _react2.default.createElement(
-	        'div',
-	        { className: this.props.cssClass },
-	        _react2.default.createElement(
-	          'h5',
-	          null,
-	          this.props.groupLabel
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          { className: 'info' },
-	          chooseText
-	        ),
-	        this.props.choices.map(function (choice) {
-	          return _react2.default.createElement(
-	            'div',
-	            { key: choice.id },
-	            _react2.default.createElement(
-	              'label',
-	              null,
-	              _react2.default.createElement('input', {
-	                type: 'checkbox',
-	                disabled: _this2.limitOptions(_this2.props.optionsLimit, choice.id),
-	                className: _this2.props.groupName,
-	                defaultChecked: choice.checked,
-	                name: choice.name,
-	                value: choice.value,
-	                'data-id': choice.id,
-	                onClick: _this2.props.onUpdate
-	              }),
-	              ' ',
-	              choice.label
-	            )
-	          );
-	        })
-	      );
-	    }
-	  }]);
-
-	  return CheckBoxGroup;
-	}(_react2.default.Component);
-
-/***/ },
-/* 174 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.SkillsForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _characterClasses = __webpack_require__(163);
-
-	var _characterClasses2 = _interopRequireDefault(_characterClasses);
-
-	var _backgrounds = __webpack_require__(164);
-
-	var _backgrounds2 = _interopRequireDefault(_backgrounds);
-
-	var _checkboxGroup = __webpack_require__(173);
-
-	var _dropDown = __webpack_require__(169);
-
-	var _textInput = __webpack_require__(170);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var SkillsForm = exports.SkillsForm = function (_React$Component) {
-	  _inherits(SkillsForm, _React$Component);
-
-	  function SkillsForm(props) {
-	    _classCallCheck(this, SkillsForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(SkillsForm).call(this, props));
-
-	    _this.state = {};
-
-	    _this.onChange = _this.onChange.bind(_this);
-	    _this.setSkillChoices = _this.setSkillChoices.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(SkillsForm, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'setSkillChoices',
-	    value: function setSkillChoices(e) {
-	      var type = e.target.getAttribute("name");
-	      var proficiency = e.target.value;
-	      var raceName = this.props.charData.select_race || {};
-	      var className = this.props.charData.select_class || {};
-	      var backgroundName = this.props.charData.select_background || {};
-	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
-	      var thisClassData = utilities.getObjectByName(_characterClasses2.default, className);
-	      var thisBackgroundData = utilities.getObjectByName(_backgrounds2.default, backgroundName);
-	      var subRaceName = this.props.charData.select_subrace || "";
-	      var thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, subRaceName);
-	      var subraceProficiencies = thisSubRaceData.proficiencies || {};
-	      console.log(this.props.charData);
-	      this.props.charData.proficiencies = this.props.charData.proficiencies || {};
-	      this.props.charData.proficiencies[type] = this.props.charData.proficiencies[type] || [];
-
-	      if (e.target.getAttribute("name") === "select_subrace") {
-	        thisSubRaceData = utilities.getObjectByName(thisRaceData.subraces, e.target.value);
-	      } else {
-	        thisSubRaceData = {};
-	      }
-
-	      if (e.target.getAttribute("name") === "select_race") {
-	        thisRaceData = utilities.getObjectByName(_races2.default, e.target.value);
-	        thisSubRaceData = {};
-	      }
-
-	      if (e.target.getAttribute("name") === "select_class") {
-	        thisClassData = utilities.getObjectByName(_characterClasses2.default, e.target.value);
-	      }
-
-	      if (e.target.getAttribute('type') === "checkbox") {
-	        if (e.target.checked) {
-	          this.props.charData.proficiencies[type].push(e.target.value);
-	        } else {
-	          if (this.props.charData.proficiencies[type].indexOf(e.target.value) > -1) {
-	            this.props.charData.proficiencies[type].splice(this.props.charData.proficiencies[type].indexOf(proficiency), 1);
-	          }
-	        }
-	      }
-
-	      this.props.charData.proficiencies = Object.assign(this.props.charData.proficiencies, thisRaceData.proficiencies, thisSubRaceData.proficiencies, thisClassData.proficiencies);
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'getSkillChoiceForm',
-	    value: function getSkillChoiceForm() {
-	      var raceName = this.props.charData.select_race || {};
-	      var className = this.props.charData.select_class || {};
-	      var backgroundName = this.props.charData.select_background || {};
-	      var thisRaceData = utilities.getObjectByName(_races2.default, raceName);
-	      var thisClassData = utilities.getObjectByName(_characterClasses2.default, className);
-	      var thisBackgroundData = utilities.getObjectByName(_backgrounds2.default, backgroundName);
-	      var groupName = "select_skills_" + this.props.source;
-	      var skillChoiceForm = _react2.default.createElement('span', null);
-	      var skillChoices = [];
-	      var optionsLimit = 0;
-	      var choiceName = "";
-	      var choice = "";
-	      var item = "";
-	      var thisData = {};
-	      var i = 0;
-	      var j = 0;
-	      var l = 0;
-
-	      thisData.proficiencies = thisData.proficiencies || {};
-	      thisData.proficiencies.skills = thisData.proficiencies.skills || [];
-	      thisData.proficiencies.skills_choice = thisData.proficiencies.skills_choice || [];
-
-	      if (thisRaceData && thisRaceData.proficiencies && thisRaceData.proficiencies.skills) {
-	        thisData.proficiencies.skills = thisData.proficiencies.skills.concat(thisRaceData.proficiencies.skills);
-
-	        if (thisRaceData.proficiencies.skills_choice) {
-	          thisData.proficiencies.skills_choice = thisData.proficiencies.skills_choice.concat(thisRaceData.proficiencies.skills_choice);
-	        }
-	      }
-
-	      if (thisClassData && thisClassData.proficiencies && thisClassData.proficiencies.skills) {
-	        thisData.proficiencies.skills = thisData.proficiencies.skills.concat(thisClassData.proficiencies.skills);
-
-	        if (thisClassData.proficiencies.skills_choice) {
-	          thisData.proficiencies.skills_choice = thisData.proficiencies.skills_choice.concat(thisClassData.proficiencies.skills_choice);
-	        }
-	      }
-
-	      if (thisBackgroundData && thisBackgroundData.proficiencies && thisBackgroundData.proficiencies.skills) {
-	        thisData.proficiencies.skills = thisData.proficiencies.skills.concat(thisBackgroundData.proficiencies.skills);
-
-	        if (thisBackgroundData.proficiencies.skills_choice) {
-	          thisData.proficiencies.skills_choice = thisData.proficiencies.skills_choice.concat(thisBackgroundData.proficiencies.skills_choice);
-	        }
-	      }
-
-	      if (thisData.proficiencies) {
-	        for (item in thisData.proficiencies) {
-	          if (thisData.proficiencies[item].indexOf('choice') > -1) {
-	            choiceName = item + "_choice";
-
-	            if (item !== "languages") {
-	              if (thisData.proficiencies[choiceName]) {
-	                l = thisData.proficiencies[choiceName].length;
-
-	                for (j = 0; j < l; j += 1) {
-	                  choice = thisData.proficiencies[choiceName][j];
-
-	                  skillChoices.push({
-	                    "name": item,
-	                    "label": utilities.titleCase(choice) + " " + utilities.titleCase(item),
-	                    "value": choice,
-	                    "id": choice
-	                  });
-	                }
-	                skillChoiceForm = _react2.default.createElement(_checkboxGroup.CheckBoxGroup, {
-	                  name: 'skill_choice_form',
-	                  label: 'Select Skills',
-	                  choices: skillChoices,
-	                  groupLabel: 'Select Skills',
-	                  groupName: groupName,
-	                  optionsLimit: utilities.countItemInArray(thisData.proficiencies[item], "choice"),
-	                  onUpdate: this.setSkillChoices
-	                });
-	              }
-	            }
-	          }
-	        }
-	      }
-
-	      return skillChoiceForm;
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        this.getSkillChoiceForm()
-	      );
-	    }
-	  }]);
-
-	  return SkillsForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.ClassForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _characterClasses = __webpack_require__(163);
-
-	var _characterClasses2 = _interopRequireDefault(_characterClasses);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	var _dropDown = __webpack_require__(169);
-
-	var _checkboxGroup = __webpack_require__(173);
-
-	var _skillsForm = __webpack_require__(174);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var ClassForm = exports.ClassForm = function (_React$Component) {
-	  _inherits(ClassForm, _React$Component);
-
-	  function ClassForm(props) {
-	    _classCallCheck(this, ClassForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ClassForm).call(this, props));
-
-	    _this.state = {
-	      character_class: ''
-	    };
-	    _this.onChange = _this.onChange.bind(_this);
-	    _this.skillsForm = new _skillsForm.SkillsForm(props);
-	    return _this;
-	  }
-
-	  _createClass(ClassForm, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-
-	      this.setState({
-	        character_class: document.querySelector('[name=select_class]').value
-	      });
-
-	      //this.resetClassData();
-	      this.skillsForm.setSkillChoices(e);
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'resetClassData',
-	    value: function resetClassData(e) {
-	      this.props.charData.proficiencies = {};
-	      this.props.charData.selected_languages = [];
-	      this.props.charData.feats = [];
-	      if (e && e.target && e.target.getAttribute('name') === "select_race") {
-	        this.props.charData.ability_score_increase = {};
-	      }
-	    }
-	  }, {
-	    key: 'getChoices',
-	    value: function getChoices() {
-	      var choices = [];
-	      var character_class = "";
-
-	      for (character_class in _characterClasses2.default) {
-	        choices.push(_characterClasses2.default[character_class]);
-	      }
-
-	      return choices;
-	    }
-	  }, {
-	    key: 'getQuestions',
-	    value: function getQuestions() {
-
-	      switch (this.state.character_class) {
-	        case "Barbarian":
-	          return _react2.default.createElement(
-	            'div',
-	            null,
-	            'This is the barbarian form'
-	          );
-	          break;
-	        case "Ranger":
-	          return _react2.default.createElement(
-	            'div',
-	            null,
-	            'This is the ranger form'
-	          );
-	          break;
-	        default:
-	          return '';
-	      }
-	    }
-	  }, {
-	    key: 'getThisClassData',
-	    value: function getThisClassData() {
-	      var className = this.props.charData.select_class;
-	      var thisClassData = utilities.getObjectByName(_characterClasses2.default, className);
-
-	      return thisClassData;
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var thisClassData = this.getThisClassData();
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'form-field character_class-form' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Class'
-	        ),
-	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_class', label: 'Select Class', choices: this.getChoices(), onUpdate: this.onChange }),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          this.getQuestions()
-	        )
-	      );
-	    }
-	  }]);
-
-	  return ClassForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 176 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.BackgroundForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _backgrounds = __webpack_require__(164);
-
-	var _backgrounds2 = _interopRequireDefault(_backgrounds);
-
-	var _dropDown = __webpack_require__(169);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var BackgroundForm = exports.BackgroundForm = function (_React$Component) {
-	  _inherits(BackgroundForm, _React$Component);
-
-	  function BackgroundForm(props) {
-	    _classCallCheck(this, BackgroundForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BackgroundForm).call(this, props));
-
-	    _this.state = {
-	      background: ''
-	    };
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(BackgroundForm, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.setState({
-	        background: document.querySelector('[name=select_background]').value
-	      });
-	      this.props.onUpdate();
-	    }
-	  }, {
-	    key: 'getChoices',
-	    value: function getChoices() {
-	      var choices = [];
-	      var background = "";
-
-	      for (background in _backgrounds2.default) {
-	        choices.push(_backgrounds2.default[background].name);
-	      }
-
-	      return choices;
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'form-field background-form' },
-	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_background', label: 'Select Background', choices: this.getChoices(), onUpdate: this.onChange }),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          this.getQuestions()
-	        )
-	      );
-	    }
-	  }]);
-
-	  return BackgroundForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 177 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.BackgroundForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _backgrounds = __webpack_require__(164);
-
-	var _backgrounds2 = _interopRequireDefault(_backgrounds);
-
-	var _dropDown = __webpack_require__(169);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var BackgroundForm = exports.BackgroundForm = function (_React$Component) {
-	  _inherits(BackgroundForm, _React$Component);
-
-	  function BackgroundForm(props) {
-	    _classCallCheck(this, BackgroundForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BackgroundForm).call(this, props));
-
-	    _this.state = {
-	      background: ''
-	    };
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(BackgroundForm, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.setState({
-	        background: document.querySelector('[name=select_background]').value
-	      });
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'getChoices',
-	    value: function getChoices() {
-	      var choices = [];
-	      var background = "";
-
-	      for (background in _backgrounds2.default) {
-	        choices.push(_backgrounds2.default[background]);
-	      }
-
-	      return choices;
-	    }
-	  }, {
-	    key: 'getQuestions',
-	    value: function getQuestions() {
-
-	      switch (this.state.background) {
-	        case "Acolyte":
-	          return _react2.default.createElement(
-	            'div',
-	            null,
-	            'This is the Acolyte form'
-	          );
-	          break;
-	        case "Criminal":
-	          return _react2.default.createElement(
-	            'div',
-	            null,
-	            'This is the Criminal form'
-	          );
-	          break;
-	        case "Custom":
-	          return _react2.default.createElement(
-	            'div',
-	            null,
-	            'This is the Custom form'
-	          );
-	        default:
-	          return '';
-	      }
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'form-field background-form' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Background'
-	        ),
-	        _react2.default.createElement(_dropDown.DropDown, { name: 'select_background', label: 'Select Background', choices: this.getChoices(), onUpdate: this.onChange }),
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          this.getQuestions()
-	        )
-	      );
-	    }
-	  }]);
-
-	  return BackgroundForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 178 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.AbilityScoresForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _dropDown = __webpack_require__(169);
-
-	var _textInput = __webpack_require__(170);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var AbilityScoresForm = exports.AbilityScoresForm = function (_React$Component) {
-	  _inherits(AbilityScoresForm, _React$Component);
-
-	  function AbilityScoresForm(props) {
-	    _classCallCheck(this, AbilityScoresForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AbilityScoresForm).call(this, props));
-
-	    _this.state = {
-	      con: 10,
-	      dex: 10,
-	      str: 10,
-	      wis: 10,
-	      int: 10,
-	      cha: 10
-	    };
-
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(AbilityScoresForm, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'getChoices',
-	    value: function getChoices() {
-	      var choices = [];
-	      var ability_score = "";
-
-	      for (ability_score in ability_scoreData) {
-	        choices.push(ability_scoreData[ability_score].name);
-	      }
-
-	      return choices;
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'form-field ability_score-form' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Ability Scores'
-	        ),
-	        _react2.default.createElement(_textInput.TextInput, { type: 'number', label: 'Strength', name: 'ability_score_str', onChange: this.onChange }),
-	        _react2.default.createElement(_textInput.TextInput, { type: 'number', label: 'Constitution', name: 'ability_score_con', onChange: this.onChange }),
-	        _react2.default.createElement(_textInput.TextInput, { type: 'number', label: 'Dexterity', name: 'ability_score_dex', onChange: this.onChange }),
-	        _react2.default.createElement(_textInput.TextInput, { type: 'number', label: 'Wisdom', name: 'ability_score_wis', onChange: this.onChange }),
-	        _react2.default.createElement(_textInput.TextInput, { type: 'number', label: 'Intelligence', name: 'ability_score_int', onChange: this.onChange }),
-	        _react2.default.createElement(_textInput.TextInput, { type: 'number', label: 'Charisma', name: 'ability_score_cha', onChange: this.onChange })
-	      );
-	    }
-	  }]);
-
-	  return AbilityScoresForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 179 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.CharacterDetailsForm = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _characterClasses = __webpack_require__(163);
-
-	var _characterClasses2 = _interopRequireDefault(_characterClasses);
-
-	var _races = __webpack_require__(160);
-
-	var _races2 = _interopRequireDefault(_races);
-
-	var _utilities = __webpack_require__(159);
-
-	var utilities = _interopRequireWildcard(_utilities);
-
-	var _radioGroup = __webpack_require__(180);
-
-	var _textInput = __webpack_require__(170);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var CharacterDetailsForm = exports.CharacterDetailsForm = function (_React$Component) {
-	  _inherits(CharacterDetailsForm, _React$Component);
-
-	  function CharacterDetailsForm(props) {
-	    _classCallCheck(this, CharacterDetailsForm);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(CharacterDetailsForm).call(this, props));
-
-	    _this.state = {
-	      selectedValue: {
-	        moral: 'neutral',
-	        law: 'neutral'
-	      }
-	    };
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(CharacterDetailsForm, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var choices_lawful = [{ "name": "Lawful", "value": "Lawful" }, { "name": "Neutral", "value": "Neutral" }, { "name": "Chaotic", "value": "Chaotic" }];
-	      var choices_moral = [{ "name": "Good", "value": "Good" }, { "name": "Neutral", "value": "Neutral" }, { "name": "Evil", "value": "Evil" }];
-
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'form-field character_class-form' },
-	        _react2.default.createElement(
-	          'h2',
-	          null,
-	          'Character Details'
-	        ),
-	        _react2.default.createElement(
-	          'h3',
-	          null,
-	          'Age'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          this.props.formDescription('age')
-	        ),
-	        _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Age', name: 'select_age' }),
-	        _react2.default.createElement(
-	          'h3',
-	          null,
-	          'Size'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          this.props.formDescription('size')
-	        ),
-	        _react2.default.createElement(_textInput.TextInput, { type: 'text', label: 'Your Size', name: 'select_size' }),
-	        _react2.default.createElement(
-	          'h3',
-	          null,
-	          'Alignment'
-	        ),
-	        _react2.default.createElement(
-	          'p',
-	          null,
-	          this.props.formDescription('alignment')
-	        ),
-	        _react2.default.createElement(_radioGroup.RadioGroup, { groupName: 'alignment_lawful', choices: choices_lawful, onUpdate: this.props.onUpdate }),
-	        _react2.default.createElement(_radioGroup.RadioGroup, { groupName: 'alignment_moral', choices: choices_moral, onUpdate: this.props.onUpdate })
-	      );
-	    }
-	  }]);
-
-	  return CharacterDetailsForm;
-	}(_react2.default.Component);
-
-/***/ },
-/* 180 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.RadioGroup = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var RadioGroup = exports.RadioGroup = function (_React$Component) {
-	  _inherits(RadioGroup, _React$Component);
-
-	  function RadioGroup(props) {
-	    _classCallCheck(this, RadioGroup);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RadioGroup).call(this, props));
-
-	    _this.state = {
-	      selection: 'Dwarf'
-	    };
-
-	    _this.onChange = _this.onChange.bind(_this);
-	    return _this;
-	  }
-
-	  _createClass(RadioGroup, [{
-	    key: 'onChange',
-	    value: function onChange(e) {
-	      this.setState({
-	        selection: e.target.value
-	      });
-	      e.target.customData = {};
-	      e.target.customData.key = this.props.groupName;
-
-	      this.props.onUpdate(e);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var _this2 = this;
-
-	      return _react2.default.createElement(
-	        'div',
-	        { className: this.props.groupName },
-	        _react2.default.createElement(
-	          'h3',
-	          null,
-	          this.props.groupLabel
-	        ),
-	        this.props.choices.map(function (choice) {
-	          return _react2.default.createElement(
-	            'div',
-	            { key: choice.value },
-	            _react2.default.createElement(
-	              'label',
-	              null,
-	              _react2.default.createElement('input', { type: 'radio', className: _this2.props.groupName, name: _this2.props.groupName,
-	                value: choice.value,
-	                checked: _this2.state.selection === choice.value,
-	                onClick: _this2.onChange }),
-	              ' ',
-	              choice.name
-	            )
-	          );
-	        })
-	      );
-	    }
-	  }]);
-
-	  return RadioGroup;
 	}(_react2.default.Component);
 
 /***/ }

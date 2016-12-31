@@ -17,25 +17,24 @@ export class SearchFilter extends React.Component {
   };
 
   filter() {
-      var name = document.querySelector('[name=search_spells]').value;
-      var filters = this.props.context.state.filter || [];
-      var props = this.state.searchFor;
+      var name = document.querySelector('[name=search]').value;
+      var filters = this.props.context.state.additiveFilters || [];
+      var searchFor = this.state.searchFor;
       var newFilters = [];
-      var descriptionSearch = this.props.context.state.descriptionSearch;
 
-      props.forEach(function(key){
+      searchFor.forEach(function(prop){
         var hasFilter = false;
         
-        filters.forEach(function(obj){
-          if (obj.key === key && obj.type === "search") {
+        filters.forEach(function(filter){
+          if (filter.key === prop && filter.type === "search") {
             hasFilter = true;
-            obj.value = name;
+            filter.value = name;
           }
         });
 
         if (!hasFilter) {
           filters.push({
-            "key" : key,
+            "key" : prop,
             "type" : "search",
             "value" : name,
             "usePartialMatch" : true
@@ -46,8 +45,7 @@ export class SearchFilter extends React.Component {
 
       this.props.context.setState({
         spells: this.props.context.state.spells,
-        filter : filters,
-        descriptionSearch : descriptionSearch
+        additiveFilters : filters
       });
 
       this.props.onUpdate();
@@ -55,10 +53,11 @@ export class SearchFilter extends React.Component {
 
   setPropertySearch(e) {
       var isChecked = false;
-      var searchFor = this.state.searchFor;
-      var filters = this.props.context.state.filter || [];
+      var searchFor = this.state.searchFor; // array
+      var filters = this.props.context.state.additiveFilters || [];
       var key = e.target.getAttribute('data-id');
       var i = 0;
+
 
       if (e.target.checked) {
         searchFor.push(key);
@@ -75,15 +74,16 @@ export class SearchFilter extends React.Component {
       this.setState({
         searchFor : searchFor
       });
-      console.log(this.state);
+
       this.filter();
+      this.props.onUpdate();
   } 
   
 
   render() {
 
     return  <div>
-              <TextInput type="text" label="Search" name="search_spells" onChange={this.filter} />
+              <TextInput type="text" label="Search" name="search" onChange={this.filter} />
               <ShowHideButton target={".advanced-search"} showText="+" hideText="-" startClosed="true"/><span>Advanced Search</span>
               <CheckBoxGroup cssClass="advanced-search height-zero" name="search_for_props" label="choices" choices={this.props.searchForChoices} groupLabel="Search In" groupName="search_for_props" onUpdate={this.setPropertySearch} />
             </div>

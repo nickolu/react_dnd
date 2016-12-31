@@ -30,6 +30,7 @@ export class FilterSet extends React.Component {
                   choices={this.props.filterOptions.choices} 
                   multiSelect={multiSelect} 
                   type={type} 
+                  additiveFilters={this.props.additiveFilters}
                   usePartialMatch={usePartialMatch} 
                   onUpdate={this.props.onUpdate}
                   data={this.props.data} 
